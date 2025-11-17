@@ -1,60 +1,58 @@
-import { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Play, Pause } from 'lucide-react';
+import { SoundManager } from '../features/advent/utils/SoundManager';
 
 export function MusicPlayer() {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const soundManager = SoundManager.getInstance();
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleCanPlay = () => {
-      setIsLoaded(true);
-      const duration = audio.duration;
-      const randomStart = Math.random() * Math.max(0, duration - 10);
-      audio.currentTime = randomStart;
-      audio.play().catch((err) => console.log('Autoplay prevented:', err));
+    const initMusic = async () => {
+      await soundManager.init();
     };
-
-    audio.addEventListener('canplaythrough', handleCanPlay);
-
-    return () => {
-      audio.removeEventListener('canplaythrough', handleCanPlay);
-    };
+    initMusic();
   }, []);
 
-  const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+  const togglePlay = () => {
+    if (isPlaying) {
+      soundManager.stopMusic();
+    } else {
+      soundManager.playMusic('/assets/christmas/audio/music/calm-carols.mp3');
     }
+    setIsPlaying(!isPlaying);
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <audio ref={audioRef} loop>
-        <source src="/music.mp3" type="audio/mpeg" />
-      </audio>
+    <div className="fixed bottom-6 right-6 z-50" data-testid="music-player">
+      <button
+        onClick={togglePlay}
+        className="p-4 rounded-full transition-all duration-300 transform hover:scale-125 bg-gradient-to-br from-golden to-peppermint shadow-lg hover:shadow-xl"
+        aria-label={isPlaying ? 'Pause music' : 'Play music'}
+      >
+        {isPlaying ? (
+          <Pause className="w-6 h-6 text-white" />
+        ) : (
+          <Play className="w-6 h-6 text-white" />
+        )}
+      </button>
+    </div>
+  );
+}
+    setIsMuted(!isMuted);
+  };
 
-      {isLoaded && (
-        <button
-          onClick={toggleMute}
-          className="clay-button p-4 rounded-full transition-all duration-300 transform hover:scale-125"
-          style={{
-            background: 'linear-gradient(145deg, #1e3a8a, #0f4c75)',
-            boxShadow: '8px 8px 16px #1a1a2e, -8px -8px 16px #0f4c75, inset 2px 2px 4px rgba(100, 200, 255, 0.4)',
-          }}
-          aria-label={isMuted ? 'Unmute music' : 'Mute music'}
-        >
-          {isMuted ? (
-            <VolumeX className="w-6 h-6 text-cyan-300" />
-          ) : (
-            <Volume2 className="w-6 h-6 text-orange-300" />
-          )}
-        </button>
-      )}
+  return (
+    <div className="fixed bottom-4 right-4 z-50" data-testid="music-player">
+      <button
+        onClick={() => setIsPlaying(!isPlaying)}
+        className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+      >
+        {isPlaying ? (
+          <Pause className="w-6 h-6 text-blue-600" />
+        ) : (
+          <Play className="w-6 h-6 text-blue-600" />
+        )}
+      </button>
     </div>
   );
 }

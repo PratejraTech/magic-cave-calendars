@@ -16,4 +16,9 @@ export interface AdventDay {
   is_opened: boolean;
   opened_at: string | null;
   created_at: string;
+  title?: string;
+  musicUrl?: string;
+  voiceUrl?: string;
+  confettiType?: 'snow' | 'stars' | 'candy' | 'reindeer';
+  unlockEffect?: 'fireworks' | 'snowstorm' | 'aurora' | 'gingerbread';
 }

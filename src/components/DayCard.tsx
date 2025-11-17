@@ -15,12 +15,7 @@ export function DayCard({ day, onOpen, isDecember }: DayCardProps) {
 
   const canOpen = isDecember && new Date().getDate() >= day.id;
 
-  const createParticles = (e: React.MouseEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+  const createParticles = () => {
     const newParticles = [];
 
     for (let i = 0; i < 12; i++) {
@@ -40,10 +35,10 @@ export function DayCard({ day, onOpen, isDecember }: DayCardProps) {
     setTimeout(() => setParticles([]), 800);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = () => {
     if (!canOpen || showContent) return;
 
-    createParticles(e);
+    createParticles();
     setIsOpening(true);
 
     setTimeout(() => {

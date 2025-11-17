@@ -1,6 +1,9 @@
 interface ButterflyProps {
   delay?: number;
   color?: 'blue' | 'orange' | 'pink' | 'lavender';
+  x?: number;
+  y?: number;
+  className?: string;
 }
 
 const colorMap = {
@@ -10,14 +13,16 @@ const colorMap = {
   lavender: 'from-purple-300 to-violet-400',
 };
 
-export function Butterfly({ delay = 0, color = 'blue' }: ButterflyProps) {
+export function Butterfly({ delay = 0, color = 'blue', x, y, className }: ButterflyProps) {
   const gradientClass = colorMap[color];
 
   return (
     <div
-      className="butterfly absolute opacity-70"
+      className={`butterfly absolute opacity-70 ${className || ''}`}
       style={{
         animationDelay: `${delay}s`,
+        left: x,
+        top: y,
       }}
     >
       <div className="butterfly-wings flex gap-1">
