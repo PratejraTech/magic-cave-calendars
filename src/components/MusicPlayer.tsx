@@ -6,7 +6,7 @@ const THEME_TRACK_FILENAME = 'Ben Bohmer, Nils Hoffmann & Malou - Breathing.mp3'
 export const THEME_TRACK_PATH = `/music/${encodeURIComponent(THEME_TRACK_FILENAME)}`;
 const RANDOM_START_WINDOW_SECONDS = 120;
 
-const startThemeFromRandomPoint = async (manager: SoundManager) => {
+export const playThemeAtRandomPoint = async (manager: SoundManager) => {
   const randomStart = Math.floor(Math.random() * RANDOM_START_WINDOW_SECONDS);
   await manager.playMusic(THEME_TRACK_PATH, randomStart);
 };
@@ -27,7 +27,7 @@ export function MusicPlayer() {
     }
 
     try {
-      await startThemeFromRandomPoint(soundManager);
+      await playThemeAtRandomPoint(soundManager);
       setIsPlaying(true);
     } catch (error) {
       setIsPlaying(false);

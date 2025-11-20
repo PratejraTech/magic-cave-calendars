@@ -54,10 +54,15 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
 
   const conversation = useMemo(() => {
     if (messages.length === 0) {
+      const greetings = [
+        'Hi Harper! Daddy is ready for a magical chat!',
+        'Peekaboo Harper! Want to tell Daddy about your sparkle today?',
+        'Hello my sweet explorer! What fun did you discover?',
+      ];
       return [
         {
           role: 'assistant' as const,
-          content: 'Hi Harper! Want to tell Daddy about your magical day?',
+          content: greetings[Math.floor(Math.random() * greetings.length)],
         },
       ];
     }
