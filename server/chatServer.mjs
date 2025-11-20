@@ -38,6 +38,9 @@ const quotesData = JSON.parse(await readFile(quotesPath, 'utf8'));
 
 const memories = new Map();
 const responseCache = new Map();
+const requestBuckets = new Map();
+const RATE_LIMIT_MAX_REQUESTS = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const getMemory = (sessionId) => {
   if (!memories.has(sessionId)) {
     memories.set(
@@ -64,6 +67,20 @@ const pickQuotes = (count = 3) => {
   return shuffled.slice(0, count);
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const checkRateLimit = (bucketKey) => {
+  const now = Date.now();
+  const bucket = requestBuckets.get(bucketKey) || [];
+  const recent = bucket.filter((timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  recent.push(now);
+  requestBuckets.set(bucketKey, recent);
+  return true;
+};
+
 app.post('/api/chat-sessions', async (req, res) => {
   const { sessionId = 'default', timestamp = new Date().toISOString(), message } = req.body || {};
   if (!message) {
@@ -87,6 +104,10 @@ app.post('/api/chat-sessions', async (req, res) => {
 app.post('/api/chat-with-daddy', async (req, res) => {
   try {
     const { messages = [], sessionId = 'default', quotes = [] } = req.body || {};
+    const bucketKey = sessionId || req.ip || 'global';
+    if (!checkRateLimit(bucketKey)) {
+      return res.status(429).json({ error: 'Too many messages. Please wait a moment.' });
+    }
     const llm = new ChatOpenAI({
       modelName: 'gpt-5-mini',
       openAIApiKey: process.env.OPENAI_API_KEY,
@@ -113,7 +134,18 @@ app.post('/api/chat-with-daddy', async (req, res) => {
       return res.json({ reply: responseCache.get(cacheKey) });
     }
 
-    const reply = await llm.invoke(lcMessages);
+    let reply;
+    const maxAttempts = 3;
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      try {
+        reply = await llm.invoke(lcMessages);
+        break;
+      } catch (error) {
+        if (attempt === maxAttempts - 1) throw error;
+        const backoffMs = 500 * 2 ** attempt;
+        await sleep(backoffMs);
+      }
+    }
     const lastUser = messages
       .filter((msg) => msg.role === 'user')
       .slice(-1)[0];
