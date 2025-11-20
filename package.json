@@ -13,7 +13,7 @@
     "chat-server": "node server/chatServer.mjs",
     "dev:fullstack": "concurrently \"npm:chat-server\" \"npm:dev\"",
     "start": "concurrently \"npm run chat-server\" \"npm run preview -- --host\"",
-    "compress:photos": "node scripts/compressPhotos.mjs"
+    "generate:photos": "node scripts/generatePhotoPairs.mjs"
   },
   "dependencies": {
     "@langchain/core": "^0.2.16",

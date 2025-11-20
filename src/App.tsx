@@ -60,6 +60,7 @@ function App() {
           unlockEffect: memory.unlockEffect,
           musicUrl: memory.musicUrl,
           voiceUrl: memory.voiceUrl,
+          photoMarkdownPath: memory.photoMarkdownPath ?? null,
         };
       });
 

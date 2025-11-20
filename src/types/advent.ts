@@ -13,6 +13,7 @@ export interface AdventDay {
   unlockEffect?: UnlockEffect;
   musicUrl?: string;
   voiceUrl?: string;
+  photoMarkdownPath?: string | null;
 }
 
 export interface AdventMemory {
@@ -25,5 +26,6 @@ export interface AdventMemory {
   musicUrl?: string;
   voiceUrl?: string;
   photoPath?: string;
+  photoMarkdownPath?: string | null;
   surpriseVideoUrl?: string;
 }

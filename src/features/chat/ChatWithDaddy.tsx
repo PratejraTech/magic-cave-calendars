@@ -8,7 +8,7 @@ import {
   logChatInput,
 } from './chatService';
 import { CHAT_SYSTEM_PROMPT } from './systemPrompt';
-import { adventMemories } from '../../data/adventMemories';
+import { photoPairs } from '../../data/photoPairs.generated';
 import { SoundManager } from '../advent/utils/SoundManager';
 import { playThemeAtRandomPoint, THEME_TRACK_PATH } from '../../components/MusicPlayer';
 
@@ -71,9 +71,8 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
   }, [messages]);
 
   const getRandomPhoto = () => {
-    if (!adventMemories.length) return undefined;
-    const randomDay = adventMemories[Math.floor(Math.random() * adventMemories.length)];
-    return randomDay.photo_url || randomDay.photoPath;
+    if (!photoPairs.length) return undefined;
+    return photoPairs[Math.floor(Math.random() * photoPairs.length)].image;
   };
 
   const sendMessage = async () => {

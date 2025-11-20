@@ -1,6 +1,6 @@
 import type { AdventMemory } from '../types/advent';
 import { getPhotoPath } from '../lib/localImageStore';
-import { generatedPhotoManifest } from './photoManifest.generated';
+import { photoPairs } from './photoPairs.generated';
 
 const titleSeeds = [
   'Butterfly Meadow Parade',
@@ -43,35 +43,36 @@ const voiceClips = [
 const TOTAL_DAYS = 25;
 const dayNumbers = Array.from({ length: TOTAL_DAYS }, (_, index) => index + 1);
 
-const randomPhotoPool = Object.values(generatedPhotoManifest);
-
-const resolvePhotoForDay = (dayIndex: number, defaultDay: number) => {
-  if (randomPhotoPool.length > 0) {
-    return randomPhotoPool[dayIndex % randomPhotoPool.length];
-  }
-  return getPhotoPath(defaultDay);
+const resolvePairEntry = (index: number) => {
+  if (!photoPairs.length) return null;
+  return photoPairs[index % photoPairs.length];
 };
 
-export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => ({
-  id: day,
-  title: `${titleSeeds[index % titleSeeds.length]} (Day ${day})`,
-  message: messageSeeds[index % messageSeeds.length](day),
-  confettiType: confettiCycle[index % confettiCycle.length],
-  unlockEffect: unlockCycle[index % unlockCycle.length],
-  palette: paletteCycle[index % paletteCycle.length],
-  musicUrl: musicTracks[index % musicTracks.length],
-  voiceUrl: voiceClips[index % voiceClips.length],
-  photoPath: resolvePhotoForDay(index, day),
-  surpriseVideoUrl:
-    index < 4
-      ? [
-          'https://www.youtube.com/embed/DXePdez8NcM?rel=0',
-          'https://www.youtube.com/embed/bqjyTjdVfsA?rel=0',
-          'https://www.youtube.com/embed/7jlxxG253ZQ?rel=0',
-          'https://www.youtube.com/embed/mSw0nmOnd7s?list=RDmSw0nmOnd7s',
-        ][index]
-      : undefined,
-}));
+export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => {
+  const pairEntry = resolvePairEntry(index);
+
+  return {
+    id: day,
+    title: `${titleSeeds[index % titleSeeds.length]} (Day ${day})`,
+    message: messageSeeds[index % messageSeeds.length](day),
+    confettiType: confettiCycle[index % confettiCycle.length],
+    unlockEffect: unlockCycle[index % unlockCycle.length],
+    palette: paletteCycle[index % paletteCycle.length],
+    musicUrl: musicTracks[index % musicTracks.length],
+    voiceUrl: voiceClips[index % voiceClips.length],
+    photoPath: pairEntry?.image ?? getPhotoPath(day),
+    photoMarkdownPath: pairEntry?.markdown ?? null,
+    surpriseVideoUrl:
+      index < 4
+        ? [
+            'https://www.youtube.com/embed/DXePdez8NcM?rel=0',
+            'https://www.youtube.com/embed/bqjyTjdVfsA?rel=0',
+            'https://www.youtube.com/embed/7jlxxG253ZQ?rel=0',
+            'https://www.youtube.com/embed/mSw0nmOnd7s?list=RDmSw0nmOnd7s',
+          ][index]
+        : undefined,
+  };
+});
 
 export const memoryTexts: Array<{ day: number; message: string }> = adventMemories.map(
   ({ id, message }) => ({
