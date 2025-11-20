@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const MESSAGE = 'I Love You Harper, Dad';
+const MESSAGE = 'I Love You, Harper - Daddy';
 const STREAM_INTERVAL_MS = 10000;
 const LETTER_DELAY_MS = 120;
 

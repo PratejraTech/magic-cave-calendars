@@ -19,6 +19,7 @@ function App() {
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const soundManager = SoundManager.getInstance();
+  const forceUnlock = import.meta.env.VITE_FORCE_UNLOCK === 'true';
   const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
 
   const sortOpenedDays = useCallback((opened: AdventDay[]) => {
@@ -38,13 +39,13 @@ function App() {
       const openedMap = loadOpenedDayMap();
 
       const preparedDays: AdventDay[] = adventMemories.map((memory) => {
-        const openedAt = openedMap[memory.id] ?? null;
+        const openedAt = forceUnlock ? null : openedMap[memory.id] ?? null;
         return {
           id: memory.id,
           title: memory.title,
           message: memory.message,
           photo_url: getImageForDay(memory.id, memory.palette),
-          is_opened: Boolean(openedAt),
+          is_opened: forceUnlock ? false : Boolean(openedAt),
           opened_at: openedAt,
           created_at: new Date(Date.UTC(2023, 11, memory.id)).toISOString(),
           confettiType: memory.confettiType,
@@ -77,7 +78,9 @@ function App() {
 
   const handleOpenDay = (dayId: number) => {
     const openedAt = new Date().toISOString();
-    persistOpenedDay(dayId, openedAt);
+    if (!forceUnlock) {
+      persistOpenedDay(dayId, openedAt);
+    }
 
     let openedDay: AdventDay | null = null;
     setDays((prevDays) =>
@@ -128,11 +131,18 @@ function App() {
 
   const ensureMusicPlaying = () => {
     soundManager.init().then(() => {
-      if (!soundManager.isMusicPlaying()) {
-        playThemeAtRandomPoint(soundManager);
-      } else {
-        soundManager.playMusic(THEME_TRACK_PATH);
-      }
+      const startMusic = async () => {
+        try {
+          if (!soundManager.isMusicPlaying()) {
+            await playThemeAtRandomPoint(soundManager);
+          } else {
+            await soundManager.playMusic(THEME_TRACK_PATH);
+          }
+        } catch {
+          // Autoplay prevented; will retry on next interaction
+        }
+      };
+      startMusic();
     });
   };
 

@@ -25,6 +25,8 @@ export class SoundManager {
     this.musicPlayer = new Audio();
     this.musicPlayer.loop = true;
     this.musicPlayer.volume = 0.3;
+    this.musicPlayer.preload = 'auto';
+    this.musicPlayer.playsInline = true;
   }
 
   static getInstance(): SoundManager {
@@ -47,6 +49,12 @@ export class SoundManager {
       this.isInitialized = true;
     } catch (error) {
       console.warn('Failed to initialize AudioContext:', error);
+    }
+  }
+
+  private async resumeContext() {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
     }
   }
 
@@ -78,10 +86,12 @@ export class SoundManager {
     source.connect(gainNode);
     gainNode.connect(this.audioContext.destination);
 
-    source.start();
+    this.resumeContext()
+      .then(() => source.start())
+      .catch(() => source.start());
   }
 
-  playMusic(url: string, startTime?: number) {
+  async playMusic(url: string, startTime?: number) {
     const hasSameSource = this.musicPlayer.src.endsWith(url);
     if (!hasSameSource) {
       this.musicPlayer.src = url;
@@ -90,7 +100,8 @@ export class SoundManager {
     if (startTime !== undefined) {
       this.musicPlayer.currentTime = startTime;
     }
-    this.musicPlayer.play().catch(err => console.log('Autoplay prevented:', err));
+    await this.resumeContext();
+    await this.musicPlayer.play();
   }
 
   duckMusic(duration = 1000) {

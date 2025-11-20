@@ -7,33 +7,54 @@ const RANDOM_START_WINDOW_SECONDS = 120;
 
 export const playThemeAtRandomPoint = (manager: SoundManager) => {
   const randomStart = Math.floor(Math.random() * RANDOM_START_WINDOW_SECONDS);
-  manager.playMusic(THEME_TRACK_PATH, randomStart);
+  return manager.playMusic(THEME_TRACK_PATH, randomStart);
 };
 
 export function MusicPlayer() {
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const soundManager = SoundManager.getInstance();
 
-  const startAtRandomPoint = useCallback(() => {
-    playThemeAtRandomPoint(soundManager);
+  const startAtRandomPoint = useCallback(async () => {
+    await playThemeAtRandomPoint(soundManager);
   }, [soundManager]);
 
   useEffect(() => {
+    let isMounted = true;
     const initMusic = async () => {
       await soundManager.init();
-      startAtRandomPoint();
+      try {
+        await startAtRandomPoint();
+        if (isMounted) setIsPlaying(true);
+      } catch {
+        if (isMounted) setIsPlaying(false);
+      }
     };
+
     initMusic();
+
+    const unlockAudio = () => {
+      initMusic();
+      window.removeEventListener('pointerdown', unlockAudio);
+    };
+
+    window.addEventListener('pointerdown', unlockAudio);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('pointerdown', unlockAudio);
+    };
   }, [soundManager, startAtRandomPoint]);
 
   const togglePlay = () => {
     if (isPlaying) {
       soundManager.stopMusic();
       setIsPlaying(false);
-    } else {
-      startAtRandomPoint();
-      setIsPlaying(true);
+      return;
     }
+
+    startAtRandomPoint()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false));
   };
 
   return (

@@ -47,9 +47,9 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
     }
     soundManager.init().then(() => {
       if (!soundManager.isMusicPlaying()) {
-        playThemeAtRandomPoint(soundManager);
+        playThemeAtRandomPoint(soundManager).catch(() => undefined);
       } else {
-        soundManager.playMusic(THEME_TRACK_PATH);
+        soundManager.playMusic(THEME_TRACK_PATH).catch(() => undefined);
       }
     });
   }, [isOpen, soundManager]);
