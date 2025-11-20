@@ -41,7 +41,6 @@ const defaultProps = () => ({
   day: createAdventDay(),
   onOpen: vi.fn(),
   canOpen: true,
-  position: { x: 0, y: 0 },
 });
 
 describe('HouseCard', () => {

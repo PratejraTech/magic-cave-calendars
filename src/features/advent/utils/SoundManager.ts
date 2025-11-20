@@ -1,11 +1,24 @@
 import { gsap } from 'gsap';
 
+type ExtendedWindow = Window &
+  typeof globalThis & {
+    webkitAudioContext?: typeof AudioContext;
+  };
+
+const getAudioContextConstructor = (): typeof AudioContext | undefined => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+  const extendedWindow = window as ExtendedWindow;
+  return window.AudioContext || extendedWindow.webkitAudioContext;
+};
+
 export class SoundManager {
   private static instance: SoundManager;
   private audioContext: AudioContext | null = null;
   private sounds: Map<string, AudioBuffer> = new Map();
   private musicPlayer: HTMLAudioElement;
-  private currentMusic: string = '';
+  private currentMusic = '';
   private isInitialized = false;
 
   private constructor() {
@@ -23,11 +36,17 @@ export class SoundManager {
 
   async init() {
     if (this.isInitialized) return;
+    const AudioContextConstructor = getAudioContextConstructor();
+    if (!AudioContextConstructor) {
+      console.warn('Web Audio API not supported in this environment');
+      return;
+    }
+
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.audioContext = new AudioContextConstructor();
       this.isInitialized = true;
     } catch (error) {
-      console.warn('Web Audio API not supported:', error);
+      console.warn('Failed to initialize AudioContext:', error);
     }
   }
 
@@ -63,9 +82,11 @@ export class SoundManager {
   }
 
   playMusic(url: string, startTime?: number) {
-    if (this.currentMusic === url) return;
+    const hasSameSource = this.musicPlayer.src.endsWith(url);
+    if (!hasSameSource) {
+      this.musicPlayer.src = url;
+    }
     this.currentMusic = url;
-    this.musicPlayer.src = url;
     if (startTime !== undefined) {
       this.musicPlayer.currentTime = startTime;
     }
@@ -80,6 +101,7 @@ export class SoundManager {
   stopMusic() {
     this.musicPlayer.pause();
     this.musicPlayer.currentTime = 0;
+    this.currentMusic = '';
   }
 
   getCurrentMusic() {

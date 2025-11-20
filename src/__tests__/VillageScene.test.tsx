@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { VillageScene } from '../features/advent/components/VillageScene';
 import { createAdventDay } from './testUtils';
+import type { AdventDay } from '../types/advent';
 
 const mockLoadSound = vi.fn();
 
@@ -16,7 +17,7 @@ vi.mock('../features/advent/utils/SoundManager', () => ({
 }));
 
 vi.mock('../features/advent/components/HouseCard', () => ({
-  HouseCard: ({ day, onOpen }: any) => (
+  HouseCard: ({ day, onOpen }: { day: AdventDay; onOpen: (dayId: number) => void }) => (
     <button data-testid={`day-${day.id}`} onClick={() => onOpen(day.id)}>
       Day {day.id}
     </button>
@@ -56,7 +57,7 @@ describe('VillageScene', () => {
   it('renders the village heading and house buttons', () => {
     render(<VillageScene days={mockDays} onOpenDay={vi.fn()} isDecember />);
 
-    expect(screen.getByText('Magical Christmas Village')).toBeInTheDocument();
+    expect(screen.getByText(/Harper's Xmas Village/i)).toBeInTheDocument();
     expect(screen.getAllByTestId(/^day-/)).toHaveLength(2);
     expect(mockLoadSound).toHaveBeenCalledWith('door-creak', expect.any(String));
   });

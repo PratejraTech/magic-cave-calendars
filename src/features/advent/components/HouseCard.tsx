@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { gsap } from 'gsap';
-import { AdventDay } from '../../../lib/supabase';
+import { AdventDay } from '../../../types/advent';
 import { ConfettiSystem } from '../utils/ConfettiSystem';
 import { SoundManager } from '../utils/SoundManager';
 
@@ -9,10 +9,9 @@ interface HouseCardProps {
   day: AdventDay;
   onOpen: (dayId: number) => void;
   canOpen: boolean;
-  position: { x: number; y: number };
 }
 
-export function HouseCard({ day, onOpen, canOpen, position }: HouseCardProps) {
+export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
   const [isOpened, setIsOpened] = useState(day.is_opened);
   const doorRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
@@ -20,7 +19,7 @@ export function HouseCard({ day, onOpen, canOpen, position }: HouseCardProps) {
 
   useEffect(() => {
     soundManager.init();
-  }, []);
+  }, [soundManager]);
 
   const handleClick = async () => {
     if (!canOpen || isOpened) return;
@@ -65,12 +64,8 @@ export function HouseCard({ day, onOpen, canOpen, position }: HouseCardProps) {
   return (
     <motion.div
       ref={doorRef}
-      className="absolute cursor-pointer"
-      style={{
-        left: position.x,
-        top: position.y,
-        transformStyle: 'preserve-3d'
-      }}
+      className="w-full cursor-pointer flex justify-center"
+      style={{ transformStyle: 'preserve-3d' }}
       animate={controls}
       whileHover={{ scale: canOpen ? 1.1 : 1 }}
       whileTap={{ scale: 0.95 }}

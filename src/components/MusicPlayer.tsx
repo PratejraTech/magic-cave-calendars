@@ -1,25 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { SoundManager } from '../features/advent/utils/SoundManager';
 
+const THEME_TRACK_PATH = '/music/harper-theme.mp3';
+const RANDOM_START_WINDOW_SECONDS = 120;
+
 export function MusicPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const soundManager = SoundManager.getInstance();
+
+  const startAtRandomPoint = useCallback(() => {
+    const randomStart = Math.floor(Math.random() * RANDOM_START_WINDOW_SECONDS);
+    soundManager.playMusic(THEME_TRACK_PATH, randomStart);
+  }, [soundManager]);
 
   useEffect(() => {
     const initMusic = async () => {
       await soundManager.init();
+      startAtRandomPoint();
     };
     initMusic();
-  }, []);
+  }, [soundManager, startAtRandomPoint]);
 
   const togglePlay = () => {
     if (isPlaying) {
       soundManager.stopMusic();
+      setIsPlaying(false);
     } else {
-      soundManager.playMusic('/assets/christmas/audio/music/calm-carols.mp3');
+      startAtRandomPoint();
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   };
 
   return (

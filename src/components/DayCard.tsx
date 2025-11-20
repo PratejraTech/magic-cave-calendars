@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { AdventDay } from '../lib/supabase';
+import { AdventDay } from '../types/advent';
 
 interface DayCardProps {
   day: AdventDay;

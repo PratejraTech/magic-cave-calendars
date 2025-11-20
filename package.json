@@ -12,7 +12,6 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4",
     "canvas-confetti": "^1.9.3",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",

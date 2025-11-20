@@ -3,19 +3,24 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import AdventCalendar from './AdventCalendar';
 import * as dateLib from '../../lib/date';
 import React from 'react';
-import { AdventDay } from '../../lib/supabase';
+import { AdventDay } from '../../types/advent';
 
 // Mock framer-motion to disable animations in tests
 vi.mock('framer-motion', async () => {
-  const actual = await vi.importActual<any>('framer-motion');
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+
+  type DivProps = React.ComponentProps<typeof actual.motion.div>;
+  type SpanProps = React.ComponentProps<typeof actual.motion.span>;
+  type PathProps = React.ComponentProps<typeof actual.motion.path>;
+
   return {
     ...actual,
-    AnimatePresence: ({ children }: { children?: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
     motion: {
       ...actual.motion,
-      div: React.forwardRef<any, any>((props, ref) => React.createElement('div', { ...props, ref })),
-      span: React.forwardRef<any, any>((props, ref) => React.createElement('span', { ...props, ref })),
-      path: React.forwardRef<any, any>((props, ref) => React.createElement('path', { ...props, ref })),
+      div: React.forwardRef<HTMLDivElement, DivProps>((props, ref) => <div {...props} ref={ref} />),
+      span: React.forwardRef<HTMLSpanElement, SpanProps>((props, ref) => <span {...props} ref={ref} />),
+      path: React.forwardRef<SVGPathElement, PathProps>((props, ref) => <path {...props} ref={ref} />),
     },
   };
 });
@@ -24,6 +29,7 @@ const createMockDays = (): AdventDay[] =>
   Array.from({ length: 25 }, (_, index) => ({
     id: index + 1,
     message: `Message ${index + 1}`,
+    title: `Day ${index + 1}`,
     photo_url: 'https://via.placeholder.com/400x300',
     is_opened: false,
     opened_at: null,

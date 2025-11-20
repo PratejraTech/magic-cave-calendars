@@ -2,13 +2,7 @@ import React, { useState } from 'react';
 import { getAdelaideDate } from '../../lib/date';
 import { Butterfly } from '../../components/Butterfly';
 import Modal from '../../components/Modal';
-import { AdventDay } from '../../lib/supabase';
-
-interface Memory {
-  title: string;
-  text: string;
-  photo: string;
-}
+import { AdventDay } from '../../types/advent';
 
 interface AdventCalendarProps {
   days: AdventDay[];
@@ -16,32 +10,18 @@ interface AdventCalendarProps {
 }
 
 const AdventCalendar: React.FC<AdventCalendarProps> = ({ days, onOpenDay }) => {
-  const [isAnimating, setIsAnimating]   = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [selectedMemory, setSelectedMemory] = useState<AdventDay | null>(null);
 
   const currentDate = getAdelaideDate();
   const currentDay = currentDate.getDate();
   const currentMonth = currentDate.getMonth();
 
-  const memories: { [key: number]: Memory } = {
-    1: {
-      title: 'A Special Day',
-      text: 'This is a beautiful memory from a special day.',
-      photo: 'https://via.placeholder.com/400x300',
-    },
-    // Add more memories for each day here
-  };
-
   const handleButtonClick = (day: AdventDay) => {
     onOpenDay(day.id);
     setIsAnimating(true);
-    const memory = memories[day.id] || {
-      title: `Day ${day.id}`,
-      text: 'A placeholder memory for this day.',
-      photo: 'https://via.placeholder.com/400x300',
-    };
-    setSelectedMemory(memory);
+    setSelectedMemory(day);
   };
 
   const onAnimationComplete = () => {
@@ -61,9 +41,9 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({ days, onOpenDay }) => {
         <Modal
           isOpen={isModalOpen}
           onClose={closeModal}
-          title={selectedMemory.title}
-          text={selectedMemory.text}
-          photo={selectedMemory.photo}
+          title={selectedMemory.title || `Day ${selectedMemory.id}`}
+          text={selectedMemory.message}
+          photo={selectedMemory.photo_url}
         />
       )}
       <h1 className="text-4xl font-bold text-center text-white mb-8">

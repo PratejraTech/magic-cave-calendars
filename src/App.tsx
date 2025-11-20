@@ -1,57 +1,124 @@
-import { useEffect, useState } from 'react';
-import { supabase, AdventDay } from './lib/supabase';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { VillageScene } from './features/advent/components/VillageScene';
 import { MusicPlayer } from './components/MusicPlayer';
+import { adventMemories } from './data/adventMemories';
+import type { AdventDay } from './types/advent';
+import { seedImageStore, getImageForDay } from './lib/localImageStore';
+import { loadOpenedDayMap, persistOpenedDay } from './lib/openedDaysStorage';
+import { MemoryModal } from './features/advent/components/MemoryModal';
+import { PastMemoryCarousel } from './features/advent/components/PastMemoryCarousel';
+import { SurprisePortal } from './features/advent/components/SurprisePortal';
 
 function App() {
   const [days, setDays] = useState<AdventDay[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDay, setSelectedDay] = useState<AdventDay | null>(null);
+  const [isMemoryOpen, setIsMemoryOpen] = useState(false);
+  const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
+  const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
 
-  const currentDate = new Date();
-  const isDecember = currentDate.getMonth() === 11;
-
-  useEffect(() => {
-    loadDays();
+  const sortOpenedDays = useCallback((opened: AdventDay[]) => {
+    return [...opened].sort((a, b) => {
+      if (a.opened_at && b.opened_at) {
+        return a.opened_at.localeCompare(b.opened_at);
+      }
+      if (a.opened_at) return -1;
+      if (b.opened_at) return 1;
+      return a.id - b.id;
+    });
   }, []);
 
-  const loadDays = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('advent_days')
-        .select('*')
-        .order('id', { ascending: true });
+  useEffect(() => {
+    const init = () => {
+      seedImageStore(adventMemories);
+      const openedMap = loadOpenedDayMap();
 
-      if (error) throw error;
-      setDays(data || []);
-    } catch (error) {
-      console.error('Error loading days:', error);
-    } finally {
+      const preparedDays: AdventDay[] = adventMemories.map((memory) => {
+        const openedAt = openedMap[memory.id] ?? null;
+        return {
+          id: memory.id,
+          title: memory.title,
+          message: memory.message,
+          photo_url: getImageForDay(memory.id, memory.palette),
+          is_opened: Boolean(openedAt),
+          opened_at: openedAt,
+          created_at: new Date(Date.UTC(2023, 11, memory.id)).toISOString(),
+          confettiType: memory.confettiType,
+          unlockEffect: memory.unlockEffect,
+          musicUrl: memory.musicUrl,
+          voiceUrl: memory.voiceUrl,
+        };
+      });
+
+      setDays(preparedDays);
       setLoading(false);
+    };
+
+    init();
+  }, [sortOpenedDays]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+          setIsMemoryOpen(false);
+          setSelectedDay(null);
+          setIsSurpriseOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleOpenDay = (dayId: number) => {
+    const openedAt = new Date().toISOString();
+    persistOpenedDay(dayId, openedAt);
+
+    let openedDay: AdventDay | null = null;
+    setDays((prevDays) =>
+      prevDays.map((day) => {
+        if (day.id === dayId) {
+          openedDay = { ...day, is_opened: true, opened_at: openedAt };
+          return openedDay;
+        }
+        return day;
+      })
+    );
+
+    if (openedDay) {
+      setSelectedDay(openedDay);
+      setIsMemoryOpen(true);
     }
   };
 
-  const handleOpenDay = async (dayId: number) => {
-    try {
-      const { error } = await supabase
-        .from('advent_days')
-        .update({
-          is_opened: true,
-          opened_at: new Date().toISOString(),
-        })
-        .eq('id', dayId);
+  const handleCloseMemory = () => {
+    setIsMemoryOpen(false);
+    setSelectedDay(null);
+  };
 
-      if (error) throw error;
+  const openedMemories = useMemo(
+    () => sortOpenedDays(days.filter((day) => day.is_opened)),
+    [days, sortOpenedDays]
+  );
 
-      setDays((prevDays) =>
-        prevDays.map((day) =>
-          day.id === dayId
-            ? { ...day, is_opened: true, opened_at: new Date().toISOString() }
-            : day
-        )
-      );
-    } catch (error) {
-      console.error('Error opening day:', error);
-    }
+  const surpriseOptions = useMemo(
+    () =>
+      adventMemories
+        .map((memory) => memory.surpriseVideoUrl)
+        .filter((url): url is string => Boolean(url)),
+    []
+  );
+
+  const openRandomSurprise = () => {
+    if (surpriseOptions.length === 0) return;
+    const nextUrl = surpriseOptions[Math.floor(Math.random() * surpriseOptions.length)];
+    setCurrentSurpriseUrl(nextUrl);
+    setIsSurpriseOpen(true);
+  };
+
+  const closeSurprise = () => {
+    setIsSurpriseOpen(false);
+    setCurrentSurpriseUrl(null);
   };
 
   if (loading) {
@@ -73,13 +140,20 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen">
-      <VillageScene
-        days={days}
-        onOpenDay={handleOpenDay}
-        isDecember={isDecember}
-      />
+    <div className="min-h-screen relative">
+      <VillageScene days={days} onOpenDay={handleOpenDay} isDecember />
+      <PastMemoryCarousel memories={openedMemories} />
+      <MemoryModal isOpen={isMemoryOpen} day={selectedDay} onClose={handleCloseMemory} />
       <MusicPlayer />
+      <div className="fixed top-6 right-6 flex flex-col gap-3 z-40">
+        <button
+          onClick={openRandomSurprise}
+          className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
+        >
+          Surprise!
+        </button>
+      </div>
+      <SurprisePortal isOpen={isSurpriseOpen} videoUrl={currentSurpriseUrl} onClose={closeSurprise} />
     </div>
   );
 }
