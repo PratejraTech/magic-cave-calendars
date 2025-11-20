@@ -30,9 +30,8 @@ export function seedImageStore(memories: AdventMemory[]) {
 
   memories.forEach((memory) => {
     const key = getStorageKey(memory.id);
-    if (!window.localStorage.getItem(key)) {
-      window.localStorage.setItem(key, paletteImages[memory.palette]);
-    }
+    const asset = memory.photoPath ?? paletteImages[memory.palette];
+    window.localStorage.setItem(key, asset);
   });
 }
 

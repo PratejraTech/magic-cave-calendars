@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import type { MouseEvent, TouchEvent } from 'react';
 import type { AdventDay } from '../../../types/advent';
+import { generateModalSubtitle } from '../../chat/chatService';
 
 interface MemoryModalProps {
   isOpen: boolean;
@@ -13,6 +15,33 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
   const messageCharacters = day?.message?.split('') ?? [];
   const heroName = day?.title ?? (day ? `Day ${day.id}` : '');
   const heroNickname = day?.title?.split(' ')[0] ?? (day ? `Day ${day.id}` : '');
+  const [subtitle, setSubtitle] = useState<string | null>(null);
+  const [subtitleLoading, setSubtitleLoading] = useState(false);
+
+  useEffect(() => {
+    if (!day || !isOpen) {
+      setSubtitle(null);
+      return;
+    }
+    let cancelled = false;
+    setSubtitleLoading(true);
+    const subtitleSource = day.photoMarkdownTitle ?? day.title ?? `Day ${day.id}`;
+    generateModalSubtitle(subtitleSource)
+      .then((result) => {
+        if (!cancelled) {
+          setSubtitle(result);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setSubtitle(null);
+      })
+      .finally(() => {
+        if (!cancelled) setSubtitleLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [day, isOpen]);
 
   const handleDownload = () => {
     if (!day) return;
@@ -86,8 +115,10 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
                 <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-fuchsia-500 to-sky-500">
                   {heroName}
                 </h2>
-                <p className="text-sm text-rose-400 font-semibold">
-                  Butterflies whisper: &ldquo;This moment belongs to {heroNickname}!&rdquo;
+                <p className="text-sm text-rose-400 font-semibold min-h-[24px]">
+                  {subtitleLoading
+                    ? 'Daddy is whispering...'
+                    : subtitle ?? `Butterflies whisper: “This moment belongs to ${heroNickname}!”`}
                 </p>
                 <motion.p
                   className="text-slate-600 leading-relaxed text-lg min-h-[120px]"

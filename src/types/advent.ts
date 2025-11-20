@@ -14,6 +14,7 @@ export interface AdventDay {
   musicUrl?: string;
   voiceUrl?: string;
   photoMarkdownPath?: string | null;
+  photoMarkdownTitle?: string | null;
 }
 
 export interface AdventMemory {
@@ -27,5 +28,6 @@ export interface AdventMemory {
   voiceUrl?: string;
   photoPath?: string;
   photoMarkdownPath?: string | null;
+  photoMarkdownTitle?: string | null;
   surpriseVideoUrl?: string;
 }

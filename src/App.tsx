@@ -61,6 +61,7 @@ function App() {
           musicUrl: memory.musicUrl,
           voiceUrl: memory.voiceUrl,
           photoMarkdownPath: memory.photoMarkdownPath ?? null,
+          photoMarkdownTitle: memory.photoMarkdownTitle ?? null,
         };
       });
 

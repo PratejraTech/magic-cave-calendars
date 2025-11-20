@@ -53,8 +53,8 @@ export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => {
 
   return {
     id: day,
-    title: `${titleSeeds[index % titleSeeds.length]} (Day ${day})`,
-    message: messageSeeds[index % messageSeeds.length](day),
+    title: pairEntry?.title ?? `${titleSeeds[index % titleSeeds.length]} (Day ${day})`,
+    message: pairEntry?.message ?? messageSeeds[index % messageSeeds.length](day),
     confettiType: confettiCycle[index % confettiCycle.length],
     unlockEffect: unlockCycle[index % unlockCycle.length],
     palette: paletteCycle[index % paletteCycle.length],
@@ -62,6 +62,7 @@ export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => {
     voiceUrl: voiceClips[index % voiceClips.length],
     photoPath: pairEntry?.image ?? getPhotoPath(day),
     photoMarkdownPath: pairEntry?.markdown ?? null,
+    photoMarkdownTitle: pairEntry?.title ?? null,
     surpriseVideoUrl:
       index < 4
         ? [

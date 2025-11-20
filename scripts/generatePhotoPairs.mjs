@@ -1,4 +1,4 @@
-import { readdir, stat, mkdir, copyFile } from 'fs/promises';
+import { readdir, stat, mkdir, copyFile, readFile, writeFile } from 'fs/promises';
 import path from 'path';
 
 const ROOT = process.cwd();
@@ -6,6 +6,7 @@ const SOURCE_DIR = path.join(ROOT, 'photos');
 const PUBLIC_DIR = path.join(ROOT, 'public', 'photos');
 const MANIFEST_PATH = path.join(ROOT, 'src', 'data', 'photoPairs.generated.ts');
 const SUPPORTED_IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.PNG', '.JPG', '.JPEG', '.WEBP']);
+const DEFAULT_MESSAGE = 'A sparkling Christmas memory filled with butterflies, heartbeats, and Daddy moments.';
 
 const toPublicPath = (filename) => `/photos/${filename}`;
 
@@ -14,27 +15,45 @@ async function ensureDirs() {
   await mkdir(PUBLIC_DIR, { recursive: true });
 }
 
+async function parseMarkdown(baseName) {
+  const mdPath = path.join(SOURCE_DIR, `${baseName}.md`);
+  const hasMarkdown = await stat(mdPath).then(
+    (stats) => stats.isFile(),
+    () => false
+  );
+
+  if (!hasMarkdown) {
+    return { title: baseName, message: DEFAULT_MESSAGE };
+  }
+
+  const raw = await readFile(mdPath, 'utf8');
+  const lines = raw.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  if (lines.length === 0) {
+    return { title: baseName, message: DEFAULT_MESSAGE };
+  }
+
+  const [firstLine, ...rest] = lines;
+  const title = firstLine.replace(/^#\s*/, '') || baseName;
+  const message = rest.join('\n') || DEFAULT_MESSAGE;
+
+  const destMarkdownPath = path.join(PUBLIC_DIR, `${baseName}.md`);
+  await copyFile(mdPath, destMarkdownPath);
+
+  return { title, message };
+}
+
 async function processPhoto(fileName) {
   const sourceImagePath = path.join(SOURCE_DIR, fileName);
   const destImagePath = path.join(PUBLIC_DIR, fileName);
   await copyFile(sourceImagePath, destImagePath);
 
   const baseName = path.parse(fileName).name;
-  const markdownFilename = `${baseName}.md`;
-  const sourceMarkdownPath = path.join(SOURCE_DIR, markdownFilename);
-  const hasMarkdown = await stat(sourceMarkdownPath).then(
-    (stats) => stats.isFile(),
-    () => false
-  );
-
-  if (hasMarkdown) {
-    const destMarkdownPath = path.join(PUBLIC_DIR, markdownFilename);
-    await copyFile(sourceMarkdownPath, destMarkdownPath);
-  }
+  const { title, message } = await parseMarkdown(baseName);
 
   return {
     image: toPublicPath(fileName),
-    markdown: hasMarkdown ? toPublicPath(markdownFilename) : null,
+    title,
+    message,
   };
 }
 
@@ -48,7 +67,7 @@ async function generatePairs() {
     const ext = path.extname(entry.name);
     if (!SUPPORTED_IMAGE_EXT.has(ext)) continue;
 
-    console.log(`[generate:photoPairs] Found ${entry.name}`);
+    console.log(`[generate:photoPairs] Processing ${entry.name}`);
     const pair = await processPhoto(entry.name);
     photos.push(pair);
   }
@@ -57,12 +76,13 @@ async function generatePairs() {
 
   const manifest = `export type PhotoPair = {
   image: string;
-  markdown: string | null;
+  title: string;
+  message: string;
 };
 
 export const photoPairs: PhotoPair[] = ${JSON.stringify(photos, null, 2)};`;
 
-  await import('fs/promises').then(({ writeFile }) => writeFile(MANIFEST_PATH, manifest));
+  await writeFile(MANIFEST_PATH, manifest);
   console.log(`[generate:photoPairs] Saved ${photos.length} entries to ${MANIFEST_PATH}`);
 }
 
