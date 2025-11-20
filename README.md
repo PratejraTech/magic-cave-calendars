@@ -29,3 +29,4 @@ harper-advent-calendar
 - The client targets `http://localhost:4000` during development (matching `npm run dev:fullstack`). For production builds, it automatically calls the same origin as the deployed frontend. If you host the backend elsewhere, set `VITE_CHAT_API_URL=https://your-domain` before building.
 - For a minimal production launch, run `npm run build` once, then `npm run start` to serve the Vite preview build and the LangChain chat server together.
 - The chat server keeps a lightweight in-memory cache of recent prompts/responses per session to reduce OpenAI token usage; it automatically evicts the oldest entries when the cache grows beyond 200 items.
+- Drop raw PNGs into the top-level `photos/` folder and run `npm run compress:photos` to optimize them (a temporary backup lives under `photos/__original_backup` while each file is recompressed and written back as `*_processed.png`).

@@ -1,5 +1,6 @@
 import type { AdventMemory } from '../types/advent';
 import { getPhotoPath } from '../lib/localImageStore';
+import { generatedPhotoManifest } from './photoManifest.generated';
 
 const titleSeeds = [
   'Butterfly Meadow Parade',
@@ -42,13 +43,14 @@ const voiceClips = [
 const TOTAL_DAYS = 25;
 const dayNumbers = Array.from({ length: TOTAL_DAYS }, (_, index) => index + 1);
 
-export const photoManifest: Record<number, string> = dayNumbers.reduce<Record<number, string>>(
-  (manifest, day) => {
-    manifest[day] = getPhotoPath(day);
-    return manifest;
-  },
-  {}
-);
+const randomPhotoPool = Object.values(generatedPhotoManifest);
+
+const resolvePhotoForDay = (dayIndex: number, defaultDay: number) => {
+  if (randomPhotoPool.length > 0) {
+    return randomPhotoPool[dayIndex % randomPhotoPool.length];
+  }
+  return getPhotoPath(defaultDay);
+};
 
 export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => ({
   id: day,
@@ -59,7 +61,7 @@ export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => ({
   palette: paletteCycle[index % paletteCycle.length],
   musicUrl: musicTracks[index % musicTracks.length],
   voiceUrl: voiceClips[index % voiceClips.length],
-  photoPath: photoManifest[day],
+  photoPath: resolvePhotoForDay(index, day),
   surpriseVideoUrl:
     index < 4
       ? [

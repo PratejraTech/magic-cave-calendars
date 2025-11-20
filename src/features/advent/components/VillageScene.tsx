@@ -15,7 +15,9 @@ interface VillageSceneProps {
   onOpenDay: (dayId: number) => void;
 }
 
-const shouldForceUnlock = import.meta.env.DEV || import.meta.env.VITE_FORCE_UNLOCK === 'true';
+const shouldForceUnlock =
+  import.meta.env.DEV ||
+  String(import.meta.env.VITE_FORCE_UNLOCK ?? import.meta.env.FORCE_UNLOCK ?? '').toLowerCase() === 'true';
 
 export function VillageScene({ days, onOpenDay }: VillageSceneProps) {
   const [collectedButterflies, setCollectedButterflies] = useState<string[]>([]);

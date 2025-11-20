@@ -8,6 +8,7 @@ import {
   logChatInput,
 } from './chatService';
 import { CHAT_SYSTEM_PROMPT } from './systemPrompt';
+import { adventMemories } from '../../data/adventMemories';
 import { SoundManager } from '../advent/utils/SoundManager';
 import { playThemeAtRandomPoint, THEME_TRACK_PATH } from '../../components/MusicPlayer';
 
@@ -69,6 +70,12 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
     return messages;
   }, [messages]);
 
+  const getRandomPhoto = () => {
+    if (!adventMemories.length) return undefined;
+    const randomDay = adventMemories[Math.floor(Math.random() * adventMemories.length)];
+    return randomDay.photo_url || randomDay.photoPath;
+  };
+
   const sendMessage = async () => {
     if (!input.trim()) return;
     const userMessage: ChatMessage = { role: 'user', content: input.trim() };
@@ -83,7 +90,11 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
       const payloadHistory = [...storedHistoryRef.current, ...newMessages];
       const payload = [{ role: 'system' as const, content: CHAT_SYSTEM_PROMPT }, ...payloadHistory];
       const reply = await requestDaddyResponse(payload, quotes);
-      const assistantMessage: ChatMessage = { role: 'assistant', content: reply };
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: reply,
+        imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+      };
       const updatedMessages = [...newMessages, assistantMessage];
       setMessages(updatedMessages);
       const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
@@ -93,7 +104,14 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
       const fallbackQuote =
         quotes[Math.floor(Math.random() * quotes.length)]?.text ??
         "Daddy's thinking about you right now, sweetheart.";
-      const updatedMessages = [...newMessages, { role: 'assistant', content: fallbackQuote }];
+      const updatedMessages = [
+        ...newMessages,
+        {
+          role: 'assistant',
+          content: fallbackQuote,
+          imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+        },
+      ];
       setMessages(updatedMessages);
       const persisted = [...storedHistoryRef.current, userMessage, updatedMessages[updatedMessages.length - 1]].slice(-5);
       storedHistoryRef.current = persisted;
@@ -134,13 +152,20 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
         {conversation.map((message, index) => (
           <div
             key={`${message.role}-${index}`}
-            className={`max-w-xl rounded-2xl px-4 py-3 shadow-lg ${
+            className={`max-w-xl rounded-2xl px-4 py-3 shadow-lg space-y-2 ${
               message.role === 'user'
                 ? 'ml-auto bg-pink-500/80'
                 : 'mr-auto bg-white/90 text-slate-900'
             }`}
           >
-            {message.content}
+            <div>{message.content}</div>
+            {message.imageUrl && message.role === 'assistant' && (
+              <img
+                src={message.imageUrl}
+                alt="Memory moment"
+                className="w-full h-40 object-cover rounded-2xl"
+              />
+            )}
           </div>
         ))}
         {loading && (

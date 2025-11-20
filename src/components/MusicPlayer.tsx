@@ -13,11 +13,27 @@ export const playThemeAtRandomPoint = async (manager: SoundManager) => {
 
 export function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasUnlocked, setHasUnlocked] = useState(false);
   const soundManager = SoundManager.getInstance();
 
   useEffect(() => {
     soundManager.init();
-  }, [soundManager]);
+
+    const handlePointerUnlock = async () => {
+      if (hasUnlocked) return;
+      try {
+        await playThemeAtRandomPoint(soundManager);
+        setIsPlaying(true);
+        setHasUnlocked(true);
+        window.removeEventListener('pointerdown', handlePointerUnlock);
+      } catch (error) {
+        setIsPlaying(false);
+      }
+    };
+
+    window.addEventListener('pointerdown', handlePointerUnlock);
+    return () => window.removeEventListener('pointerdown', handlePointerUnlock);
+  }, [soundManager, hasUnlocked]);
 
   const handleToggle = async () => {
     if (isPlaying) {
@@ -29,6 +45,7 @@ export function MusicPlayer() {
     try {
       await playThemeAtRandomPoint(soundManager);
       setIsPlaying(true);
+      setHasUnlocked(true);
     } catch (error) {
       setIsPlaying(false);
     }

@@ -11,6 +11,9 @@ import { SurprisePortal } from './features/advent/components/SurprisePortal';
 import { ChatWithDaddy } from './features/chat/ChatWithDaddy';
 import { SoundManager } from './features/advent/utils/SoundManager';
 
+const ACCESS_KEY = 'access-codeword';
+const ACCESS_PHRASE = 'grace janin';
+
 function App() {
   const [days, setDays] = useState<AdventDay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,8 +21,12 @@ function App() {
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [codeAttempt, setCodeAttempt] = useState('');
+  const [authError, setAuthError] = useState('');
   const soundManager = SoundManager.getInstance();
-  const forceUnlock = import.meta.env.VITE_FORCE_UNLOCK === 'true';
+  const forceUnlock =
+    String(import.meta.env.VITE_FORCE_UNLOCK ?? import.meta.env.FORCE_UNLOCK ?? '').toLowerCase() === 'true';
   const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
 
   const sortOpenedDays = useCallback((opened: AdventDay[]) => {
@@ -39,12 +46,13 @@ function App() {
       const openedMap = loadOpenedDayMap();
 
       const preparedDays: AdventDay[] = adventMemories.map((memory) => {
+        const assignedPhoto = memory.photoPath ?? getImageForDay(memory.id, memory.palette);
         const openedAt = forceUnlock ? null : openedMap[memory.id] ?? null;
         return {
           id: memory.id,
           title: memory.title,
           message: memory.message,
-          photo_url: getImageForDay(memory.id, memory.palette),
+          photo_url: assignedPhoto,
           is_opened: forceUnlock ? false : Boolean(openedAt),
           opened_at: openedAt,
           created_at: new Date(Date.UTC(2023, 11, memory.id)).toISOString(),
@@ -75,6 +83,25 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem(ACCESS_KEY);
+    if (stored && stored.toLowerCase() === ACCESS_PHRASE) {
+      setIsAuthorized(true);
+    }
+  }, []);
+
+  const handleCodeSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (codeAttempt.trim().toLowerCase() === ACCESS_PHRASE) {
+      localStorage.setItem(ACCESS_KEY, ACCESS_PHRASE);
+      setIsAuthorized(true);
+      setAuthError('');
+    } else {
+      setAuthError('Hmm, that does not sound right. Try again!');
+    }
+  };
 
   const handleOpenDay = (dayId: number) => {
     const openedAt = new Date().toISOString();
@@ -160,6 +187,34 @@ function App() {
             Loading magic...
           </span>
         </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 via-sky-100 to-amber-100 p-6 text-center">
+        <form
+          onSubmit={handleCodeSubmit}
+          className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg space-y-4"
+        >
+          <h1 className="text-2xl font-extrabold text-pink-500">What is your Middle and Last Name?</h1>
+          <p className="text-sm text-slate-500">Please share the secret codeword so Daddy can open the village.</p>
+          <input
+            type="text"
+            value={codeAttempt}
+            onChange={(event) => setCodeAttempt(event.target.value)}
+            className="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            placeholder="Type it here"
+          />
+          {authError && <p className="text-pink-600 text-sm">{authError}</p>}
+          <button
+            type="submit"
+            className="w-full rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-orange-400 text-white font-semibold py-3 shadow-lg hover:scale-105 transition"
+          >
+            Enter
+          </button>
+        </form>
       </div>
     );
   }
