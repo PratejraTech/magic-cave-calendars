@@ -1,34 +1,82 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { vi, describe, it, expect } from 'vitest'
-import { HouseCard } from '../features/advent/components/HouseCard'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { HouseCard } from '../features/advent/components/HouseCard';
+import { createAdventDay } from './testUtils';
 
-const mockDay = { id: 1, day: 1, is_opened: false, opened_at: null, message: 'Test', photo_url: 'test.jpg', created_at: '2023-12-01T00:00:00Z' }
+const mockDuckMusic = vi.fn();
+const mockPlay = vi.fn();
+const mockInit = vi.fn();
+const mockConfettiBurst = vi.fn();
+const mockTimeline = {
+  to: vi.fn().mockReturnThis(),
+  call: vi.fn().mockImplementation((callback: () => void) => {
+    callback();
+    return mockTimeline;
+  }),
+};
+
+vi.mock('../features/advent/utils/SoundManager', () => ({
+  SoundManager: {
+    getInstance: () => ({
+      init: mockInit,
+      duckMusic: mockDuckMusic,
+      play: mockPlay,
+    }),
+  },
+}));
+
+vi.mock('../features/advent/utils/ConfettiSystem', () => ({
+  ConfettiSystem: {
+    burst: mockConfettiBurst,
+  },
+}));
+
+vi.mock('gsap', () => ({
+  gsap: {
+    timeline: () => mockTimeline,
+  },
+}));
+
+const defaultProps = () => ({
+  day: createAdventDay(),
+  onOpen: vi.fn(),
+  canOpen: true,
+  position: { x: 0, y: 0 },
+});
 
 describe('HouseCard', () => {
-  it('renders closed day', () => {
-    const mockOnOpen = vi.fn()
-    render(<HouseCard day={mockDay} onOpen={mockOnOpen} isDecember={true} />)
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    expect(screen.getByText('1')).toBeInTheDocument()
-  })
+  it('renders the closed day state', () => {
+    render(<HouseCard {...defaultProps()} />);
 
-  it('calls onOpen when clicked', () => {
-    const mockOnOpen = vi.fn()
-    render(<HouseCard day={mockDay} onOpen={mockOnOpen} isDecember={true} />)
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(mockInit).toHaveBeenCalled();
+  });
 
-    const card = screen.getByTestId('day-1')
-    fireEvent.click(card)
+  it('prevents opening when locked', () => {
+    const props = { ...defaultProps(), canOpen: false };
+    render(<HouseCard {...props} />);
 
-    expect(mockOnOpen).toHaveBeenCalledWith(1)
-  })
+    fireEvent.click(screen.getByTestId('day-1'));
 
-  it('shows opened state', () => {
-    const openedDay = { ...mockDay, is_opened: true, opened_at: '2023-12-01T00:00:00Z' }
-    const mockOnOpen = vi.fn()
-    render(<HouseCard day={openedDay} onOpen={mockOnOpen} canOpen={true} position={{ x: 0, y: 0 }} />)
+    expect(props.onOpen).not.toHaveBeenCalled();
+    expect(mockDuckMusic).not.toHaveBeenCalled();
+  });
 
-    // Check for opened styling or content
-    const card = screen.getByTestId('day-1')
-    expect(card).toHaveClass('scale-105') // Assuming opened style
-  })
-})
+  it('opens the door and triggers effects', async () => {
+    const props = defaultProps();
+    render(<HouseCard {...props} />);
+
+    fireEvent.click(screen.getByTestId('day-1'));
+
+    await waitFor(() => {
+      expect(props.onOpen).toHaveBeenCalledWith(1);
+    });
+    expect(mockDuckMusic).toHaveBeenCalledWith(2000);
+    expect(mockPlay).toHaveBeenCalledWith('door-creak');
+    expect(mockConfettiBurst).toHaveBeenCalled();
+  });
+});

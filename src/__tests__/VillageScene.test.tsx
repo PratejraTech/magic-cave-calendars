@@ -1,28 +1,72 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { vi, describe, it, expect } from 'vitest'
-import { VillageScene } from '../features/advent/components/VillageScene'
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { VillageScene } from '../features/advent/components/VillageScene';
+import { createAdventDay } from './testUtils';
+
+const mockLoadSound = vi.fn();
+
+vi.mock('../features/advent/utils/SoundManager', () => ({
+  SoundManager: {
+    getInstance: () => ({
+      init: vi.fn(),
+      loadSound: mockLoadSound,
+      play: vi.fn(),
+    }),
+  },
+}));
+
+vi.mock('../features/advent/components/HouseCard', () => ({
+  HouseCard: ({ day, onOpen }: any) => (
+    <button data-testid={`day-${day.id}`} onClick={() => onOpen(day.id)}>
+      Day {day.id}
+    </button>
+  ),
+}));
+
+vi.mock('../features/advent/components/Snowfall', () => ({
+  Snowfall: () => <div data-testid="snowfall" />,
+}));
+
+vi.mock('../features/advent/components/NorthernLights', () => ({
+  NorthernLights: () => <div data-testid="northern-lights" />,
+}));
+
+vi.mock('../features/advent/components/FloatingFireflies', () => ({
+  FloatingFireflies: () => <div data-testid="fireflies" />,
+}));
+
+vi.mock('../features/advent/components/ButterflyCollection', () => ({
+  ButterflyCollection: () => <div data-testid="butterflies" />,
+}));
+
+vi.mock('../features/advent/components/ButterflyPath', () => ({
+  ButterflyPath: () => <div data-testid="butterfly-path" />,
+}));
 
 const mockDays = [
-  { id: 1, day: 1, is_opened: false, opened_at: null, message: 'Test message', photo_url: 'test.jpg', created_at: '2023-12-01T00:00:00Z' },
-  { id: 2, day: 2, is_opened: true, opened_at: '2023-12-02T00:00:00Z', message: 'Test message 2', photo_url: 'test2.jpg', created_at: '2023-12-02T00:00:00Z' },
-]
+  createAdventDay({ id: 1 }),
+  createAdventDay({ id: 2, is_opened: true, opened_at: '2023-12-02T00:00:00Z' }),
+];
 
 describe('VillageScene', () => {
-  it('renders all house cards', () => {
-    const mockOnOpen = vi.fn()
-    render(<VillageScene days={mockDays} onOpenDay={mockOnOpen} isDecember={true} />)
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    expect(screen.getByText('Magical Christmas Village')).toBeInTheDocument()
-    expect(screen.getAllByTestId(/^day-/)).toHaveLength(2)
-  })
+  it('renders the village heading and house buttons', () => {
+    render(<VillageScene days={mockDays} onOpenDay={vi.fn()} isDecember />);
 
-  it('calls onOpenDay when day is clicked', () => {
-    const mockOnOpen = vi.fn()
-    render(<VillageScene days={mockDays} onOpenDay={mockOnOpen} isDecember={true} />)
+    expect(screen.getByText('Magical Christmas Village')).toBeInTheDocument();
+    expect(screen.getAllByTestId(/^day-/)).toHaveLength(2);
+    expect(mockLoadSound).toHaveBeenCalledWith('door-creak', expect.any(String));
+  });
 
-    const day1 = screen.getByTestId('day-1')
-    fireEvent.click(day1)
+  it('delegates clicks to onOpenDay', () => {
+    const onOpenDay = vi.fn();
+    render(<VillageScene days={mockDays} onOpenDay={onOpenDay} isDecember />);
 
-    expect(mockOnOpen).toHaveBeenCalledWith(1)
-  })
-})
+    fireEvent.click(screen.getByTestId('day-1'));
+
+    expect(onOpenDay).toHaveBeenCalledWith(1);
+  });
+});

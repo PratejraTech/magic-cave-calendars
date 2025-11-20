@@ -1,69 +1,70 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import { vi, describe, it, expect, beforeEach } from 'vitest'
-import App from '../App'
+import { render, screen, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import App from '../App';
+import { createAdventDay } from './testUtils';
 
-// Mock Supabase
+const mockOrder = vi.fn();
+const mockSelect = vi.fn();
+const mockUpdateEq = vi.fn();
+const mockUpdate = vi.fn();
+const mockFrom = vi.fn();
+
 vi.mock('../lib/supabase', () => ({
   supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => ({
-          data: [
-            { id: 1, day: 1, is_opened: false, opened_at: null },
-            { id: 2, day: 2, is_opened: true, opened_at: '2023-12-02T00:00:00Z' },
-          ],
-          error: null,
-        })),
-      })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          error: null,
-        })),
-      })),
-    })),
+    from: mockFrom,
   },
-  AdventDay: {},
-}))
+}));
 
 describe('App', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+    mockFrom.mockReturnValue({
+      select: mockSelect,
+      update: mockUpdate,
+    });
+    mockSelect.mockReturnValue({ order: mockOrder });
+    mockUpdate.mockReturnValue({ eq: mockUpdateEq });
+    mockOrder.mockResolvedValue({
+      data: [
+        createAdventDay({ id: 1 }),
+        createAdventDay({ id: 2, is_opened: true, opened_at: '2023-12-02T00:00:00Z' }),
+      ],
+      error: null,
+    });
+    mockUpdateEq.mockResolvedValue({ error: null });
+  });
 
   it('loads and displays advent days', async () => {
-    render(<App />)
+    render(<App />);
 
-    // Check loading state
-    expect(screen.getByText('Loading magic...')).toBeInTheDocument()
+    expect(screen.getByText('Loading magic...')).toBeInTheDocument();
 
-    // Wait for days to load
     await waitFor(() => {
-      expect(screen.queryByText('Loading magic...')).not.toBeInTheDocument()
-    })
+      expect(screen.queryByText('Loading magic...')).not.toBeInTheDocument();
+    });
 
-    // Check that VillageScene and MusicPlayer are rendered
-    expect(screen.getByTestId('village-scene')).toBeInTheDocument()
-    expect(screen.getByTestId('music-player')).toBeInTheDocument()
-  })
+    expect(screen.getByTestId('village-scene')).toBeInTheDocument();
+    expect(screen.getByTestId('music-player')).toBeInTheDocument();
+    expect(mockFrom).toHaveBeenCalledWith('advent_days');
+    expect(mockSelect).toHaveBeenCalledTimes(1);
+    expect(mockOrder).toHaveBeenCalledWith('id', { ascending: true });
+  });
 
   it('handles opening a day', async () => {
-    const mockSupabase = vi.mocked(require('../lib/supabase').supabase)
-    render(<App />)
+    render(<App />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Loading magic...')).not.toBeInTheDocument()
-    })
+      expect(screen.queryByText('Loading magic...')).not.toBeInTheDocument();
+    });
 
-    // Simulate opening day 1
-    const dayButton = screen.getByTestId('day-1')
-    dayButton.click()
+    const dayButton = screen.getByTestId('day-1');
+    dayButton.click();
 
-    // Check Supabase update was called
-    expect(mockSupabase.from).toHaveBeenCalledWith('advent_days')
-    expect(mockSupabase.from().update).toHaveBeenCalledWith({
+    expect(mockFrom).toHaveBeenCalledWith('advent_days');
+    expect(mockUpdate).toHaveBeenCalledWith({
       is_opened: true,
       opened_at: expect.any(String),
-    })
-    expect(mockSupabase.from().update().eq).toHaveBeenCalledWith('id', 1)
-  })
-})
+    });
+    expect(mockUpdateEq).toHaveBeenCalledWith('id', 1);
+  });
+});

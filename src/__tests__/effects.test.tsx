@@ -1,29 +1,47 @@
-import { render, screen } from '@testing-library/react'
-import { vi, describe, it, expect } from 'vitest'
-import { Snowfall } from '../features/advent/components/Snowfall'
-import { NorthernLights } from '../features/advent/components/NorthernLights'
-import { ButterflyCollection } from '../features/advent/components/ButterflyCollection'
-import { FloatingFireflies } from '../features/advent/components/FloatingFireflies'
+import { render } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
+import { vi, describe, it, expect, afterEach } from 'vitest';
+import { Snowfall } from '../features/advent/components/Snowfall';
+import { NorthernLights } from '../features/advent/components/NorthernLights';
+import { ButterflyCollection } from '../features/advent/components/ButterflyCollection';
+import { FloatingFireflies } from '../features/advent/components/FloatingFireflies';
+
+vi.mock('../features/advent/utils/SoundManager', () => ({
+  SoundManager: {
+    getInstance: () => ({
+      play: vi.fn(),
+    }),
+  },
+}));
 
 describe('Visual Effects', () => {
-  it('renders Snowfall', () => {
-    render(<Snowfall />)
-    // Assuming Snowfall has some identifiable element
-    expect(document.querySelector('.snowflake')).toBeInTheDocument()
-  })
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-  it('renders NorthernLights', () => {
-    render(<NorthernLights />)
-    expect(document.querySelector('.northern-lights')).toBeInTheDocument()
-  })
+  it('renders a field of snowflakes', () => {
+    const { container } = render(<Snowfall />);
+    expect(container.querySelector('.snowflake')).toBeInTheDocument();
+  });
 
-  it('renders ButterflyCollection', () => {
-    render(<ButterflyCollection onButterflyCaught={() => {}} />)
-    expect(document.querySelector('.butterfly')).toBeInTheDocument()
-  })
+  it('renders the aurora curtain', () => {
+    render(<NorthernLights />);
+    expect(document.querySelector('.northern-lights')).toBeInTheDocument();
+  });
 
-  it('renders FloatingFireflies', () => {
-    render(<FloatingFireflies />)
-    expect(document.querySelector('.firefly')).toBeInTheDocument()
-  })
-})
+  it('spawns butterflies over time', () => {
+    vi.useFakeTimers();
+    render(<ButterflyCollection onButterflyCaught={vi.fn()} />);
+
+    act(() => {
+      vi.advanceTimersByTime(15000);
+    });
+
+    expect(document.querySelector('.butterfly')).toBeInTheDocument();
+  });
+
+  it('renders floating fireflies', () => {
+    render(<FloatingFireflies />);
+    expect(document.querySelector('.firefly')).toBeInTheDocument();
+  });
+});
