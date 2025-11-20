@@ -11,7 +11,7 @@ import { SurprisePortal } from './features/advent/components/SurprisePortal';
 import { ChatWithDaddy } from './features/chat/ChatWithDaddy';
 import { SoundManager } from './features/advent/utils/SoundManager';
 
-const ACCESS_KEY = 'access-codeword';
+const ACCESS_PARAM = 'code';
 const ACCESS_PHRASE = 'grace janin';
 
 function App() {
@@ -87,8 +87,9 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const stored = localStorage.getItem(ACCESS_KEY);
-    if (stored && stored.toLowerCase() === ACCESS_PHRASE) {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get(ACCESS_PARAM);
+    if (code && code.trim().toLowerCase() === ACCESS_PHRASE) {
       setIsAuthorized(true);
     }
   }, []);
@@ -96,9 +97,7 @@ function App() {
   const handleCodeSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (codeAttempt.trim().toLowerCase() === ACCESS_PHRASE) {
-      localStorage.setItem(ACCESS_KEY, ACCESS_PHRASE);
-      setIsAuthorized(true);
-      setAuthError('');
+      window.location.search = `${ACCESS_PARAM}=${encodeURIComponent(codeAttempt.trim())}`;
     } else {
       setAuthError('Hmm, that does not sound right. Try again!');
     }

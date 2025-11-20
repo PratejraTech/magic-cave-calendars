@@ -58,6 +58,11 @@ const getSessionId = () => {
   return newId;
 };
 
+export const resetSessionId = () => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(SESSION_STORAGE_KEY);
+};
+
 export const fetchDaddyQuotes = async (): Promise<DaddyQuote[]> => {
   const response = await fetch(QUOTE_ENDPOINT);
   if (!response.ok) {

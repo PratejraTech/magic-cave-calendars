@@ -6,6 +6,7 @@ import {
   persistMessages,
   requestDaddyResponse,
   logChatInput,
+  resetSessionId,
 } from './chatService';
 import { CHAT_SYSTEM_PROMPT } from './systemPrompt';
 import { photoPairs } from '../../data/photoPairs.generated';
@@ -42,8 +43,18 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
   }, []);
 
   useEffect(() => {
-    if (!isOpen) return;
-    setMessages([]);
+    if (!isOpen) {
+      storedHistoryRef.current = [];
+      persistMessages([]);
+      resetSessionId();
+      setMessages([]);
+      setInput('');
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    setMessages(storedHistoryRef.current);
     soundManager.init().then(() => {
       if (!soundManager.isMusicPlaying()) {
         playThemeAtRandomPoint(soundManager).catch(() => undefined);
