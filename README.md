@@ -11,6 +11,6 @@ harper-advent-calendar
 
 ## Music Uploads
 
-- Drop your MP3 into `public/music/harper-theme.mp3`. The `MusicPlayer` component points to `/music/harper-theme.mp3` and will begin looping it (from a random timestamp) as soon as the app boots, so the floating control renders in the pause state.
+- Drop your MP3 into `public/music/Ben Bohmer, Nils Hoffmann & Malou - Breathing.mp3`. The `MusicPlayer` component points to this exact file (served as `/music/Ben Bohmer, Nils Hoffmann & Malou - Breathing.mp3`) and will begin looping it (from a random timestamp) as soon as the app boots, so the floating control renders in the pause state.
 - The `SoundManager` ducks the music when doors are opened (e.g., door creaks, confetti bursts) and then restores volume automatically, so the track keeps flowing right after the interaction.
 - If you want to rotate multiple songs, update `THEME_TRACK_PATH` inside `src/components/MusicPlayer.tsx` to point at the appropriate asset.

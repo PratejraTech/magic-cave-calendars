@@ -63,10 +63,10 @@ export const adventMemories: AdventMemory[] = dayNumbers.map((day, index) => ({
   surpriseVideoUrl:
     index < 4
       ? [
-          'https://www.youtube.com/embed/t3217H8JppI',
-          'https://www.youtube.com/embed/Z1BCujX3pw8',
-          'https://www.youtube.com/embed/L_jWHffIx5E',
-          'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          'https://www.youtube.com/embed/DXePdez8NcM?rel=0',
+          'https://www.youtube.com/embed/bqjyTjdVfsA?rel=0',
+          'https://www.youtube.com/embed/7jlxxG253ZQ?rel=0',
+          'https://www.youtube.com/embed/mSw0nmOnd7s?list=RDmSw0nmOnd7s',
         ][index]
       : undefined,
 }));
