@@ -55,7 +55,7 @@ describe('VillageScene', () => {
   });
 
   it('renders the village heading and house buttons', () => {
-    render(<VillageScene days={mockDays} onOpenDay={vi.fn()} isDecember />);
+    render(<VillageScene days={mockDays} onOpenDay={vi.fn()} />);
 
     expect(screen.getByText(/Harper's Xmas Village/i)).toBeInTheDocument();
     expect(screen.getAllByTestId(/^day-/)).toHaveLength(2);
@@ -64,7 +64,7 @@ describe('VillageScene', () => {
 
   it('delegates clicks to onOpenDay', () => {
     const onOpenDay = vi.fn();
-    render(<VillageScene days={mockDays} onOpenDay={onOpenDay} isDecember />);
+    render(<VillageScene days={mockDays} onOpenDay={onOpenDay} />);
 
     fireEvent.click(screen.getByTestId('day-1'));
 

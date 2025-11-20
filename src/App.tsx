@@ -8,6 +8,7 @@ import { loadOpenedDayMap, persistOpenedDay } from './lib/openedDaysStorage';
 import { MemoryModal } from './features/advent/components/MemoryModal';
 import { PastMemoryCarousel } from './features/advent/components/PastMemoryCarousel';
 import { SurprisePortal } from './features/advent/components/SurprisePortal';
+import { ChatWithDaddy } from './features/chat/ChatWithDaddy';
 
 function App() {
   const [days, setDays] = useState<AdventDay[]>([]);
@@ -15,6 +16,7 @@ function App() {
   const [selectedDay, setSelectedDay] = useState<AdventDay | null>(null);
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
 
   const sortOpenedDays = useCallback((opened: AdventDay[]) => {
@@ -60,9 +62,10 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-          setIsMemoryOpen(false);
-          setSelectedDay(null);
-          setIsSurpriseOpen(false);
+        setIsMemoryOpen(false);
+        setSelectedDay(null);
+        setIsSurpriseOpen(false);
+        setIsChatOpen(false);
       }
     };
 
@@ -141,19 +144,26 @@ function App() {
 
   return (
     <div className="min-h-screen relative">
-      <VillageScene days={days} onOpenDay={handleOpenDay} isDecember />
+      <VillageScene days={days} onOpenDay={handleOpenDay} />
       <PastMemoryCarousel memories={openedMemories} />
       <MemoryModal isOpen={isMemoryOpen} day={selectedDay} onClose={handleCloseMemory} />
       <MusicPlayer />
-      <div className="fixed top-6 right-6 flex flex-col gap-3 z-40">
+      <div className="fixed top-6 right-6 flex flex-row-reverse gap-3 z-40">
         <button
           onClick={openRandomSurprise}
           className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
         >
           Surprise!
         </button>
+        <button
+          onClick={() => setIsChatOpen(true)}
+          className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
+        >
+          Chat With Daddy
+        </button>
       </div>
       <SurprisePortal isOpen={isSurpriseOpen} videoUrl={currentSurpriseUrl} onClose={closeSurprise} />
+      <ChatWithDaddy isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }

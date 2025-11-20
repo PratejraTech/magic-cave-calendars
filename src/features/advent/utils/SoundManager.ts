@@ -107,4 +107,8 @@ export class SoundManager {
   getCurrentMusic() {
     return this.currentMusic;
   }
+
+  isMusicPlaying() {
+    return !this.musicPlayer.paused;
+  }
 }
