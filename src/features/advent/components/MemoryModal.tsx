@@ -12,11 +12,42 @@ interface MemoryModalProps {
 }
 
 export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) {
-  const messageCharacters = day?.message?.split('') ?? [];
-  const heroName = day?.title ?? (day ? `Day ${day.id}` : '');
-  const heroNickname = day?.title?.split(' ')[0] ?? (day ? `Day ${day.id}` : '');
+  const [markdownTitle, setMarkdownTitle] = useState(day?.title ?? (day ? `Day ${day.id}` : ''));
+  const [markdownMessage, setMarkdownMessage] = useState(day?.message ?? '');
+  const messageCharacters = markdownMessage.split('');
+  const heroName = markdownTitle;
+  const heroNickname = markdownTitle.split(' ')[0] ?? (day ? `Day ${day.id}` : '');
   const [subtitle, setSubtitle] = useState<string | null>(null);
   const [subtitleLoading, setSubtitleLoading] = useState(false);
+  const [isLoadingMarkdown, setIsLoadingMarkdown] = useState(false);
+
+  useEffect(() => {
+    if (!day || !isOpen) return;
+    setMarkdownTitle(day.title ?? `Day ${day.id}`);
+    setMarkdownMessage(day.message ?? '');
+    if (!day.photoMarkdownPath) return;
+    let cancelled = false;
+    setIsLoadingMarkdown(true);
+    fetch(day.photoMarkdownPath)
+      .then((res) => (res.ok ? res.text() : Promise.reject()))
+      .then((text) => {
+        if (cancelled) return;
+        const lines = text.split(/\r?\n/).map((line) => line.trim());
+        const nonEmpty = lines.filter(Boolean);
+        if (nonEmpty.length > 0) {
+          const [firstLine, ...rest] = nonEmpty;
+          setMarkdownTitle(firstLine.replace(/^#\s*/, '') || (day.title ?? `Day ${day.id}`));
+          setMarkdownMessage(rest.join('\n') || day.message || '');
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIsLoadingMarkdown(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [day, isOpen]);
 
   useEffect(() => {
     if (!day || !isOpen) {
@@ -25,7 +56,7 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
     }
     let cancelled = false;
     setSubtitleLoading(true);
-    const subtitleSource = day.photoMarkdownTitle ?? day.title ?? `Day ${day.id}`;
+    const subtitleSource = markdownTitle || day.title || `Day ${day.id}`;
     generateModalSubtitle(subtitleSource)
       .then((result) => {
         if (!cancelled) {
@@ -41,7 +72,7 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
     return () => {
       cancelled = true;
     };
-  }, [day, isOpen]);
+  }, [day, isOpen, markdownTitle]);
 
   const handleDownload = () => {
     if (!day) return;

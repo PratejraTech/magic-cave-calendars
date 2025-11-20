@@ -23,7 +23,7 @@ async function parseMarkdown(baseName) {
   );
 
   if (!hasMarkdown) {
-    return { title: baseName, message: DEFAULT_MESSAGE };
+    return { title: baseName, message: DEFAULT_MESSAGE, markdownPath: null };
   }
 
   const raw = await readFile(mdPath, 'utf8');
@@ -39,7 +39,7 @@ async function parseMarkdown(baseName) {
   const destMarkdownPath = path.join(PUBLIC_DIR, `${baseName}.md`);
   await copyFile(mdPath, destMarkdownPath);
 
-  return { title, message };
+  return { title, message, markdownPath: toPublicPath(`${baseName}.md`) };
 }
 
 async function processPhoto(fileName) {
@@ -48,12 +48,13 @@ async function processPhoto(fileName) {
   await copyFile(sourceImagePath, destImagePath);
 
   const baseName = path.parse(fileName).name;
-  const { title, message } = await parseMarkdown(baseName);
+  const { title, message, markdownPath } = await parseMarkdown(baseName);
 
   return {
     image: toPublicPath(fileName),
     title,
     message,
+    markdown: markdownPath,
   };
 }
 
