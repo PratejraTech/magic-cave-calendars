@@ -169,26 +169,30 @@ function App() {
       <VillageScene days={days} onOpenDay={handleOpenDay} />
       <PastMemoryCarousel memories={openedMemories} />
       <MemoryModal isOpen={isMemoryOpen} day={selectedDay} onClose={handleCloseMemory} />
-      <div className="fixed bottom-6 right-6 flex items-center gap-3 z-40 flex-wrap justify-end">
-        <button
-          onClick={() => {
-            ensureMusicPlaying();
-            setIsChatOpen(true);
-          }}
-          className="px-4 sm:px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition text-sm sm:text-base"
-        >
-          Chat With Daddy
-        </button>
-        <button
-          onClick={() => {
-            ensureMusicPlaying();
-            openRandomSurprise();
-          }}
-          className="px-4 sm:px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition text-sm sm:text-base"
-        >
-          Surprise!
-        </button>
-        <MusicPlayer />
+      <div className="fixed bottom-4 right-4 z-40 w-full max-w-3xl px-4">
+        <div className="grid grid-cols-3 gap-3 items-center">
+          <button
+            onClick={() => {
+              ensureMusicPlaying();
+              setIsChatOpen(true);
+            }}
+            className="px-2 sm:px-4 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition text-xs sm:text-base"
+          >
+            Chat With Daddy
+          </button>
+          <button
+            onClick={() => {
+              ensureMusicPlaying();
+              openRandomSurprise();
+            }}
+            className="px-2 sm:px-4 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition text-xs sm:text-base"
+          >
+            Surprise!
+          </button>
+          <div className="flex justify-center">
+            <MusicPlayer />
+          </div>
+        </div>
       </div>
       <SurprisePortal isOpen={isSurpriseOpen} videoUrl={currentSurpriseUrl} onClose={closeSurprise} />
       <ChatWithDaddy isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />

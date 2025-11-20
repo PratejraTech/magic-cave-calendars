@@ -12,6 +12,16 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    return res.sendStatus(204);
+  }
+  return next();
+});
+
 const PORT = process.env.CHAT_SERVER_PORT || 4000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +37,7 @@ const systemPrompt = rawPrompt.trim();
 const quotesData = JSON.parse(await readFile(quotesPath, 'utf8'));
 
 const memories = new Map();
+const responseCache = new Map();
 const getMemory = (sessionId) => {
   if (!memories.has(sessionId)) {
     memories.set(
@@ -78,7 +89,6 @@ app.post('/api/chat-with-daddy', async (req, res) => {
     const { messages = [], sessionId = 'default', quotes = [] } = req.body || {};
     const llm = new ChatOpenAI({
       modelName: 'gpt-5-mini',
-      temperature: 0.4,
       openAIApiKey: process.env.OPENAI_API_KEY,
     });
 
@@ -98,6 +108,11 @@ app.post('/api/chat-with-daddy', async (req, res) => {
         .map(toLangChainMessage),
     ];
 
+    const cacheKey = `${sessionId}:${JSON.stringify(messages.slice(-5))}`;
+    if (responseCache.has(cacheKey)) {
+      return res.json({ reply: responseCache.get(cacheKey) });
+    }
+
     const reply = await llm.invoke(lcMessages);
     const lastUser = messages
       .filter((msg) => msg.role === 'user')
@@ -107,6 +122,11 @@ app.post('/api/chat-with-daddy', async (req, res) => {
       await memory.saveContext({ input: lastUser.content }, { output: reply.content });
     }
 
+    responseCache.set(cacheKey, reply.content);
+    if (responseCache.size > 200) {
+      const oldestKey = responseCache.keys().next().value;
+      responseCache.delete(oldestKey);
+    }
     res.json({ reply: reply.content });
   } catch (error) {
     console.error('Chat error:', error);

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChatMessage, DaddyQuote } from './chatService';
 import {
   fetchDaddyQuotes,
@@ -17,7 +17,8 @@ interface ChatWithDaddyProps {
 }
 
 export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => loadStoredMessages());
+  const storedHistoryRef = useRef<ChatMessage[]>(loadStoredMessages());
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [quotes, setQuotes] = useState<DaddyQuote[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,10 +42,7 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
 
   useEffect(() => {
     if (!isOpen) return;
-    const lastMessages = loadStoredMessages();
-    if (lastMessages.length) {
-      setMessages(lastMessages);
-    }
+    setMessages([]);
     soundManager.init().then(() => {
       if (!soundManager.isMusicPlaying()) {
         playThemeAtRandomPoint(soundManager).catch(() => undefined);
@@ -77,18 +75,24 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
     logChatInput(userMessage);
 
     try {
-      const payload = [{ role: 'system' as const, content: CHAT_SYSTEM_PROMPT }, ...newMessages];
+      const payloadHistory = [...storedHistoryRef.current, ...newMessages];
+      const payload = [{ role: 'system' as const, content: CHAT_SYSTEM_PROMPT }, ...payloadHistory];
       const reply = await requestDaddyResponse(payload, quotes);
-      const updatedMessages = [...newMessages, { role: 'assistant', content: reply }];
+      const assistantMessage: ChatMessage = { role: 'assistant', content: reply };
+      const updatedMessages = [...newMessages, assistantMessage];
       setMessages(updatedMessages);
-      persistMessages(updatedMessages);
+      const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
+      storedHistoryRef.current = persisted;
+      persistMessages(persisted);
     } catch (err) {
       const fallbackQuote =
         quotes[Math.floor(Math.random() * quotes.length)]?.text ??
         "Daddy's thinking about you right now, sweetheart.";
       const updatedMessages = [...newMessages, { role: 'assistant', content: fallbackQuote }];
       setMessages(updatedMessages);
-      persistMessages(updatedMessages);
+      const persisted = [...storedHistoryRef.current, userMessage, updatedMessages[updatedMessages.length - 1]].slice(-5);
+      storedHistoryRef.current = persisted;
+      persistMessages(persisted);
       setError('Chat service is taking a nap. Using a favorite quote instead.');
     } finally {
       setLoading(false);

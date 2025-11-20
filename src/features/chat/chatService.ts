@@ -15,7 +15,12 @@ export interface ChatResponse {
 
 const CHAT_STORAGE_KEY = 'chat-with-daddy';
 const SESSION_STORAGE_KEY = 'chat-with-daddy-session-id';
-const API_BASE = import.meta.env.VITE_CHAT_API_URL || '';
+
+const env = import.meta.env as Record<string, string | boolean | undefined>;
+const API_BASE =
+  env.VITE_CHAT_API_URL?.toString() ||
+  (import.meta.env.PROD ? '' : 'http://localhost:4000');
+
 const QUOTE_ENDPOINT = '/data/daddy-quotes.json';
 const CHAT_ENDPOINT = `${API_BASE}/api/chat-with-daddy`;
 const CHAT_SESSION_ENDPOINT = `${API_BASE}/api/chat-sessions`;

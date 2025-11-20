@@ -2,48 +2,24 @@ import { useCallback, useEffect, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { SoundManager } from '../features/advent/utils/SoundManager';
 
-export const THEME_TRACK_PATH = encodeURI('/music/Ben Bohmer, Nils Hoffmann & Malou - Breathing.mp3');
+const THEME_TRACK_FILENAME = 'Ben Bohmer, Nils Hoffmann & Malou - Breathing.mp3';
+export const THEME_TRACK_PATH = `/music/${encodeURIComponent(THEME_TRACK_FILENAME)}`;
 const RANDOM_START_WINDOW_SECONDS = 120;
 
-export const playThemeAtRandomPoint = (manager: SoundManager) => {
+export const playThemeAtRandomPoint = async (manager: SoundManager) => {
   const randomStart = Math.floor(Math.random() * RANDOM_START_WINDOW_SECONDS);
-  return manager.playMusic(THEME_TRACK_PATH, randomStart);
+  await manager.playMusic(THEME_TRACK_PATH, randomStart);
 };
 
 export function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const soundManager = SoundManager.getInstance();
 
-  const startAtRandomPoint = useCallback(async () => {
-    await playThemeAtRandomPoint(soundManager);
-  }, [soundManager]);
+  const startAtRandomPoint = useCallback(() => playThemeAtRandomPoint(soundManager), [soundManager]);
 
   useEffect(() => {
-    let isMounted = true;
-    const initMusic = async () => {
-      await soundManager.init();
-      try {
-        await startAtRandomPoint();
-        if (isMounted) setIsPlaying(true);
-      } catch {
-        if (isMounted) setIsPlaying(false);
-      }
-    };
-
-    initMusic();
-
-    const unlockAudio = () => {
-      initMusic();
-      window.removeEventListener('pointerdown', unlockAudio);
-    };
-
-    window.addEventListener('pointerdown', unlockAudio);
-
-    return () => {
-      isMounted = false;
-      window.removeEventListener('pointerdown', unlockAudio);
-    };
-  }, [soundManager, startAtRandomPoint]);
+    soundManager.init();
+  }, [soundManager]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -58,7 +34,7 @@ export function MusicPlayer() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50" data-testid="music-player">
+    <div data-testid="music-player" className="flex justify-center">
       <button
         onClick={togglePlay}
         className="p-4 rounded-full transition-all duration-300 transform hover:scale-125 bg-gradient-to-br from-golden to-peppermint shadow-lg hover:shadow-xl"
