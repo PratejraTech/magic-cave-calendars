@@ -8,6 +8,7 @@ import { ButterflyCollection } from './ButterflyCollection';
 import { SoundManager } from '../utils/SoundManager';
 import { getAdelaideDate } from '../../../lib/date';
 import { EnchantedBackground } from './EnchantedBackground';
+import { LoveNote } from './LoveNote';
 
 interface VillageSceneProps {
   days: AdventDay[];
@@ -88,6 +89,7 @@ export function VillageScene({ days, onOpenDay }: VillageSceneProps) {
               );
             })}
           </div>
+          <LoveNote />
         </div>
       </div>
     </div>

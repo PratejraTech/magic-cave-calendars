@@ -24,3 +24,5 @@ harper-advent-calendar
 - The guiding system prompt that LangChain/`gpt-5-mini` should consume lives at `src/features/chat/systemPrompt.ts`. Import that file inside your LangChain pipeline so the model consistently responds with Harper-friendly tone and randomly remixes retrieved quotes.
 - Every time Harper sends a message, the UI POSTs to `/api/chat-sessions`; implement that endpoint so each payload is persisted (e.g., JSON files under `chat_sessions/`). This gives you a server-side archive of conversations.
 - When wiring LangChain JS, add conversational memory (buffer of the last few turns) plus the provided system prompt + retrieval hits so `gpt-5-mini` can reply with short, loving messages that stay in context session-to-session.
+- Run the included Express/ LangChain bridge with `npm run chat-server`. Make sure your `.env` contains `OPENAI_API_KEY=...` and (optionally) `CHAT_SERVER_PORT=4000`. Point the client to the API by setting `VITE_CHAT_API_URL=http://localhost:4000`.
+- To develop everything together, run `npm run dev:fullstack` which uses `concurrently` to start both the Vite frontend and the LangChain chat server.

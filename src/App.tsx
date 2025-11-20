@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { VillageScene } from './features/advent/components/VillageScene';
-import { MusicPlayer } from './components/MusicPlayer';
+import { MusicPlayer, playThemeAtRandomPoint, THEME_TRACK_PATH } from './components/MusicPlayer';
 import { adventMemories } from './data/adventMemories';
 import type { AdventDay } from './types/advent';
 import { seedImageStore, getImageForDay } from './lib/localImageStore';
@@ -9,6 +9,7 @@ import { MemoryModal } from './features/advent/components/MemoryModal';
 import { PastMemoryCarousel } from './features/advent/components/PastMemoryCarousel';
 import { SurprisePortal } from './features/advent/components/SurprisePortal';
 import { ChatWithDaddy } from './features/chat/ChatWithDaddy';
+import { SoundManager } from './features/advent/utils/SoundManager';
 
 function App() {
   const [days, setDays] = useState<AdventDay[]>([]);
@@ -17,6 +18,7 @@ function App() {
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const soundManager = SoundManager.getInstance();
   const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
 
   const sortOpenedDays = useCallback((opened: AdventDay[]) => {
@@ -124,6 +126,16 @@ function App() {
     setCurrentSurpriseUrl(null);
   };
 
+  const ensureMusicPlaying = () => {
+    soundManager.init().then(() => {
+      if (!soundManager.isMusicPlaying()) {
+        playThemeAtRandomPoint(soundManager);
+      } else {
+        soundManager.playMusic(THEME_TRACK_PATH);
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-lavender-100 via-sky-100 to-orange-100">
@@ -147,20 +159,26 @@ function App() {
       <VillageScene days={days} onOpenDay={handleOpenDay} />
       <PastMemoryCarousel memories={openedMemories} />
       <MemoryModal isOpen={isMemoryOpen} day={selectedDay} onClose={handleCloseMemory} />
-      <MusicPlayer />
-      <div className="fixed top-6 right-6 flex flex-row-reverse gap-3 z-40">
+      <div className="fixed bottom-6 right-6 flex items-center gap-3 z-40 flex-wrap justify-end">
         <button
-          onClick={openRandomSurprise}
-          className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
-        >
-          Surprise!
-        </button>
-        <button
-          onClick={() => setIsChatOpen(true)}
-          className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition"
+          onClick={() => {
+            ensureMusicPlaying();
+            setIsChatOpen(true);
+          }}
+          className="px-4 sm:px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition text-sm sm:text-base"
         >
           Chat With Daddy
         </button>
+        <button
+          onClick={() => {
+            ensureMusicPlaying();
+            openRandomSurprise();
+          }}
+          className="px-4 sm:px-6 py-3 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition text-sm sm:text-base"
+        >
+          Surprise!
+        </button>
+        <MusicPlayer />
       </div>
       <SurprisePortal isOpen={isSurpriseOpen} videoUrl={currentSurpriseUrl} onClose={closeSurprise} />
       <ChatWithDaddy isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />

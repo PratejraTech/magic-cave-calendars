@@ -14,9 +14,11 @@ export interface ChatResponse {
 }
 
 const CHAT_STORAGE_KEY = 'chat-with-daddy';
+const SESSION_STORAGE_KEY = 'chat-with-daddy-session-id';
+const API_BASE = import.meta.env.VITE_CHAT_API_URL || '';
 const QUOTE_ENDPOINT = '/data/daddy-quotes.json';
-const CHAT_ENDPOINT = '/api/chat-with-daddy';
-const CHAT_SESSION_ENDPOINT = '/api/chat-sessions';
+const CHAT_ENDPOINT = `${API_BASE}/api/chat-with-daddy`;
+const CHAT_SESSION_ENDPOINT = `${API_BASE}/api/chat-sessions`;
 
 export const loadStoredMessages = (): ChatMessage[] => {
   if (typeof window === 'undefined') {
@@ -41,6 +43,15 @@ export const persistMessages = (messages: ChatMessage[]) => {
   }
 };
 
+const getSessionId = () => {
+  if (typeof window === 'undefined') return 'server';
+  const existing = localStorage.getItem(SESSION_STORAGE_KEY);
+  if (existing) return existing;
+  const newId = crypto.randomUUID();
+  localStorage.setItem(SESSION_STORAGE_KEY, newId);
+  return newId;
+};
+
 export const fetchDaddyQuotes = async (): Promise<DaddyQuote[]> => {
   const response = await fetch(QUOTE_ENDPOINT);
   if (!response.ok) {
@@ -59,6 +70,7 @@ export const requestDaddyResponse = async (messages: ChatMessage[], quotes: Dadd
       model: 'gpt-5-mini',
       messages,
       quotes,
+      sessionId: getSessionId(),
     }),
   });
 
@@ -80,6 +92,7 @@ export const logChatInput = async (message: ChatMessage) => {
       body: JSON.stringify({
         timestamp: new Date().toISOString(),
         message,
+        sessionId: getSessionId(),
       }),
     });
   } catch {
