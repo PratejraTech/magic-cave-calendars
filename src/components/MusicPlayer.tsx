@@ -38,21 +38,3 @@ export function MusicPlayer() {
     </div>
   );
 }
-    setIsMuted(!isMuted);
-  };
-
-  return (
-    <div className="fixed bottom-4 right-4 z-50" data-testid="music-player">
-      <button
-        onClick={() => setIsPlaying(!isPlaying)}
-        className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-      >
-        {isPlaying ? (
-          <Pause className="w-6 h-6 text-blue-600" />
-        ) : (
-          <Play className="w-6 h-6 text-blue-600" />
-        )}
-      </button>
-    </div>
-  );
-}

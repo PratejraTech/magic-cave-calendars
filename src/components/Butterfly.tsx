@@ -1,34 +1,69 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+
 interface ButterflyProps {
-  delay?: number;
-  color?: 'blue' | 'orange' | 'pink' | 'lavender';
-  x?: number;
-  y?: number;
-  className?: string;
+  onAnimationComplete?: () => void;
 }
 
-const colorMap = {
-  blue: 'from-sky-300 to-blue-400',
-  orange: 'from-orange-300 to-amber-400',
-  pink: 'from-pink-300 to-rose-400',
-  lavender: 'from-purple-300 to-violet-400',
-};
-
-export function Butterfly({ delay = 0, color = 'blue', x, y, className }: ButterflyProps) {
-  const gradientClass = colorMap[color];
-
+export const Butterfly: React.FC<ButterflyProps> = ({ onAnimationComplete }) => {
   return (
-    <div
-      className={`butterfly absolute opacity-70 ${className || ''}`}
+    <motion.div
+      initial={{ scale: 0, rotate: -180 }}
+      animate={{ rotate: 0, scale: 1 }}
+      transition={{
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+      }}
+      onAnimationComplete={onAnimationComplete}
       style={{
-        animationDelay: `${delay}s`,
-        left: x,
-        top: y,
+        width: 100,
+        height: 100,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        x: '-50%',
+        y: '-50%',
       }}
     >
-      <div className="butterfly-wings flex gap-1">
-        <div className={`wing-left w-8 h-12 rounded-full bg-gradient-to-br ${gradientClass} shadow-lg`}></div>
-        <div className={`wing-right w-8 h-12 rounded-full bg-gradient-to-br ${gradientClass} shadow-lg`}></div>
-      </div>
-    </div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 100 100"
+        className="w-full h-full"
+      >
+        <motion.path
+          d="M 50,50 m -25,-10 a 25,25 0 1,0 50,0"
+          fill="#ff69b4"
+          animate={{
+            d: [
+              'M 50,50 m -25,-10 a 25,25 0 1,0 50,0',
+              'M 50,50 m -40,-10 a 40,25 0 1,0 80,0',
+              'M 50,50 m -25,-10 a 25,25 0 1,0 50,0',
+            ],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        <motion.path
+          d="M 50,50 m -25,10 a 25,25 0 1,0 50,0"
+          fill="#ff69b4"
+          animate={{
+            d: [
+              'M 50,50 m -25,10 a 25,25 0 1,0 50,0',
+              'M 50,50 m -40,10 a 40,25 0 1,0 80,0',
+              'M 50,50 m -25,10 a 25,25 0 1,0 50,0',
+            ],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      </svg>
+    </motion.div>
   );
-}
+};
