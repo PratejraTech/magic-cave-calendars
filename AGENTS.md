@@ -1,19 +1,36 @@
-# Repository Guidelines
+# Agent Instructions: Advent Calendar Project
 
-## Project Structure & Module Organization
-Runtime code lives in `src/`: feature flows (village, houses, confetti) stay in `src/features/advent`, shared widgets sit in `src/components`, and integrations belong to `src/lib` (Supabase client, animation helpers). Tests mirror component names in `src/__tests__`. Global styles live in `src/index.css`; static art or audio is served from `public/`. Supabase DDL resides in `supabase/migrations`—reference the migration ID whenever schema changes ship. Tooling config (`vite.config.ts`, `tailwind.config.js`, `eslint.config.js`) sits at the repo root; edit it only for cross-cutting updates.
+## Project Goal
+To create a delightful and engaging Christmas Advent Calendar for a 3-year-old. The experience should be magical, with a special focus on smooth animations and a user-friendly interface for a young child.
 
-## Build, Test, and Development Commands
-Install dependencies with `npm install`. `npm run dev` starts the hot-reloading Vite server, `npm run build` emits the production bundle, and `npm run preview` serves that output for smoke tests. Quality gates are `npm run lint`, `npm run typecheck`, and `npm run test`; run them together before pushing to catch regressions early.
+## Key Features
+- **Advent Calendar UI:** A screen with 25 heart-shaped buttons, representing the days of December leading up to Christmas.
+- **Date-Locked Buttons:** Each button can only be activated on its corresponding day (e.g., button "3" is only active on December 3rd). The timezone for this logic is UTC+1030.
+- **Modal with Memories:** When an active button is pressed, a modal window smoothly opens.
+- **Content:** The modal will display a photo and a short text memory. Initially, this will be placeholder content.
+- **Butterfly Animation:** A beautiful butterfly animation should play when a button is successfully pressed.
+- **Slow Text Reveal:** The text inside the modal should appear with a slow, engaging animation.
 
-## Coding Style & Naming Conventions
-We ship typed React 18 components with Tailwind utilities. Maintain two-space indentation, PascalCase filenames (`VillageScene.tsx`), and `use*` prefixes for custom hooks so ESLint can enforce hook contracts. Prefer named exports from shared modules and keep stateful logic close to its component. Use Tailwind before writing custom CSS; if overrides are required, scope them and document globals. Fix lint issues via `npm run lint -- --fix` and treat type errors as blockers.
+## Design & Theme
+- **Theme:** The overall theme is "butterflies" and "love hearts."
+- **Color Palette:** Use bright, engaging, and cheerful colors suitable for a toddler.
+- **Interactions:** All animations should be smooth and enjoyable. Interactions should be simple and intuitive.
 
-## Testing Guidelines
-Vitest and Testing Library handle automated coverage. Place UI-focused tests next to their component (`VillageScene.test.tsx`) and describe scenarios in plain English (“opens door after December 1”). Mock Supabase via `vi.mock('src/lib/supabase')` to keep suites deterministic. Add at least one happy-path and one guard test for every change that touches unlocking logic, animation timing, or persistence.
+## Technical Stack
+- **Framework:** React with TypeScript
+- **Bundler:** Vite
+- **Styling:** Tailwind CSS
+- **Testing:** Vitest and React Testing Library
 
-## Commit & Pull Request Guidelines
-Keep commit messages short, imperative, and descriptive (e.g., “Add aurora unlock animation”), and avoid mixing unrelated work. Each PR should include a summary, linked issues, screenshots or recordings for UI changes, and confirmation that lint, tests, and typecheck passed. Call out Supabase migration IDs or new environment variables, and request another reviewer whenever motion, accessibility, or production data changes.
+## Development Workflow
+1.  **Follow `tasks.md`:** Use the `tasks.md` file as a guide for the development process.
+2.  **Installation:** Run `npm install` to install dependencies.
+3.  **Development Server:** Run `npm run dev` to start the local development server.
+4.  **Testing:** Run `npm run test` to execute the test suite.
+5.  **Linting & Type-checking:** Before committing, ensure the code passes linting (`npm run lint`) and type-checking (`npm run typecheck`).
 
-## Environment & Secrets
-Create `.env.local` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; the app throws early if either is missing. Never commit secrets—use `.env.example` to document variables instead. Update the README and deployment notes whenever a new key or service is required.
+## File Structure
+- **Components:** Reusable components are located in `src/components`.
+- **Features:** Feature-specific components and logic are in `src/features`.
+- **Static Assets:** Place images in a `public/photos` directory.
+- **Tests:** Tests are co-located with the components they are testing or in the `src/__tests__` directory.
