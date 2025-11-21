@@ -119,21 +119,21 @@ Update this file *after each subtask*.
 
 ### **2.3 Chat API integration**
 
-- [ ] 2.3.1 Implement `chat.repository.ts`
-- [ ] 2.3.2 Implement `chat.service.ts`:
+- [x] 2.3.1 Implement `chat.repository.ts`
+- [x] 2.3.2 Implement `chat.service.ts`:
   - Create chat_record
   - Append child message
   - Append parent_agent message after streaming completes
-- [ ] 2.3.3 Implement `chat.routes.ts`:
+- [x] 2.3.3 Implement `chat.routes.ts`:
   - POST `/chat/session`
   - POST `/chat/message` (stream)
 - [ ] 2.3.4 Implement streaming fetch wrapper to Python service via `restClient.ts`
 
 ### **2.4 Analytics**
 
-- [ ] 2.4.1 Implement `analytics.repository.ts`
-- [ ] 2.4.2 Implement `analytics.service.ts`
-- [ ] 2.4.3 Add `analytics.routes.ts`:
+- [x] 2.4.1 Implement `analytics.repository.ts`
+- [x] 2.4.2 Implement `analytics.service.ts`
+- [x] 2.4.3 Add `analytics.routes.ts`:
   - calendar_open
   - day_open
   - surprise_open

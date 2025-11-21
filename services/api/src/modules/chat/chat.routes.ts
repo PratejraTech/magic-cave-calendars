@@ -1,0 +1,131 @@
+import { Router } from 'express';
+import { ChatService } from './chat.service';
+
+const router = Router();
+
+export function createChatRoutes(chatService: ChatService) {
+  // POST /chat/session - Create new chat session
+  router.post('/session', async (req, res) => {
+    try {
+      const accountId = req.user?.id;
+      if (!accountId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { child_id, session_id } = req.body;
+
+      if (!child_id || !session_id) {
+        return res.status(400).json({ error: 'child_id and session_id are required' });
+      }
+
+      const session = await chatService.createChatSession({
+        account_id: accountId,
+        child_id,
+        session_id,
+      });
+
+      res.status(201).json(session);
+    } catch (error) {
+      console.error('Error creating chat session:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // GET /chat/session/:sessionId - Get chat session
+  router.get('/session/:sessionId', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const accountId = req.user?.id;
+
+      const session = await chatService.getChatSession(sessionId);
+
+      // Check ownership
+      if (session.account_id !== accountId) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+
+      res.json(session);
+    } catch (error) {
+      if (error.message === 'Chat session not found') {
+        return res.status(404).json({ error: 'Chat session not found' });
+      }
+      console.error('Error fetching chat session:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // GET /chat/history/:childId - Get chat history for child
+  router.get('/history/:childId', async (req, res) => {
+    try {
+      const { childId } = req.params;
+      const accountId = req.user?.id;
+      const limit = parseInt(req.query.limit as string) || 50;
+
+      if (!accountId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // TODO: Verify child ownership
+
+      const history = await chatService.getChatHistory(childId, limit);
+      res.json(history);
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // GET /chat/messages/:chatRecordId - Get messages for chat session
+  router.get('/messages/:chatRecordId', async (req, res) => {
+    try {
+      const { chatRecordId } = req.params;
+      const accountId = req.user?.id;
+      const limit = parseInt(req.query.limit as string) || 100;
+
+      if (!accountId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // TODO: Verify chat record ownership through session
+
+      const messages = await chatService.getChatMessages(chatRecordId, limit);
+      res.json(messages);
+    } catch (error) {
+      console.error('Error fetching chat messages:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // POST /chat/message - Add child message (streaming endpoint delegates to intelligence service)
+  router.post('/message', async (req, res) => {
+    try {
+      const accountId = req.user?.id;
+      if (!accountId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const { session_id, message } = req.body;
+
+      if (!session_id || !message) {
+        return res.status(400).json({ error: 'session_id and message are required' });
+      }
+
+      // Add child message to database
+      const result = await chatService.addChildMessage(session_id, message);
+
+      // TODO: Forward to intelligence service for streaming response
+      // This will be implemented when we add the restClient integration
+
+      res.json({
+        session: result.session,
+        child_message: result.message,
+        // streaming_response_url: 'will be added with intelligence service integration'
+      });
+    } catch (error) {
+      console.error('Error adding chat message:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  return router;
+}
