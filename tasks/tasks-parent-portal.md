@@ -55,12 +55,16 @@ Update this markdown file after each sub-task, not just at the parent task level
   - [x] 2.6 Write tests for form validation and upload component (`ChildProfileStep.test.tsx`)
 
 - [ ] 3.0 Build daily entries step (24 day cards)  
-  - [ ] 3.1 Create `DailyEntriesStep.tsx` folder with components for card grid (24 cards)  
-  - [ ] 3.2 Each card: day number, photo upload, text input, preview thumbnail  
-  - [ ] 3.3 Allow bulk “AI-generate all text” button that triggers backend job (optional for MVP)  
-  - [ ] 3.4 API integration: `PUT /api/calendar/:calendarId/days` to save photo URLs & text content  
-  - [ ] 3.5 Validation: all 24 entries must have at least text before allowing “Next”  
-  - [ ] 3.6 Write tests for 24-grid UI and upload + text logic (`DailyEntriesStep.test.tsx`)  
+  - [x] 3.1 Create `DailyEntriesStep.tsx` folder with components for card grid (24 cards)  
+  - [x] 3.2 Each card: day number, photo upload, text input, preview thumbnail
+  - [x] 3.3 Allow bulk "AI-generate all text" button that triggers backend job (optional for MVP)
+  - [x] 3.4 API integration: `PUT /api/calendar/:calendarId/days` to save photo URLs & text content
+  - [x] 3.5 Validation: all 24 entries must have at least text before allowing "Next"
+  - [x] 3.6 Write tests for 24-grid UI and upload + text logic (`DailyEntriesStep.test.tsx`)
+- [x] 3.7 Write comprehensive component tests (`DayCard.test.tsx`, `BulkActions.test.tsx`)
+- [x] 3.8 Add error handling improvements (retry logic for uploads)
+- [x] 3.9 Add performance optimizations (debounced auto-save)
+- [x] 3.10 Add accessibility enhancements (ARIA labels, keyboard navigation)
 
 - [ ] 4.0 Build Surprise URL editor & theme selection step  
   - [ ] 4.1 Create `SurpriseStep.tsx` component: list of YouTube URLs, add/remove URLs dynamically  

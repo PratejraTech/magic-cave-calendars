@@ -32,6 +32,8 @@ export function ChildCalendarRoute() {
     });
   }, []);
 
+
+
   // Load calendar data on mount
   useEffect(() => {
     const loadCalendarData = async () => {

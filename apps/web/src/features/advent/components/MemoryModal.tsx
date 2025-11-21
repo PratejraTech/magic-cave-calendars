@@ -1,52 +1,31 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import type { MouseEvent, TouchEvent } from 'react';
-import type { AdventDay } from '../../../types/advent';
+import { type CalendarDay } from '../../../lib/api';
 import { generateModalSubtitle } from '../../chat/chatService';
 
 interface MemoryModalProps {
   isOpen: boolean;
-  day: AdventDay | null;
+  day: CalendarDay | null;
   onNext?: () => void;
   onClose?: () => void;
 }
 
 export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) {
-  const [markdownTitle, setMarkdownTitle] = useState(day?.title ?? (day ? `Day ${day.id}` : ''));
+  const [markdownTitle, setMarkdownTitle] = useState(day?.title ?? (day ? `Day ${day.day_number}` : ''));
   const [markdownMessage, setMarkdownMessage] = useState(day?.message ?? '');
   const messageCharacters = markdownMessage.split('');
   const heroName = markdownTitle;
-  const heroNickname = markdownTitle.split(' ')[0] ?? (day ? `Day ${day.id}` : '');
+  const heroNickname = markdownTitle.split(' ')[0] ?? (day ? `Day ${day.day_number}` : '');
   const [subtitle, setSubtitle] = useState<string | null>(null);
   const [subtitleLoading, setSubtitleLoading] = useState(false);
-  const [isLoadingMarkdown, setIsLoadingMarkdown] = useState(false);
+
 
   useEffect(() => {
     if (!day || !isOpen) return;
-    setMarkdownTitle(day.title ?? `Day ${day.id}`);
+    setMarkdownTitle(day.title ?? `Day ${day.day_number}`);
     setMarkdownMessage(day.message ?? '');
-    if (!day.photoMarkdownPath) return;
-    let cancelled = false;
-    setIsLoadingMarkdown(true);
-    fetch(day.photoMarkdownPath)
-      .then((res) => (res.ok ? res.text() : Promise.reject()))
-      .then((text) => {
-        if (cancelled) return;
-        const lines = text.split(/\r?\n/).map((line) => line.trim());
-        const nonEmpty = lines.filter(Boolean);
-        if (nonEmpty.length > 0) {
-          const [firstLine, ...rest] = nonEmpty;
-          setMarkdownTitle(firstLine.replace(/^#\s*/, '') || (day.title ?? `Day ${day.id}`));
-          setMarkdownMessage(rest.join('\n') || day.message || '');
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setIsLoadingMarkdown(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+    // No markdown loading for parent-created calendars - use data directly
   }, [day, isOpen]);
 
   useEffect(() => {
@@ -56,7 +35,7 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
     }
     let cancelled = false;
     setSubtitleLoading(true);
-    const subtitleSource = markdownTitle || day.title || `Day ${day.id}`;
+    const subtitleSource = markdownTitle || day.title || `Day ${day.day_number}`;
     generateModalSubtitle(subtitleSource)
       .then((result) => {
         if (!cancelled) {
@@ -77,8 +56,8 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
   const handleDownload = () => {
     if (!day) return;
     const link = document.createElement('a');
-    link.href = day.photo_url;
-    link.download = `harper-day-${day.id.toString().padStart(2, '0')}.jpg`;
+    link.href = day.photo_asset_id || '';
+    link.download = `harper-day-${day.day_number.toString().padStart(2, '0')}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -122,14 +101,14 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
                 transition={{ duration: 0.8, ease: 'easeOut' }}
               >
                 <img
-                  src={day.photo_url}
+                  src={day.photo_asset_id || ''}
                   alt={day.title}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-pink-500/40 via-transparent to-transparent" />
                 <div className="absolute top-4 left-4 bg-white/85 rounded-full px-4 py-2 font-bold text-pink-500 text-sm shadow-md">
-                  Day {day.id}
+                  Day {day.day_number}
                 </div>
                 {onClose && (
                   <button
@@ -165,7 +144,7 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
                 >
                   {messageCharacters.map((char, index) => (
                     <motion.span
-                      key={`${day.id}-${index}`}
+                      key={`${day.day_number}-${index}`}
                       variants={{
                         hidden: { opacity: 0, y: 6 },
                         visible: { opacity: 1, y: 0 },

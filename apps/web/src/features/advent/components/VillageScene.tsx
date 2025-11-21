@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
-import { AdventDay } from '../../../types/advent';
+import { CalendarDay } from '../../../lib/api';
 import { HouseCard } from './HouseCard';
 import { Snowfall } from './Snowfall';
 import { NorthernLights } from './NorthernLights';
 import { FloatingFireflies } from './FloatingFireflies';
-import { ButterflyCollection } from './ButterflyCollection';
 import { SoundManager } from '../utils/SoundManager';
 import { getAdelaideDate } from '../../../lib/date';
 import { EnchantedBackground } from './EnchantedBackground';
 import { LoveNote } from './LoveNote';
 
 interface VillageSceneProps {
-  days: AdventDay[];
+  days: CalendarDay[];
   onOpenDay: (dayId: string) => void;
 }
 
