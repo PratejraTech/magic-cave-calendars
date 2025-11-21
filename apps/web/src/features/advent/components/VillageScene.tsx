@@ -8,6 +8,7 @@ import { SoundManager } from '../utils/SoundManager';
 import { getAdelaideDate } from '../../../lib/date';
 import { EnchantedBackground } from './EnchantedBackground';
 import { LoveNote } from './LoveNote';
+import { useCurrentTheme } from '../../../themes/ThemeProvider';
 
 interface VillageSceneProps {
   days: CalendarDay[];
@@ -21,6 +22,7 @@ const shouldForceUnlock =
 export function VillageScene({ days, onOpenDay }: VillageSceneProps) {
   const [collectedButterflies, setCollectedButterflies] = useState<string[]>([]);
   const soundManager = SoundManager.getInstance();
+  const currentTheme = useCurrentTheme();
 
   useEffect(() => {
     soundManager.init();
@@ -43,7 +45,7 @@ export function VillageScene({ days, onOpenDay }: VillageSceneProps) {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-[#02030a] via-[#080f1f] to-[#0d0420] relative overflow-hidden border border-white/15 rounded-[32px] m-2 sm:m-6 shadow-[0_25px_60px_rgba(0,0,0,0.55)]"
+      className={`min-h-screen relative overflow-hidden border border-white/15 rounded-[32px] m-2 sm:m-6 shadow-[0_25px_60px_rgba(0,0,0,0.55)] ${currentTheme?.colors.background || "bg-gradient-to-br from-[#02030a] via-[#080f1f] to-[#0d0420]"}`}
       data-testid="village-scene"
     >
       {/* Background effects */}

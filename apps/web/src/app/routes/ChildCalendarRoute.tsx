@@ -4,13 +4,16 @@ import { MemoryModal } from '../../features/advent/components/MemoryModal';
 import { SurprisePortal } from '../../features/advent/components/SurprisePortal';
 import { ChatWithDaddy } from '../../features/chat/ChatWithDaddy';
 import { PastMemoryCarousel } from '../../features/advent/components/PastMemoryCarousel';
+import { ThemeSwitcher } from '../../features/advent/components/ThemeSwitcher';
 import { MusicPlayer, playThemeAtRandomPoint } from '../../components/MusicPlayer';
 import { SoundManager } from '../../features/advent/utils/SoundManager';
+import { useTheme } from '../../themes/ThemeProvider';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { fetchCalendarDays, fetchSurpriseUrls, openCalendarDay, trackAnalytics, type CalendarDay } from '../../lib/api';
+import { fetchCalendarDays, fetchSurpriseUrls, openCalendarDay, trackAnalytics, type CalendarDay, type ChildInfo } from '../../lib/api';
 
 export function ChildCalendarRoute() {
   const { shareUuid } = useParams<{ shareUuid: string }>();
+  const { setTheme } = useTheme();
   const [days, setDays] = useState<CalendarDay[]>([]);
   const [surpriseUrls, setSurpriseUrls] = useState<string[]>([]);
   const [selectedDay, setSelectedDay] = useState<CalendarDay | null>(null);
@@ -41,12 +44,17 @@ export function ChildCalendarRoute() {
 
       try {
         setIsLoading(true);
-        const [calendarDays, urls] = await Promise.all([
+        const [calendarResponse, urls] = await Promise.all([
           fetchCalendarDays(shareUuid),
           fetchSurpriseUrls(shareUuid)
         ]);
-        setDays(calendarDays);
+        setDays(calendarResponse.days);
         setSurpriseUrls(urls);
+
+        // Set theme from calendar data
+        if (calendarResponse.childInfo?.theme) {
+          setTheme(calendarResponse.childInfo.theme);
+        }
 
         // Track calendar view analytics
         trackAnalytics(shareUuid, 'calendar_open');
@@ -59,7 +67,7 @@ export function ChildCalendarRoute() {
     };
 
     loadCalendarData();
-  }, [shareUuid]);
+  }, [shareUuid, setTheme]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -154,6 +162,7 @@ export function ChildCalendarRoute() {
 
   return (
     <div className="min-h-screen relative">
+      <ThemeSwitcher />
       <VillageScene days={days} onOpenDay={handleOpenDay} />
       <PastMemoryCarousel memories={openedMemories} />
       <MemoryModal isOpen={isMemoryOpen} day={selectedDay} onClose={handleCloseMemory} />

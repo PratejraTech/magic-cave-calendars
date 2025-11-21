@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, Check, Calendar, User, Video, Copy, ExternalLink } from 'lucide-react';
+import { createCalendar, updateCalendarDays, publishCalendar, updateSurpriseVideos, createChildProfile } from '../../../lib/api';
 
 export interface PreviewPublishData {
   published: boolean;
@@ -73,23 +74,65 @@ export function PreviewPublishStep({ onComplete, wizardData }: PreviewPublishSte
   };
 
   const handlePublish = async () => {
+    if (!wizardData) return;
+
     setIsPublishing(true);
 
     try {
-      // TODO: Implement actual publishing logic
-      // This would save all the wizard data to the backend
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Step 1: Create or update child profile
+      const childProfileData = {
+        child_name: wizardData.childProfile.childName,
+        chat_persona: wizardData.childProfile.chatPersona,
+        custom_chat_prompt: wizardData.childProfile.customPrompt || undefined,
+        theme: wizardData.selectedTheme,
+        hero_photo_url: wizardData.childProfile.heroPhotoPreview || undefined,
+      };
 
-      // Generate mock share URL
-      const mockShareUuid = 'demo-share-uuid-' + Date.now();
-      const generatedUrl = `https://example.com/calendar/${mockShareUuid}`;
+      const childResult = await createChildProfile(childProfileData);
+
+      // Step 2: Create calendar
+      const currentYear = new Date().getFullYear();
+      const calendarResult = await createCalendar({
+        child_id: childResult.child_id,
+        year: currentYear,
+      });
+
+      // Step 3: Update calendar days
+      const calendarDays = wizardData.dailyEntries.map((entry, index) => ({
+        day_number: index + 1,
+        title: entry.title || `Day ${index + 1}`,
+        message: entry.message,
+        photo_asset_id: entry.photoPreview || undefined,
+        voice_asset_id: undefined, // Not implemented yet
+        music_asset_id: undefined, // Not implemented yet
+        confetti_type: 'snow' as const, // Default for now
+        unlock_effect: 'snowstorm' as const, // Default for now
+      }));
+
+      await updateCalendarDays(calendarResult.calendar_id, calendarDays);
+
+      // Step 4: Update surprise videos
+      const youtubeUrls = wizardData.surpriseVideos
+        .map(video => video.url)
+        .filter(url => url && url.trim().length > 0);
+
+      if (youtubeUrls.length > 0) {
+        await updateSurpriseVideos(calendarResult.calendar_id, youtubeUrls);
+      }
+
+      // Step 5: Publish calendar
+      const publishResult = await publishCalendar(calendarResult.calendar_id);
+
+      // Generate share URL
+      const shareUrl = `${window.location.origin}/calendar/${publishResult.share_uuid}`;
 
       setPublished(true);
-      setShareUrl(generatedUrl);
-      onComplete({ published: true, shareUrl: generatedUrl });
+      setShareUrl(shareUrl);
+      onComplete({ published: true, shareUrl });
     } catch (error) {
       console.error('Failed to publish calendar:', error);
-      // Handle error - show error message to user
+      // TODO: Show error message to user
+      alert('Failed to publish calendar. Please try again.');
     } finally {
       setIsPublishing(false);
     }

@@ -66,7 +66,7 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/children', createChildRoutes(childService));
-app.use('/api/calendars', createCalendarRoutes(calendarService));
+app.use('/api/calendars', createCalendarRoutes(calendarService, surpriseService));
 app.use('/api/surprise', createSurpriseRoutes(surpriseService));
 app.use('/api/chat', createChatRoutes(chatServiceInstance));
 app.use('/api/analytics', createAnalyticsRoutes(analyticsService));

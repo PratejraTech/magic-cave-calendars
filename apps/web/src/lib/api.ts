@@ -28,29 +28,46 @@ export interface SurpriseData {
   youtube_urls: string[];
 }
 
+export interface ChildInfo {
+  theme: string;
+  childName: string;
+}
+
+export interface CalendarDaysResponse {
+  days: CalendarDay[];
+  childInfo?: ChildInfo;
+}
+
 /**
  * Fetch calendar days for a given share UUID
  */
-export async function fetchCalendarDays(shareUuid: string): Promise<CalendarDay[]> {
+export async function fetchCalendarDays(shareUuid: string): Promise<CalendarDaysResponse> {
   try {
-    return await httpClient.get<CalendarDay[]>(`/calendars/${shareUuid}/days`);
+    const response = await httpClient.get<CalendarDaysResponse>(`/calendars/${shareUuid}/days`);
+    return response;
   } catch (error) {
     console.error('Failed to fetch calendar days:', error);
     // Return mock data as fallback
-    return Array.from({ length: 24 }, (_, i) => ({
-      day_id: `mock-day-${i + 1}`,
-      calendar_id: 'mock-calendar-id',
-      day_number: i + 1,
-      title: `Day ${i + 1}`,
-      message: `A magical message for day ${i + 1}!`,
-      photo_asset_id: `mock-photo-${i + 1}`,
-      is_opened: i < 3, // First 3 days opened for demo
-      opened_at: i < 3 ? new Date(Date.UTC(2024, 11, i + 1)).toISOString() : undefined,
-      created_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
-      updated_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
-      confetti_type: 'snow' as const,
-      unlock_effect: 'snowstorm' as const,
-    }));
+    return {
+      days: Array.from({ length: 24 }, (_, i) => ({
+        day_id: `mock-day-${i + 1}`,
+        calendar_id: 'mock-calendar-id',
+        day_number: i + 1,
+        title: `Day ${i + 1}`,
+        message: `A magical message for day ${i + 1}!`,
+        photo_asset_id: `mock-photo-${i + 1}`,
+        is_opened: i < 3, // First 3 days opened for demo
+        opened_at: i < 3 ? new Date(Date.UTC(2024, 11, i + 1)).toISOString() : undefined,
+        created_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
+        updated_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
+        confetti_type: 'snow' as const,
+        unlock_effect: 'snowstorm' as const,
+      })),
+      childInfo: {
+        theme: 'snow',
+        childName: 'Test Child'
+      }
+    };
   }
 }
 
@@ -129,6 +146,57 @@ export async function getChildProfile(): Promise<any> {
     return await httpClient.get('/child');
   } catch (error) {
     console.error('Failed to get child profile:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new calendar
+ */
+export async function createCalendar(data: {
+  child_id: string;
+  year: number;
+}): Promise<any> {
+  try {
+    return await httpClient.post('/calendars', data);
+  } catch (error) {
+    console.error('Failed to create calendar:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update calendar days
+ */
+export async function updateCalendarDays(calendarId: string, days: any[]): Promise<any> {
+  try {
+    return await httpClient.put(`/calendars/${calendarId}/days`, { days });
+  } catch (error) {
+    console.error('Failed to update calendar days:', error);
+    throw error;
+  }
+}
+
+/**
+ * Publish calendar
+ */
+export async function publishCalendar(calendarId: string): Promise<any> {
+  try {
+    return await httpClient.put(`/calendars/${calendarId}/publish`);
+  } catch (error) {
+    console.error('Failed to publish calendar:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update surprise videos for calendar
+ */
+export async function updateSurpriseVideos(calendarId: string, youtubeUrls: string[]): Promise<any> {
+  try {
+    return await httpClient.put(`/surprise/${calendarId}`, { youtube_urls: youtubeUrls });
+  } catch (error) {
+    console.error('Failed to update surprise videos:', error);
     throw error;
   }
 }

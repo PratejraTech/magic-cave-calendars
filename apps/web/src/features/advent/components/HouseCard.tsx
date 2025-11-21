@@ -4,6 +4,7 @@ import { gsap } from 'gsap';
 import { AdventDay } from '../../../types/advent';
 import { ConfettiSystem } from '../utils/ConfettiSystem';
 import { SoundManager } from '../utils/SoundManager';
+import { useCurrentTheme } from '../../../themes/ThemeProvider';
 
 interface HouseCardProps {
   day: AdventDay;
@@ -16,6 +17,7 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
   const doorRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   const soundManager = SoundManager.getInstance();
+  const currentTheme = useCurrentTheme();
 
   useEffect(() => {
     soundManager.init();
@@ -45,7 +47,7 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
     .call(() => {
       soundManager.play('magical-ding');
       ConfettiSystem.burst({
-        type: day.confetti_type || 'snow',
+        type: currentTheme?.animations.confetti || day.confetti_type || 'snow',
         count: 100,
         origin: { x: 0.5, y: 0.3 }
       });

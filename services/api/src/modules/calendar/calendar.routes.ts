@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { CalendarService } from './calendar.service';
+import { ChildService } from '../child/child.service';
+import { SurpriseService } from '../surprise/surprise.service';
 
 const router = Router();
 
-export function createCalendarRoutes(calendarService: CalendarService) {
+export function createCalendarRoutes(calendarService: CalendarService, childService?: ChildService, surpriseService?: SurpriseService) {
   // GET /calendars - Get all calendars for account
   router.get('/', async (req, res) => {
     try {
@@ -181,6 +183,87 @@ export function createCalendarRoutes(calendarService: CalendarService) {
         return res.status(404).json({ error: 'Calendar not found' });
       }
       console.error('Error fetching shared calendar:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // GET /:shareUuid/days - Get calendar days for published calendar (public endpoint)
+  router.get('/:shareUuid/days', async (req, res) => {
+    try {
+      const { shareUuid } = req.params;
+
+      // Try to get calendar by share UUID first (for published calendars)
+      let calendar;
+      try {
+        calendar = await calendarService.getCalendarByShareUuid(shareUuid);
+      } catch (error) {
+        // If not found as share UUID, try as regular calendar ID (for development/testing)
+        calendar = await calendarService.getCalendarById(shareUuid);
+        // Only allow access if calendar is published
+        if (!calendar.is_published) {
+          return res.status(404).json({ error: 'Calendar not found' });
+        }
+      }
+
+      const days = await calendarService.getCalendarDays(calendar.calendar_id);
+
+      // Get child information for theme and personalization
+      let childInfo: { theme: string; childName: string } | null = null;
+      if (childService) {
+        try {
+          const child = await childService.getChildById(calendar.child_id);
+          childInfo = {
+            theme: child.theme,
+            childName: child.child_name
+          };
+        } catch (error) {
+          console.warn('Could not fetch child info for calendar:', error.message);
+        }
+      }
+
+      res.json({
+        days,
+        childInfo
+      });
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        return res.status(404).json({ error: 'Calendar not found' });
+      }
+      console.error('Error fetching calendar days:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // GET /:shareUuid/surprises - Get surprise URLs for published calendar (public endpoint)
+  router.get('/:shareUuid/surprises', async (req, res) => {
+    try {
+      const { shareUuid } = req.params;
+
+      if (!surpriseService) {
+        return res.status(500).json({ error: 'Surprise service not available' });
+      }
+
+      // Try to get calendar by share UUID first (for published calendars)
+      let calendar;
+      try {
+        calendar = await calendarService.getCalendarByShareUuid(shareUuid);
+      } catch (error) {
+        // If not found as share UUID, try as regular calendar ID (for development/testing)
+        calendar = await calendarService.getCalendarById(shareUuid);
+        // Only allow access if calendar is published
+        if (!calendar.is_published) {
+          return res.status(404).json({ error: 'Calendar not found' });
+        }
+      }
+
+      const config = await surpriseService.getSurpriseConfig(calendar.calendar_id);
+      res.json({ youtube_urls: config.youtube_urls });
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        // Return empty array if no surprise config exists
+        return res.json({ youtube_urls: [] });
+      }
+      console.error('Error fetching surprise URLs:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

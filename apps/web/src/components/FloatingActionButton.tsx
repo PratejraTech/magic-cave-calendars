@@ -5,7 +5,7 @@ interface FloatingActionButtonProps {
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
-  theme?: 'christmas' | 'winter' | 'magical';
+  theme?: 'christmas' | 'winter' | 'magical' | 'candy' | 'forest';
   notificationCount?: number;
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   disabled?: boolean;

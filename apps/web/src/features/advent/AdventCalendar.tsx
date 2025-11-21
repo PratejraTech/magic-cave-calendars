@@ -17,21 +17,29 @@ interface AdventCalendarProps {
   theme?: 'snow' | 'warm' | 'candy' | 'forest' | 'starlight' | 'christmas' | 'winter' | 'magical';
 }
 
+type CalendarTheme = 'christmas' | 'winter' | 'magical' | 'candy' | 'forest';
+
 // Map parent portal themes to calendar component themes
-const mapThemeToCalendar = (theme: AdventCalendarProps['theme']): 'christmas' | 'winter' | 'magical' => {
+const mapThemeToCalendar = (theme: AdventCalendarProps['theme']): CalendarTheme => {
   switch (theme) {
     case 'snow':
-    case 'christmas':
       return 'christmas';
     case 'warm':
-    case 'forest':
-    case 'winter':
       return 'winter';
     case 'candy':
+      return 'candy';
+    case 'forest':
+      return 'forest';
     case 'starlight':
-    case 'magical':
-    default:
       return 'magical';
+    case 'christmas':
+      return 'christmas';
+    case 'winter':
+      return 'winter';
+    case 'magical':
+      return 'magical';
+    default:
+      return 'christmas';
   }
 };
 
@@ -86,7 +94,9 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
 
     // Trigger confetti based on theme
     const confettiType = calendarTheme === 'christmas' ? 'stars' :
-                        calendarTheme === 'winter' ? 'snow' : 'candy';
+                        calendarTheme === 'winter' ? 'snow' :
+                        calendarTheme === 'candy' ? 'candy' :
+                        calendarTheme === 'forest' ? 'reindeer' : 'candy';
     ConfettiSystem.burst({ type: confettiType, origin });
   };
 
@@ -135,6 +145,10 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
         return 'bg-gradient-to-br from-blue-300 via-cyan-300 to-indigo-400';
       case 'magical':
         return 'bg-gradient-to-br from-purple-300 via-pink-300 to-indigo-400';
+      case 'candy':
+        return 'bg-gradient-to-br from-pink-400 via-red-400 to-yellow-400';
+      case 'forest':
+        return 'bg-gradient-to-br from-green-400 via-emerald-400 to-teal-500';
       default: // christmas
         return 'bg-gradient-to-br from-pink-300 via-red-300 to-green-400';
     }

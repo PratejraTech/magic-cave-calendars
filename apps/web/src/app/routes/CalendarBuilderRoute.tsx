@@ -1022,30 +1022,34 @@ function ThemeStep() {
   );
 }
 
-function PreviewStep({ onComplete }: { onComplete: () => void }) {
+function PreviewStep({ wizardState, onComplete }: { wizardState: WizardState; onComplete: () => void }) {
   const [isPublishing, setIsPublishing] = useState(false);
+  const [published, setPublished] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string>('');
 
-  // Mock data - in a real implementation, this would come from the wizard state
+  // Build preview data from actual wizard state
   const previewData = {
     childProfile: {
-      name: 'Alex',
-      persona: 'Daddy',
-      theme: 'Snow ❄️',
-      hasPhoto: true,
+      name: wizardState.childProfile.childName || 'Not set',
+      persona: wizardState.childProfile.chatPersona === 'daddy' ? 'Daddy' :
+               wizardState.childProfile.chatPersona === 'mummy' ? 'Mummy' :
+               wizardState.childProfile.customPrompt ? 'Custom' : 'Not set',
+      theme: wizardState.selectedTheme || 'Not selected',
+      hasPhoto: !!wizardState.childProfile.heroPhotoPreview,
     },
     dailyEntries: {
       totalDays: 24,
-      completedDays: 18,
-      daysWithPhotos: 12,
-      daysWithMessages: 18,
+      completedDays: wizardState.dailyEntries.filter(entry =>
+        entry.message.trim() || entry.photoPreview
+      ).length,
+      daysWithPhotos: wizardState.dailyEntries.filter(entry => entry.photoPreview).length,
+      daysWithMessages: wizardState.dailyEntries.filter(entry => entry.message.trim()).length,
     },
     surpriseVideos: {
-      count: 3,
-      urls: [
-        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        'https://www.youtube.com/watch?v=oHg5SJYRHA0',
-        'https://www.youtube.com/watch?v=9bZkp7q19f0',
-      ],
+      count: wizardState.surpriseVideos.filter(video => video.url.trim()).length,
+      urls: wizardState.surpriseVideos
+        .map(video => video.url)
+        .filter(url => url.trim()),
     },
   };
 
@@ -1053,14 +1057,61 @@ function PreviewStep({ onComplete }: { onComplete: () => void }) {
     setIsPublishing(true);
 
     try {
-      // TODO: Implement actual publishing logic
-      // This would save all the wizard data to the backend
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Import API functions
+      const { createCalendar, updateCalendarDays, publishCalendar, updateSurpriseVideos, createChildProfile } = await import('../../lib/api');
 
-      onComplete();
+      // Step 1: Create or update child profile
+      const childProfileData = {
+        child_name: wizardState.childProfile.childName,
+        chat_persona: wizardState.childProfile.chatPersona,
+        custom_chat_prompt: wizardState.childProfile.customPrompt || undefined,
+        theme: wizardState.selectedTheme,
+        hero_photo_url: wizardState.childProfile.heroPhotoPreview || undefined,
+      };
+
+      const childResult = await createChildProfile(childProfileData);
+
+      // Step 2: Create calendar
+      const currentYear = new Date().getFullYear();
+      const calendarResult = await createCalendar({
+        child_id: childResult.child_id,
+        year: currentYear,
+      });
+
+      // Step 3: Update calendar days
+      const calendarDays = wizardState.dailyEntries.map((entry, index) => ({
+        day_number: index + 1,
+        title: entry.title || `Day ${index + 1}`,
+        message: entry.message,
+        photo_asset_id: entry.photoPreview || undefined,
+        voice_asset_id: undefined, // Not implemented yet
+        music_asset_id: undefined, // Not implemented yet
+        confetti_type: 'snow' as const, // Default for now
+        unlock_effect: 'snowstorm' as const, // Default for now
+      }));
+
+      await updateCalendarDays(calendarResult.calendar_id, calendarDays);
+
+      // Step 4: Update surprise videos
+      const youtubeUrls = wizardState.surpriseVideos
+        .map(video => video.url)
+        .filter(url => url && url.trim().length > 0);
+
+      if (youtubeUrls.length > 0) {
+        await updateSurpriseVideos(calendarResult.calendar_id, youtubeUrls);
+      }
+
+      // Step 5: Publish calendar
+      const publishResult = await publishCalendar(calendarResult.calendar_id);
+
+      // Generate share URL
+      const generatedShareUrl = `${window.location.origin}/calendar/${publishResult.share_uuid}`;
+
+      setPublished(true);
+      setShareUrl(generatedShareUrl);
     } catch (error) {
       console.error('Failed to publish calendar:', error);
-      // Handle error - show error message to user
+      alert('Failed to publish calendar. Please try again.');
     } finally {
       setIsPublishing(false);
     }

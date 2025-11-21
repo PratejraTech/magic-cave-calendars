@@ -53,7 +53,7 @@ export function createRoutes(): Router {
   router.use('/child', createChildRoutes(childService));
 
   // Calendar management routes
-  router.use('/calendar', createCalendarRoutes(calendarService));
+  router.use('/calendar', createCalendarRoutes(calendarService, childService));
 
   // Chat functionality routes
   router.use('/chat', createChatRoutes(chatService));

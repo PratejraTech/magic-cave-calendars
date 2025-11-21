@@ -8,7 +8,7 @@ interface ModalProps {
   title: string;
   text: string;
   photo: string;
-  theme?: 'christmas' | 'winter' | 'magical';
+  theme?: 'christmas' | 'winter' | 'magical' | 'candy' | 'forest';
   voiceUrl?: string;
   musicUrl?: string;
   confettiType?: 'snow' | 'stars' | 'candy' | 'reindeer';

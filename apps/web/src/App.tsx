@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryProvider } from './app/providers/QueryProvider';
 import { SupabaseProvider } from './app/providers/SupabaseProvider';
+import { ThemeProvider } from './themes/ThemeProvider';
 import { RootLayout } from './app/layout/RootLayout';
 import { AuthGuard } from './app/components/AuthGuard';
 import { AuthRoute } from './app/routes/AuthRoute';
@@ -12,39 +13,41 @@ function App() {
   return (
     <SupabaseProvider>
       <QueryProvider>
-        <BrowserRouter>
-          <RootLayout>
-            <Routes>
-              <Route path="/" element={<Navigate to="/auth" replace />} />
-              <Route
-                path="/auth"
-                element={
-                  <AuthGuard requireAuth={false}>
-                    <AuthRoute />
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/parent-portal"
-                element={
-                  <AuthGuard requireAuth={true}>
-                    <ParentDashboardRoute />
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/builder"
-                element={
-                  <AuthGuard requireAuth={true}>
-                    <CalendarBuilderRoute />
-                  </AuthGuard>
-                }
-              />
-              <Route path="/calendar/:shareUuid" element={<ChildCalendarRoute />} />
-              <Route path="*" element={<Navigate to="/auth" replace />} />
-            </Routes>
-          </RootLayout>
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <RootLayout>
+              <Routes>
+                <Route path="/" element={<Navigate to="/auth" replace />} />
+                <Route
+                  path="/auth"
+                  element={
+                    <AuthGuard requireAuth={false}>
+                      <AuthRoute />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/parent-portal"
+                  element={
+                    <AuthGuard requireAuth={true}>
+                      <ParentDashboardRoute />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/builder"
+                  element={
+                    <AuthGuard requireAuth={true}>
+                      <CalendarBuilderRoute />
+                    </AuthGuard>
+                  }
+                />
+                <Route path="/calendar/:shareUuid" element={<ChildCalendarRoute />} />
+                <Route path="*" element={<Navigate to="/auth" replace />} />
+              </Routes>
+            </RootLayout>
+          </BrowserRouter>
+        </ThemeProvider>
       </QueryProvider>
     </SupabaseProvider>
   );
