@@ -12,7 +12,7 @@ export interface Calendar {
 }
 
 export interface CalendarDay {
-  calendar_day_id: string;
+  day_id: string;
   calendar_id: string;
   day_number: number;
   photo_url?: string;
@@ -47,7 +47,7 @@ export class CalendarRepository {
 
   async findById(calendarId: string): Promise<Calendar | null> {
     const { data, error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .select('*')
       .eq('calendar_id', calendarId)
       .single();
@@ -62,7 +62,7 @@ export class CalendarRepository {
 
   async findByShareUuid(shareUuid: string): Promise<Calendar | null> {
     const { data, error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .select('*')
       .eq('share_uuid', shareUuid)
       .eq('is_published', true)
@@ -78,7 +78,7 @@ export class CalendarRepository {
 
   async findByChildAndYear(childId: string, year: number): Promise<Calendar | null> {
     const { data, error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .select('*')
       .eq('child_id', childId)
       .eq('year', year)
@@ -94,7 +94,7 @@ export class CalendarRepository {
 
   async findByAccountId(accountId: string): Promise<Calendar[]> {
     const { data, error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .select('*')
       .eq('account_id', accountId)
       .order('year', { ascending: false });
@@ -105,7 +105,7 @@ export class CalendarRepository {
 
   async create(calendarData: CreateCalendarData): Promise<Calendar> {
     const { data, error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .insert({
         account_id: calendarData.account_id,
         child_id: calendarData.child_id,
@@ -120,7 +120,7 @@ export class CalendarRepository {
 
   async update(calendarId: string, updateData: UpdateCalendarData): Promise<Calendar> {
     const { data, error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .update(updateData)
       .eq('calendar_id', calendarId)
       .select()
@@ -132,7 +132,7 @@ export class CalendarRepository {
 
   async delete(calendarId: string): Promise<void> {
     const { error } = await this.supabase
-      .from('calendar')
+      .from('advent_calendar_v2')
       .delete()
       .eq('calendar_id', calendarId);
 
@@ -140,11 +140,11 @@ export class CalendarRepository {
   }
 
   // Calendar Day methods
-  async findDayById(calendarDayId: string): Promise<CalendarDay | null> {
+  async findDayById(dayId: string): Promise<CalendarDay | null> {
     const { data, error } = await this.supabase
-      .from('calendar_day')
+      .from('calendar_day_v2')
       .select('*')
-      .eq('calendar_day_id', calendarDayId)
+      .eq('day_id', dayId)
       .single();
 
     if (error) {
@@ -157,7 +157,7 @@ export class CalendarRepository {
 
   async findDaysByCalendarId(calendarId: string): Promise<CalendarDay[]> {
     const { data, error } = await this.supabase
-      .from('calendar_day')
+      .from('calendar_day_v2')
       .select('*')
       .eq('calendar_id', calendarId)
       .order('day_number', { ascending: true });
@@ -168,7 +168,7 @@ export class CalendarRepository {
 
   async createDay(dayData: CreateCalendarDayData): Promise<CalendarDay> {
     const { data, error } = await this.supabase
-      .from('calendar_day')
+      .from('calendar_day_v2')
       .insert({
         calendar_id: dayData.calendar_id,
         day_number: dayData.day_number,
@@ -182,11 +182,11 @@ export class CalendarRepository {
     return data;
   }
 
-  async updateDay(calendarDayId: string, updateData: UpdateCalendarDayData): Promise<CalendarDay> {
+  async updateDay(dayId: string, updateData: UpdateCalendarDayData): Promise<CalendarDay> {
     const { data, error } = await this.supabase
-      .from('calendar_day')
+      .from('calendar_day_v2')
       .update(updateData)
-      .eq('calendar_day_id', calendarDayId)
+      .eq('day_id', dayId)
       .select()
       .single();
 
@@ -194,11 +194,11 @@ export class CalendarRepository {
     return data;
   }
 
-  async deleteDay(calendarDayId: string): Promise<void> {
+  async deleteDay(dayId: string): Promise<void> {
     const { error } = await this.supabase
-      .from('calendar_day')
+      .from('calendar_day_v2')
       .delete()
-      .eq('calendar_day_id', calendarDayId);
+      .eq('day_id', dayId);
 
     if (error) throw error;
   }
@@ -210,7 +210,7 @@ export class CalendarRepository {
     }));
 
     const { error } = await this.supabase
-      .from('calendar_day')
+      .from('calendar_day_v2')
       .insert(days);
 
     if (error) throw error;

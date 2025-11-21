@@ -1,0 +1,139 @@
+{
+  "name": "Embed Chat History",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 1,
+              "unit": "hours"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/chat/history?limit=100&since={{ $now.minus({ hours: 1 }).toISOString() }}",
+        "options": {}
+      },
+      "id": "fetch-recent-chats",
+      "name": "Fetch Recent Chat Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const messages = $node[\"Fetch Recent Chat Messages\"].json;\n\n// Group messages by session\nconst sessions = {};\n\nfor (const message of messages) {\n  const sessionId = message.session_id;\n  if (!sessions[sessionId]) {\n    sessions[sessionId] = {\n      session_id: sessionId,\n      account_id: message.account_id,\n      child_id: message.child_id,\n      messages: []\n    };\n  }\n  sessions[sessionId].messages.push({\n    sender: message.sender,\n    message_text: message.message_text,\n    timestamp: message.timestamp\n  });\n}\n\nreturn Object.values(sessions);"
+      },
+      "id": "group-messages-by-session",
+      "name": "Group Messages by Session",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/api/embed",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sessions",
+              "value": "={{ $node[\"Group Messages by Session\"].json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "embed-sessions",
+      "name": "Embed Sessions to Vector Store",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/analytics",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "event_type",
+              "value": "chat_history_embedded"
+            },
+            {
+              "name": "event_payload",
+              "value": "={{ { session_count: $node[\"Group Messages by Session\"].json.length, timestamp: $now.toISOString() } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-embedding-event",
+      "name": "Log Embedding Analytics Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Recent Chat Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Recent Chat Messages": {
+      "main": [
+        [
+          {
+            "node": "Group Messages by Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group Messages by Session": {
+      "main": [
+        [
+          {
+            "node": "Embed Sessions to Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embed Sessions to Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Log Embedding Analytics Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null
+}

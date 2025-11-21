@@ -1,1 +1,0 @@
-Your first big show. The circus! Ice skating, you were smiling as bright as the lights <3

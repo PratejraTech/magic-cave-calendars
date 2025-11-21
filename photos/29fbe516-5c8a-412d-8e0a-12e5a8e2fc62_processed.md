@@ -1,1 +1,0 @@
-You loved to wear my mala necklace. Don't forget to take big breaths <3

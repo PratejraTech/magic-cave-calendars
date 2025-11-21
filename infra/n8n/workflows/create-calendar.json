@@ -1,0 +1,159 @@
+{
+  "name": "Create Advent Calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar",
+        "options": {}
+      },
+      "id": "calendar-creation-trigger",
+      "name": "Calendar Creation Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "boolean": [
+            {
+              "name": "is_published",
+              "value": false
+            }
+          ],
+          "number": [
+            {
+              "name": "year",
+              "value": "={{ new Date().getFullYear() }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.body.account_id }}"
+            },
+            {
+              "name": "child_id",
+              "value": "={{ $json.body.child_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-calendar-data",
+      "name": "Set Calendar Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/calendar",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $node[\"Set Calendar Data\"].json[\"account_id\"] }}"
+            },
+            {
+              "name": "child_id",
+              "value": "={{ $node[\"Set Calendar Data\"].json[\"child_id\"] }}"
+            },
+            {
+              "name": "year",
+              "value": "={{ $node[\"Set Calendar Data\"].json[\"year\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-calendar-api",
+      "name": "Create Calendar API Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const calendarId = $node[\"Create Calendar API Call\"].json[\"calendar\"][\"calendar_id\"];\nconst days = [];\n\nfor (let i = 1; i <= 24; i++) {\n  days.push({\n    calendar_id: calendarId,\n    day_number: i,\n    photo_url: null,\n    text_content: null\n  });\n}\n\nreturn { days };"
+      },
+      "id": "generate-day-rows",
+      "name": "Generate 24 Day Rows",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://localhost:3001/api/calendar/{{ $node[\"Create Calendar API Call\"].json[\"calendar\"][\"calendar_id\"] }}/days",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "days",
+              "value": "={{ $node[\"Generate 24 Day Rows\"].json[\"days\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "populate-calendar-days",
+      "name": "Populate Calendar Days",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Calendar Creation Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Calendar Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Calendar Data": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar API Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Calendar API Call": {
+      "main": [
+        [
+          {
+            "node": "Generate 24 Day Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate 24 Day Rows": {
+      "main": [
+        [
+          {
+            "node": "Populate Calendar Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null
+}

@@ -32,6 +32,8 @@ export function ChildCalendarRoute() {
     });
   }, []);
 
+
+
   // Load calendar data on mount
   useEffect(() => {
     const loadCalendarData = async () => {
@@ -73,7 +75,7 @@ export function ChildCalendarRoute() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleOpenDay = async (dayId: number) => {
+  const handleOpenDay = async (dayId: string) => {
     if (!shareUuid) return;
 
     const openedAt = new Date().toISOString();
@@ -81,7 +83,7 @@ export function ChildCalendarRoute() {
 
     setDays((prevDays) =>
       prevDays.map((day) => {
-        if (day.id === dayId) {
+        if (day.day_id === dayId) {
           openedDay = { ...day, is_opened: true, opened_at: openedAt };
           return openedDay;
         }

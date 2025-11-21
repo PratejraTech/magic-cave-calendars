@@ -1,0 +1,408 @@
+---
+description: Check this file before every feature change to ensure cohesiveness.
+alwaysApply: false
+---
+## 2. TOP-LEVEL DIRECTORY LAYOUT
+
+```text
+.
+├── apps/                 # User-facing applications (React/Vite)
+│   └── web/
+├── services/             # Backend + intelligence services
+│   ├── api/              # Typescript backend
+│   └── intelligence/     # Python + LangGraph + memory
+├── infra/                # Infrastructure, migrations, workflows
+│   ├── supabase/
+│   ├── n8n/
+│   └── ops/
+├── packages/             # Shared libraries and assets
+│   ├── core/
+│   ├── ui/
+│   └── prompts/
+├── meta/                 # Docs, agent instructions, project governance
+│   ├── AGENTS.md
+│   ├── folder-structure.mdc
+│   ├── tasks/
+│   └── docs/
+├── scripts/              # One-off / dev-time scripts (non-runtime)
+├── .github/              # CI/CD workflows
+├── .vscode/ or .idea/    # Editor config (optional)
+├── README.md
+├── package.json          # Monorepo root config (if used)
+└── tooling configs       # tsconfig, eslint, prettier, etc.
+````
+
+> **Agents:** When you see old files at repo root (e.g. `index.html`, `src/`, `functions/`, `chat_sessions/`, `photos/`), treat them as **legacy**. Do NOT reintroduce them as canonical structures. Use `apps/web`, `services/*`, and `infra/*` as the source of truth.
+
+---
+
+## 3. FRONTEND APPLICATION – `apps/web`
+
+The React/Vite web app (child experience + parent portal).
+
+```text
+apps/
+└── web/
+    ├── public/                # Static assets served as-is
+    │   ├── favicon.ico
+    │   ├── robots.txt
+    │   └── assets/
+    ├── src/
+    │   ├── app/
+    │   │   ├── routes/        # Route-level components/pages
+    │   │   │   ├── ChildCalendarRoute.tsx
+    │   │   │   ├── ParentDashboardRoute.tsx
+    │   │   │   ├── CalendarBuilderRoute.tsx
+    │   │   │   ├── AuthRoute.tsx
+    │   │   │   └── NotFoundRoute.tsx
+    │   │   ├── layout/        # Layouts & shells
+    │   │   │   ├── RootLayout.tsx
+    │   │   │   └── ParentLayout.tsx
+    │   │   └── providers/     # App-level providers (Supabase, QueryClient)
+    │   │       ├── SupabaseProvider.tsx
+    │   │       └── QueryProvider.tsx
+    │   ├── features/
+    │   │   ├── calendar-viewer/
+    │   │   │   ├── components/
+    │   │   │   ├── hooks/
+    │   │   │   ├── api/
+    │   │   │   └── index.ts
+    │   │   ├── parent-portal/
+    │   │   │   ├── components/
+    │   │   │   ├── wizard/
+    │   │   │   ├── api/
+    │   │   │   └── index.ts
+    │   │   ├── chat/
+    │   │   │   ├── ChatModal.tsx
+    │   │   │   ├── ChatStreamView.tsx
+    │   │   │   ├── hooks/
+    │   │   │   └── api/
+    │   │   ├── surprise/
+    │   │   │   ├── SurpriseModal.tsx
+    │   │   │   ├── ChannelList.tsx
+    │   │   │   └── api/
+    │   │   └── analytics/
+    │   │       ├── hooks/
+    │   │       └── tracker.ts
+    │   ├── components/        # Cross-feature presentational components
+    │   ├── lib/               # Frontend utilities (api client, helpers)
+    │   │   ├── httpClient.ts
+    │   │   ├── supabaseClient.ts
+    │   │   └── theme.ts
+    │   ├── styles/
+    │   │   ├── index.css
+    │   │   └── tailwind.css (if needed)
+    │   ├── types/
+    │   │   ├── calendar.ts
+    │   │   ├── chat.ts
+    │   │   ├── surprise.ts
+    │   │   └── analytics.ts
+    │   ├── main.tsx
+    │   └── vite-env.d.ts
+    ├── index.html
+    ├── vite.config.ts
+    ├── tailwind.config.cjs or .js
+    ├── tsconfig.json
+    └── package.json
+```
+
+### Frontend rules
+
+* API calls go through `lib/httpClient.ts` or `features/*/api/` modules, NOT directly to external URLs scattered throughout components.
+* Do NOT store secrets or API keys in the frontend.
+* Any new feature should live under `src/features/<feature-name>/` with:
+
+  * `components/`, `hooks/`, `api/` as needed.
+* Shared styles belong in `styles/` or `packages/ui`, not duplicated across features.
+
+---
+
+## 4. BACKEND SERVICE – `services/api` (Typescript)
+
+The TS backend exposes REST endpoints and manages DB access, auth integration, and communication with the intelligence layer.
+
+```text
+services/
+└── api/
+    ├── src/
+    │   ├── http/
+    │   │   ├── routes/
+    │   │   │   ├── account.routes.ts
+    │   │   │   ├── child.routes.ts
+    │   │   │   ├── calendar.routes.ts
+    │   │   │   ├── chat.routes.ts
+    │   │   │   ├── surprise.routes.ts
+    │   │   │   └── analytics.routes.ts
+    │   │   ├── middlewares/
+    │   │   │   ├── authMiddleware.ts
+    │   │   │   └── errorHandler.ts
+    │   │   └── server.ts
+    │   ├── modules/
+    │   │   ├── account/
+    │   │   │   ├── account.service.ts
+    │   │   │   └── account.repository.ts
+    │   │   ├── child/
+    │   │   │   ├── child.service.ts
+    │   │   │   └── child.repository.ts
+    │   │   ├── calendar/
+    │   │   │   ├── calendar.service.ts
+    │   │   │   └── calendar.repository.ts
+    │   │   ├── chat/
+    │   │   │   ├── chat.service.ts
+    │   │   │   ├── chat.repository.ts
+    │   │   │   └── chat.dto.ts
+    │   │   ├── surprise/
+    │   │   │   ├── surprise.service.ts
+    │   │   │   └── surprise.repository.ts
+    │   │   ├── analytics/
+    │   │   │   ├── analytics.service.ts
+    │   │   │   └── analytics.repository.ts
+    │   │   └── uploads/
+    │   │       ├── uploads.service.ts
+    │   │       └── uploads.signed-urls.ts
+    │   ├── lib/
+    │   │   ├── supabaseClient.ts
+    │   │   ├── restClient.ts        # Client to Python intelligence
+    │   │   ├── schemaValidator.ts
+    │   │   ├── logger.ts
+    │   │   └── config.ts
+    │   ├── types/
+    │   │   ├── domain.ts            # Account/Child/Calendar types
+    │   │   └── api.ts               # Request/response DTOs
+    │   └── index.ts
+    ├── tests/
+    │   ├── http/
+    │   └── modules/
+    ├── tsconfig.json
+    ├── package.json
+    └── README.md
+```
+
+### Backend rules
+
+* All database operations go through `*.repository.ts`, not directly from route handlers.
+* All calls to the Python intelligence service go through `lib/restClient.ts`.
+* Do NOT embed prompt strings directly in TS code; use `packages/prompts`.
+* Enforce 1:1 `account -> child` logic at the service layer (e.g. account cannot create a second child).
+
+---
+
+## 5. INTELLIGENCE SERVICE – `services/intelligence` (Python)
+
+Python service for LLM orchestration, memory, and content generation.
+
+```text
+services/
+└── intelligence/
+    ├── src/
+    │   ├── api/
+    │   │   ├── http_server.py       # REST server (FastAPI/Flask/etc.)
+    │   │   ├── routes/
+    │   │   │   ├── chat_routes.py
+    │   │   │   └── generate_routes.py
+    │   │   └── schemas.py           # Pydantic models for request/response
+    │   ├── core/
+    │   │   ├── chat_engine.py       # LLM chat logic with streaming
+    │   │   ├── persona_builder.py   # Build prompt from child + account config
+    │   │   ├── memory_manager.py    # Short & long-term memory interface
+    │   │   ├── recall_engine.py     # Relevance-based retrieval
+    │   │   └── safety.py            # Optional safety checks
+    │   ├── integrations/
+    │   │   ├── openai_client.py
+    │   │   ├── document_store_client.py
+    │   │   └── supabase_proxy.py (if needed for metadata)
+    │   ├── prompts/
+    │   │   └── parent_chat/         # Loaded from packages/prompts at build time or mounted
+    │   └── settings.py
+    ├── tests/
+    ├── pyproject.toml or requirements.txt
+    └── README.md
+```
+
+### Intelligence rules
+
+* Only accepts/returns JSON via REST.
+* Does NOT hold DB credentials; any DB-related identifiers arrive as primitive IDs.
+* Uses `document_store_client` for memory; never writes directly to Postgres.
+* Reads canonical prompt templates from `packages/prompts` (mounted or vendored).
+
+---
+
+## 6. INFRASTRUCTURE – `infra/`
+
+```text
+infra/
+├── supabase/
+│   ├── migrations/
+│   │   ├── 0001_init_account_child_calendar.sql
+│   │   ├── 0002_chat_tables.sql
+│   │   └── ...
+│   └── schema.md         # Human-readable schema description
+├── n8n/
+│   ├── workflows/
+│   │   ├── create-calendar.json
+│   │   ├── upload-photo.json
+│   │   ├── generate-prompts.json
+│   │   ├── embed-chat-history.json
+│   │   └── cleanup-old-chats.json
+│   └── README.md
+└── ops/
+    ├── env.example       # All services environment variables (documented)
+    ├── deployment.md     # How to deploy frontend, backend, intelligence, n8n
+    ├── backup-restore.md
+    └── ci-cd.md
+```
+
+### Infra rules
+
+* **Migrations**: Any schema change must be represented as a new migration file and documented in `schema.md`.
+* **n8n** exports: Workflows should be versioned and named with clear prefixes (e.g. `chat-embed-*`, `calendar-*`).
+* **ops** docs must remain up to date with infrastructure changes.
+
+---
+
+## 7. SHARED PACKAGES – `packages/`
+
+Shared code and assets for the entire system.
+
+```text
+packages/
+├── core/
+│   ├── src/
+│   │   ├── types/
+│   │   │   ├── domain.ts          # Shared TS domain types
+│   │   │   └── events.ts
+│   │   ├── validation/
+│   │   │   ├── calendarSchemas.ts
+│   │   │   └── chatSchemas.ts
+│   │   └── index.ts
+│   ├── tsconfig.json
+│   └── package.json
+├── ui/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── Card.tsx
+│   │   │   └── ThemeWrapper.tsx
+│   │   └── index.ts
+│   ├── tsconfig.json
+│   └── package.json
+└── prompts/
+    ├── parent_chat/
+    │   ├── base.md
+    │   ├── mummy_variant.md
+    │   ├── daddy_variant.md
+    │   └── custom_template.md
+    └── README.md
+```
+
+### Packages rules
+
+* `core` should contain **pure, framework-agnostic** logic and types.
+* `ui` should contain React components that can be reused across different frontends if needed.
+* `prompts` are the single source of truth for LLM prompts; no hard-coded prompts in service code.
+
+---
+
+## 8. META & AGENT GUIDANCE – `meta/`
+
+```text
+meta/
+├── AGENTS.md                 # Canonical agent instruction file
+├── folder-structure.mdc      # This file
+├── tasks/
+│   ├── tasks.md
+│   └── <other task specs>
+└── docs/
+    ├── repo-map.md
+    ├── refactor-log.md
+    ├── architecture.md
+    ├── prd.md                # Product Requirements Document
+    └── guide-to-vibe.md      # If applicable
+```
+
+### Meta rules
+
+* Any major structural or architectural change must be noted in `refactor-log.md`.
+* Agents should always:
+
+  1. Read `AGENTS.md`.
+  2. Read `folder-structure.mdc`.
+  3. Read relevant `docs/*.md` (e.g. `prd.md` for product context) before making changes.
+
+---
+
+## 9. SCRIPTS – `scripts/`
+
+```text
+scripts/
+├── dev/
+│   ├── seed-db.ts
+│   └── generate-mock-data.ts
+├── maintenance/
+│   ├── export-n8n-workflows.ts
+│   └── cleanup-local-artifacts.ts
+└── README.md
+```
+
+### Scripts rules
+
+* Scripts are **non-runtime helpers** and must not be relied upon in production execution paths.
+* Do not store sensitive data or environment-specific secrets inside scripts.
+
+---
+
+## 10. LEGACY PATHS & MIGRATION NOTES
+
+When working with historical code trees (e.g. from the original prototype), you may encounter:
+
+* `src/` at repo root → now lives under `apps/web/src/`.
+* `functions/` at root → now `services/api` and `services/intelligence`.
+* `chat_sessions/` with `.json` files → replaced by Postgres + document store; do NOT reintroduce file-based storage.
+* `photos/` at root → canonical storage is Supabase; local folders are only for dev/demo content.
+* `dist/` → build artefact; should be ignored.
+
+**Agents:**
+If you see these folders in the current repo, assume they are **temporary, legacy, or to-be-migrated**. Do not write new production code into them. Instead, migrate functionality into the appropriate `apps/`, `services/`, `infra/`, or `packages/` path and update docs.
+
+---
+
+## 11. WHEN ADDING NEW FOLDERS
+
+1. **Check if it fits an existing domain**
+
+   * Feature UI → `apps/web/src/features/<feature>/`
+   * Shared logic → `packages/core`
+   * Shared UI → `packages/ui`
+   * Infra → `infra/*`
+   * Service logic → `services/api` or `services/intelligence`
+
+2. **Update this file**
+
+   * Add the new folder path under the appropriate section.
+   * Briefly describe its purpose.
+
+3. **Avoid duplication**
+
+   * Do not create parallel, similar folders (e.g. `components2`, `new-lib`, `tmp`) for production code.
+   * If refactoring, move code and clean up the old path.
+
+---
+
+## 12. QUICK CHECKLIST FOR AGENTS
+
+Before modifying the repository:
+
+* [ ] Read `meta/AGENTS.md`.
+* [ ] Read this `meta/folder-structure.mdc`.
+* [ ] Identify whether the change is frontend, backend, intelligence, infra, or shared.
+* [ ] Work within the correct domain folder.
+* [ ] Do NOT touch `dist/`, legacy `chat_sessions/`, or local `photos/` as canonical.
+* [ ] If you change structure, update this file and `meta/docs/repo-map.md`.
+
+This structure is the **single source of truth** for where code and configuration should live.
+Deviations MUST be deliberate, documented, and consistent with the overall architecture.
+
+```
+```

@@ -1,0 +1,170 @@
+{
+  "name": "Cleanup Old Chat Data",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "custom",
+              "cronExpression": "0 0 1 2 *"
+            }
+          ]
+        }
+      },
+      "id": "annual-cleanup-trigger",
+      "name": "Annual Cleanup Trigger (Feb 1)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Calculate cutoff date: Feb 1 of previous year\nconst currentYear = new Date().getFullYear();\nconst cutoffDate = new Date(currentYear - 1, 1, 1).toISOString(); // Feb 1 of previous year\n\nreturn { cutoff_date: cutoffDate, current_year: currentYear };"
+      },
+      "id": "calculate-cutoff-date",
+      "name": "Calculate Cutoff Date",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/admin/chat-records?before={{ $node[\"Calculate Cutoff Date\"].json[\"cutoff_date\"] }}",
+        "options": {}
+      },
+      "id": "fetch-old-chat-records",
+      "name": "Fetch Old Chat Records",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "http://localhost:3001/api/admin/chat-records/bulk",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "record_ids",
+              "value": "={{ $node[\"Fetch Old Chat Records\"].json.map(record => record.chat_record_id) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "delete-old-chat-records",
+      "name": "Delete Old Chat Records",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "http://localhost:8000/api/embed/bulk",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session_ids",
+              "value": "={{ $node[\"Fetch Old Chat Records\"].json.map(record => record.session_id) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "delete-vector-embeddings",
+      "name": "Delete Vector Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/analytics",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "event_type",
+              "value": "chat_cleanup_completed"
+            },
+            {
+              "name": "event_payload",
+              "value": "={{ { cutoff_date: $node[\"Calculate Cutoff Date\"].json[\"cutoff_date\"], records_deleted: $node[\"Fetch Old Chat Records\"].json.length, year: $node[\"Calculate Cutoff Date\"].json[\"current_year\"] } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-cleanup-event",
+      "name": "Log Cleanup Analytics Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Annual Cleanup Trigger (Feb 1)": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cutoff Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Cutoff Date": {
+      "main": [
+        [
+          {
+            "node": "Fetch Old Chat Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Old Chat Records": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Chat Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Chat Records": {
+      "main": [
+        [
+          {
+            "node": "Delete Vector Embeddings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Vector Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Log Cleanup Analytics Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null
+}

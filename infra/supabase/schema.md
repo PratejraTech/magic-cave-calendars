@@ -194,11 +194,14 @@ account (1) ──── (1) child
 
 ## Security Considerations
 
-- Row Level Security (RLS) should be implemented on all tables
-- Access control based on account_id ownership
-- Public access only for published calendars via share_uuid
-- Signed URLs for media assets
-- Input validation for YouTube URLs and user content
+- ✅ Row Level Security (RLS) implemented on all tables
+- ✅ Access control based on account_id ownership
+- ✅ Public access only for published calendars via share_uuid
+- 🔄 Signed URLs for media assets (planned)
+- ✅ Input validation and sanitization implemented
+- ✅ Content Security Policy (CSP) implemented
+- ✅ Rate limiting and security headers configured
+- ✅ Authentication hardening with email confirmation
 
 ## Migration Notes
 
