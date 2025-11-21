@@ -46,13 +46,13 @@ Update this markdown file after each sub-task, not just at the parent task level
   - [x] 1.5 Add `AuthRoute` wrapper component for protected routes in `apps/web/src/lib/`
   - [x] 1.6 Write unit tests for authentication components (`AuthRoute.test.tsx`)  
 
-- [ ] 2.0 Build child profile step in wizard  
-  - [ ] 2.1 Create `ChildProfileStep.tsx` under `apps/web/src/features/parent-portal/steps/`  
-  - [ ] 2.2 Design form fields: child name, hero photo upload, chat persona selection, custom prompt textarea  
-  - [ ] 2.3 Implement photo upload: drag & drop, preview thumbnail, validation of file type & size  
-  - [ ] 2.4 API integration: `POST /api/child` or `PUT /api/child/:childId` for profile data  
-  - [ ] 2.5 Persist the form state and enable “Next” when valid  
-  - [ ] 2.6 Write tests for form validation and upload component (`ChildProfileStep.test.tsx`)  
+- [x] 2.0 Build child profile step in wizard
+  - [x] 2.1 Create `ChildProfileStep.tsx` under `apps/web/src/features/parent-portal/steps/`
+  - [x] 2.2 Design form fields: child name, hero photo upload, chat persona selection, custom prompt textarea
+  - [x] 2.3 Implement photo upload: drag & drop, preview thumbnail, validation of file type & size
+  - [x] 2.4 API integration: `POST /api/child` or `PUT /api/child/:childId` for profile data
+  - [x] 2.5 Persist the form state and enable "Next" when valid
+  - [x] 2.6 Write tests for form validation and upload component (`ChildProfileStep.test.tsx`)
 
 - [ ] 3.0 Build daily entries step (24 day cards)  
   - [ ] 3.1 Create `DailyEntriesStep.tsx` folder with components for card grid (24 cards)  
