@@ -98,22 +98,22 @@ Update this file *after each subtask*.
 
 ### **2.1 Calendar + Child domain**
 
-- [ ] 2.1.1 Implement `child.repository.ts`
-- [ ] 2.1.2 Enforce "one account → one child" in `child.service.ts`
-- [ ] 2.1.3 Implement `calendar.repository.ts`
-- [ ] 2.1.4 Implement `calendar_day.repository.ts`
-- [ ] 2.1.5 Implement `calendar.service.ts`:
+- [x] 2.1.1 Implement `child.repository.ts`
+- [x] 2.1.2 Enforce "one account → one child" in `child.service.ts`
+- [x] 2.1.3 Implement `calendar.repository.ts`
+- [x] 2.1.4 Implement `calendar_day.repository.ts`
+- [x] 2.1.5 Implement `calendar.service.ts`:
   - Create calendar
   - Update calendar days
   - Publish/unpublish calendar
-- [ ] 2.1.6 Implement routes in `calendar.routes.ts`
+- [x] 2.1.6 Implement routes in `calendar.routes.ts`
 
 ### **2.2 Surprise YouTube URLs (array model)**
 
-- [ ] 2.2.1 Implement `surprise.repository.ts` (CRUD for a single record)
-- [ ] 2.2.2 Implement `surprise.service.ts`
-- [ ] 2.2.3 Implement `surprise.routes.ts`
-- [ ] 2.2.4 Add validation:
+- [x] 2.2.1 Implement `surprise.repository.ts` (CRUD for a single record)
+- [x] 2.2.2 Implement `surprise.service.ts`
+- [x] 2.2.3 Implement `surprise.routes.ts`
+- [x] 2.2.4 Add validation:
   - HTTPS only
   - YouTube or YouTube Kids only
 
