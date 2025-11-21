@@ -97,6 +97,93 @@ export const requestDaddyResponse = async (
   return data.reply;
 };
 
+export const requestDaddyResponseStreaming = (
+  messages: ChatMessage[],
+  quotes: DaddyQuote[],
+  onChunk: (chunk: string) => void,
+  onComplete: (fullResponse: string) => void,
+  onError: (error: string) => void,
+  sessionOverride?: string
+): (() => void) => {
+  const controller = new AbortController();
+
+  fetch(`${CHAT_ENDPOINT.replace('/chat', '/chat/stream')}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      child_id: 'default', // TODO: Get from context
+      session_id: sessionOverride ?? getSessionId(),
+      persona: 'daddy',
+      message: messages[messages.length - 1]?.content || '',
+      custom_prompt: '', // TODO: Add custom prompt support
+      conversation_history: messages.slice(0, -1)
+    }),
+    signal: controller.signal
+  })
+  .then(async (response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error('No response body reader available');
+    }
+
+    const decoder = new TextDecoder();
+    let fullResponse = '';
+
+    const readStream = async () => {
+      try {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          onComplete(fullResponse);
+          return;
+        }
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              onComplete(fullResponse);
+              return;
+            }
+            if (data.startsWith('[ERROR]')) {
+              onError(data.slice(7));
+              return;
+            }
+            fullResponse += data;
+            onChunk(data);
+          }
+        }
+
+        await readStream();
+      } catch (error) {
+        onError('Stream reading failed');
+      }
+    };
+
+    await readStream();
+  })
+  .catch((error) => {
+    if (error.name === 'AbortError') {
+      return; // Request was cancelled
+    }
+    onError(error.message || 'Connection failed');
+  });
+
+  // Return cleanup function
+  return () => {
+    controller.abort();
+  };
+};
+
 let subtitleQuotesCache: DaddyQuote[] | null = null;
 
 const SUBTITLE_SYSTEM_PROMPT =
