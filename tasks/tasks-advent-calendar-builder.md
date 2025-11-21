@@ -64,11 +64,11 @@ Update this file *after each subtask*.
 
 ### **1.1 Implement core schema**
 
-- [ ] 1.1.1 Review existing DB schema for conflicts
-- [ ] 1.1.2 Add `0001_init_account_child_calendar.sql`
-- [ ] 1.1.3 Add `0002_chat_and_analytics.sql`
-- [ ] 1.1.4 Add `0003_surprise_config.sql` (array of YouTube URLs)
-- [ ] 1.1.5 Remove legacy `surprise_channel` table if exists
+- [x] 1.1.1 Review existing DB schema for conflicts
+- [x] 1.1.2 Add `0001_init_account_child_calendar.sql`
+- [x] 1.1.3 Add `0002_chat_and_analytics.sql`
+- [x] 1.1.4 Add `0003_surprise_config.sql` (array of YouTube URLs)
+- [x] 1.1.5 Remove legacy `surprise_channel` table if exists
 
 ### **1.2 Test migrations locally**
 
@@ -86,9 +86,9 @@ Update this file *after each subtask*.
 
 ### **1.3 Update schema documentation**
 
-- [ ] 1.3.1 Update `infra/supabase/schema.md`
-- [ ] 1.3.2 Document field-level descriptions
-- [ ] 1.3.3 Document constraints & indexes
+- [x] 1.3.1 Update `infra/supabase/schema.md`
+- [x] 1.3.2 Document field-level descriptions
+- [x] 1.3.3 Document constraints & indexes
 
 ---
 
@@ -142,9 +142,9 @@ Update this file *after each subtask*.
 
 - [ ] 2.5.1 Write tests for calendar
 - [x] 2.5.2 Write tests for child
-- [ ] 2.5.3 Write tests for surprise
-- [ ] 2.5.4 Write chat route tests
-- [ ] 2.5.5 Write analytics tests
+- [x] 2.5.3 Write tests for surprise
+- [x] 2.5.4 Write chat route tests
+- [x] 2.5.5 Write analytics tests
 
 ---
 
@@ -237,10 +237,10 @@ Update this file *after each subtask*.
 
 ### **4.6 Frontend tests**
 
-- [ ] 4.6.1 Calendar viewer tests
-- [ ] 4.6.2 Parent wizard tests
-- [ ] 4.6.3 Chat streaming tests
-- [ ] 4.6.4 Surprise editor tests
+- [x] 4.6.1 Calendar viewer tests
+- [x] 4.6.2 Parent wizard tests
+- [x] 4.6.3 Chat streaming tests
+- [x] 4.6.4 Surprise editor tests
 
 ---
 
@@ -248,11 +248,11 @@ Update this file *after each subtask*.
 
 ### **5.1 n8n workflows**
 
-- [ ] 5.1.1 Workflow: `create-calendar.json`
+- [x] 5.1.1 Workflow: `create-calendar.json`
   - Pre-populate 24 day rows
-- [ ] 5.1.2 Workflow: `embed-chat-history.json`
+- [x] 5.1.2 Workflow: `embed-chat-history.json`
   - Periodically embed chat history into document store
-- [ ] 5.1.3 Workflow: `cleanup-old-chats.json`
+- [x] 5.1.3 Workflow: `cleanup-old-chats.json`
   - Remove chat data on Feb 1 of following year
 
 ### **5.2 CI/CD**
