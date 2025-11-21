@@ -127,7 +127,7 @@ Update this file *after each subtask*.
 - [x] 2.3.3 Implement `chat.routes.ts`:
   - POST `/chat/session`
   - POST `/chat/message` (stream)
-- [ ] 2.3.4 Implement streaming fetch wrapper to Python service via `restClient.ts`
+- [x] 2.3.4 Implement streaming fetch wrapper to Python service via `restClient.ts`
 
 ### **2.4 Analytics**
 

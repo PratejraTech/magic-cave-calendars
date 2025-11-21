@@ -1,7 +1,11 @@
 import { ChatRepository, CreateChatRecordData, CreateChatMessageData } from './chat.repository';
+import { RestClient, ChatStreamRequest } from '../../lib/restClient';
 
 export class ChatService {
-  constructor(private chatRepository: ChatRepository) {}
+  constructor(
+    private chatRepository: ChatRepository,
+    private restClient: RestClient
+  ) {}
 
   async createChatSession(sessionData: CreateChatRecordData) {
     return await this.chatRepository.createChatRecord(sessionData);
@@ -69,6 +73,31 @@ export class ChatService {
 
   async getLastFiveMessages(chatRecordId: string) {
     return await this.chatRepository.getLastFiveMessages(chatRecordId);
+  }
+
+  /**
+   * Handle streaming chat response from intelligence service
+   */
+  async streamChatResponse(sessionId: string, childId: string, message: string, personaConfig?: any) {
+    // Get recent context messages
+    const contextMessages = await this.getRecentMessagesForContext(childId);
+
+    // Prepare request for intelligence service
+    const request: ChatStreamRequest = {
+      session_id: sessionId,
+      child_id: childId,
+      message,
+      context_messages: contextMessages,
+      persona_config: personaConfig,
+    };
+
+    // Call intelligence service
+    const response = await this.restClient.streamChatResponse(request);
+
+    // Store the AI response in database
+    await this.addParentAgentMessage(sessionId, response.response);
+
+    return response;
   }
 
   // Cleanup method for retention policy (called by scheduled job)

@@ -96,7 +96,7 @@ export function createChatRoutes(chatService: ChatService) {
     }
   });
 
-  // POST /chat/message - Add child message (streaming endpoint delegates to intelligence service)
+  // POST /chat/message - Add child message and get streaming response from intelligence service
   router.post('/message', async (req, res) => {
     try {
       const accountId = req.user?.id;
@@ -104,25 +104,37 @@ export function createChatRoutes(chatService: ChatService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const { session_id, message } = req.body;
+      const { session_id, message, persona_config } = req.body;
 
       if (!session_id || !message) {
         return res.status(400).json({ error: 'session_id and message are required' });
       }
 
+      // Get session to verify ownership and get child_id
+      const session = await chatService.getChatSession(session_id);
+      if (session.account_id !== accountId) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+
       // Add child message to database
       const result = await chatService.addChildMessage(session_id, message);
 
-      // TODO: Forward to intelligence service for streaming response
-      // This will be implemented when we add the restClient integration
+      // Get streaming response from intelligence service
+      const streamingResponse = await chatService.streamChatResponse(
+        session_id,
+        session.child_id,
+        message,
+        persona_config
+      );
 
       res.json({
         session: result.session,
         child_message: result.message,
-        // streaming_response_url: 'will be added with intelligence service integration'
+        ai_response: streamingResponse.response,
+        finished: streamingResponse.finished,
       });
     } catch (error) {
-      console.error('Error adding chat message:', error);
+      console.error('Error processing chat message:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
