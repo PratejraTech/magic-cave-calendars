@@ -141,7 +141,7 @@ Update this file *after each subtask*.
 ### **2.5 Backend tests**
 
 - [ ] 2.5.1 Write tests for calendar
-- [ ] 2.5.2 Write tests for child
+- [x] 2.5.2 Write tests for child
 - [ ] 2.5.3 Write tests for surprise
 - [ ] 2.5.4 Write chat route tests
 - [ ] 2.5.5 Write analytics tests
@@ -216,24 +216,24 @@ Update this file *after each subtask*.
 
 ### **4.3 Child Calendar Viewer**
 
-- [ ] 4.3.1 Day tile grid with animations  
-- [ ] 4.3.2 Locked/unlocked logic  
-- [ ] 4.3.3 Day reveal modal  
-- [ ] 4.3.4 Integration with Surprise modal  
-- [ ] 4.3.5 Integration with Chat modal
+- [x] 4.3.1 Day tile grid with animations
+- [x] 4.3.2 Locked/unlocked logic
+- [x] 4.3.3 Day reveal modal
+- [x] 4.3.4 Integration with Surprise modal
+- [x] 4.3.5 Integration with Chat modal
 
 ### **4.4 Chat Window (Child)**
 
-- [ ] 4.4.1 Streaming UI for parent-agent responses  
-- [ ] 4.4.2 Token-by-token render  
-- [ ] 4.4.3 Session persistence  
-- [ ] 4.4.4 Respect persona fields
+- [x] 4.4.1 Streaming UI for parent-agent responses
+- [x] 4.4.2 Token-by-token render
+- [x] 4.4.3 Session persistence
+- [x] 4.4.4 Respect persona fields
 
 ### **4.5 Surprise Modal**
 
-- [ ] 4.5.1 Render thumbnails from YouTube URLs  
-- [ ] 4.5.2 Embed YouTube player safely  
-- [ ] 4.5.3 Handle URL validation feedback
+- [x] 4.5.1 Render thumbnails from YouTube URLs
+- [x] 4.5.2 Embed YouTube player safely
+- [x] 4.5.3 Handle URL validation feedback
 
 ### **4.6 Frontend tests**
 
