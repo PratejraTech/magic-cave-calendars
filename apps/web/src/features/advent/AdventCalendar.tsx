@@ -14,14 +14,34 @@ import { adventMemories } from '../../data/adventMemories';
 interface AdventCalendarProps {
   days: AdventDay[];
   onOpenDay: (dayId: string) => void;
-  theme?: 'christmas' | 'winter' | 'magical';
+  theme?: 'snow' | 'warm' | 'candy' | 'forest' | 'starlight' | 'christmas' | 'winter' | 'magical';
 }
+
+// Map parent portal themes to calendar component themes
+const mapThemeToCalendar = (theme: AdventCalendarProps['theme']): 'christmas' | 'winter' | 'magical' => {
+  switch (theme) {
+    case 'snow':
+    case 'christmas':
+      return 'christmas';
+    case 'warm':
+    case 'forest':
+    case 'winter':
+      return 'winter';
+    case 'candy':
+    case 'starlight':
+    case 'magical':
+    default:
+      return 'magical';
+  }
+};
 
 const AdventCalendar: React.FC<AdventCalendarProps> = ({
   days,
   onOpenDay,
   theme = 'christmas'
 }) => {
+  // Map the incoming theme to calendar-compatible theme
+  const calendarTheme = mapThemeToCalendar(theme);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemory, setSelectedMemory] = useState<AdventDay | null>(null);
@@ -65,8 +85,8 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
     });
 
     // Trigger confetti based on theme
-    const confettiType = theme === 'christmas' ? 'stars' :
-                        theme === 'winter' ? 'snow' : 'candy';
+    const confettiType = calendarTheme === 'christmas' ? 'stars' :
+                        calendarTheme === 'winter' ? 'snow' : 'candy';
     ConfettiSystem.burst({ type: confettiType, origin });
   };
 
@@ -110,7 +130,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
 
 
   const getThemeBackground = () => {
-    switch (theme) {
+    switch (calendarTheme) {
       case 'winter':
         return 'bg-gradient-to-br from-blue-300 via-cyan-300 to-indigo-400';
       case 'magical':
@@ -130,7 +150,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
           title={selectedMemory.title || `Day ${selectedMemory.day_number}`}
           text={selectedMemory.message}
           photo={selectedMemory.photo_asset_id || `https://picsum.photos/400/300?random=${selectedMemory.day_number}`} // Temporary fallback
-          theme={theme}
+          theme={calendarTheme}
           voiceUrl={selectedMemory.voice_asset_id || undefined}
           musicUrl={selectedMemory.music_asset_id || undefined}
           confettiType={selectedMemory.confetti_type}
@@ -159,7 +179,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
           </svg>
         }
         label="Surprise Video"
-        theme={theme}
+        theme={calendarTheme}
         position="bottom-left"
       />
 
@@ -171,7 +191,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
           </svg>
         }
         label="Chat with Daddy"
-        theme={theme}
+        theme={calendarTheme}
         position="bottom-right"
         notificationCount={0} // TODO: Add unread message count
       />
