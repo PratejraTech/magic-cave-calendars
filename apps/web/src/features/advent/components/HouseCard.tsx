@@ -7,7 +7,7 @@ import { SoundManager } from '../utils/SoundManager';
 
 interface HouseCardProps {
   day: AdventDay;
-  onOpen: (dayId: number) => void;
+  onOpen: (dayId: string) => void;
   canOpen: boolean;
 }
 
@@ -45,13 +45,13 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
     .call(() => {
       soundManager.play('magical-ding');
       ConfettiSystem.burst({
-        type: day.confettiType || 'snow',
+        type: day.confetti_type || 'snow',
         count: 100,
         origin: { x: 0.5, y: 0.3 }
       });
       soundManager.play('confetti-burst');
       setIsOpened(true);
-      onOpen(day.id);
+      onOpen(day.day_id);
     });
 
     // Framer Motion for smooth reveal
@@ -70,7 +70,7 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
       whileHover={{ scale: canOpen ? 1.1 : 1 }}
       whileTap={{ scale: 0.95 }}
       onClick={handleClick}
-      data-testid={`day-${day.id}`}
+      data-testid={`day-${day.day_number}`}
     >
       {!isOpened ? (
         <div
@@ -85,7 +85,7 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"></div>
           <div className="absolute inset-2 flex items-center justify-center">
             <span className="text-2xl font-bold text-white drop-shadow-lg">
-              {day.id}
+              {day.day_number}
             </span>
           </div>
           {canOpen && !day.is_opened && (
@@ -106,13 +106,13 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
           }}
         >
           <img
-            src={day.photo_url}
-            alt={`Day ${day.id}`}
+            src={day.photo_asset_id ? `https://picsum.photos/400/300?random=${day.day_number}` : `https://picsum.photos/400/300?random=${day.day_number}`}
+            alt={`Day ${day.day_number}`}
             className="w-full h-full object-cover"
           />
           <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2">
             <p className="text-xs text-white text-center font-semibold">
-              {day.title || `Day ${day.id}`}
+              {day.title || `Day ${day.day_number}`}
             </p>
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-yellow-400/20 to-transparent animate-pulse"></div>

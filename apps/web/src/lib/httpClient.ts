@@ -6,9 +6,42 @@ const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://loca
 
 class HttpClient {
   private baseURL: string;
+  private supabase: any = null;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
+    // Lazy load supabase for auth tokens
+    this.initializeSupabase();
+  }
+
+  private async initializeSupabase() {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+      this.supabase = createClient(supabaseUrl, supabaseAnonKey);
+    } catch (error) {
+      console.warn('Failed to initialize Supabase client:', error);
+    }
+  }
+
+  private async getAuthHeaders(): Promise<Record<string, string>> {
+    if (!this.supabase) {
+      await this.initializeSupabase();
+    }
+
+    if (this.supabase) {
+      try {
+        const { data: { session } } = await this.supabase.auth.getSession();
+        if (session?.access_token) {
+          return { Authorization: `Bearer ${session.access_token}` };
+        }
+      } catch (error) {
+        console.warn('Failed to get auth token:', error);
+      }
+    }
+
+    return {};
   }
 
   private async request<T>(
@@ -16,10 +49,12 @@ class HttpClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
+    const authHeaders = await this.getAuthHeaders();
 
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...options.headers,
       },
       ...options,

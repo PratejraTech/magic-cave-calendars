@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, User, Calendar, Video, Palette, Eye, Upload, X } from 'lucide-react';
+import { useWizardState, WizardState } from '../hooks/useWizardState';
 
 const STEPS = [
   { id: 'profile', title: 'Child Profile', icon: User, description: 'Set up your child\'s information' },
@@ -11,18 +12,26 @@ const STEPS = [
 ];
 
 export function CalendarBuilderRoute() {
-  const [currentStep, setCurrentStep] = useState(0);
+  const { state, isLoaded, updateState, clearState, markSaved } = useWizardState();
   const navigate = useNavigate();
 
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+      </div>
+    );
+  }
+
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+    if (state.currentStep < STEPS.length - 1) {
+      updateState({ currentStep: state.currentStep + 1 });
     }
   };
 
   const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (state.currentStep > 0) {
+      updateState({ currentStep: state.currentStep - 1 });
     }
   };
 
@@ -32,17 +41,17 @@ export function CalendarBuilderRoute() {
   };
 
   const renderStepContent = () => {
-    switch (currentStep) {
+    switch (state.currentStep) {
       case 0:
-        return <ChildProfileStep />;
+        return <ChildProfileStep wizardState={state} onUpdate={updateState} />;
       case 1:
-        return <DailyEntriesStep />;
+        return <DailyEntriesStep wizardState={state} onUpdate={updateState} />;
       case 2:
-        return <SurpriseVideosStep />;
+        return <SurpriseVideosStep wizardState={state} onUpdate={updateState} />;
       case 3:
-        return <ThemeStep />;
+        return <ThemeStep wizardState={state} onUpdate={updateState} />;
       case 4:
-        return <PreviewStep onComplete={handleComplete} />;
+        return <PreviewStep wizardState={state} onComplete={handleComplete} />;
       default:
         return null;
     }
@@ -73,8 +82,8 @@ export function CalendarBuilderRoute() {
           <div className="flex items-center justify-between mb-4">
             {STEPS.map((step, index) => {
               const Icon = step.icon;
-              const isCompleted = index < currentStep;
-              const isCurrent = index === currentStep;
+              const isCompleted = index < state.currentStep;
+              const isCurrent = index === state.currentStep;
 
               return (
                 <div key={step.id} className="flex flex-col items-center flex-1">
@@ -102,7 +111,7 @@ export function CalendarBuilderRoute() {
                   </div>
                   {index < STEPS.length - 1 && (
                     <div className={`flex-1 h-0.5 mt-4 ${
-                      index < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                      index < state.currentStep ? 'bg-green-500' : 'bg-gray-200'
                     }`} />
                   )}
                 </div>
@@ -123,13 +132,13 @@ export function CalendarBuilderRoute() {
           <div className="flex justify-between">
             <button
               onClick={handlePrevious}
-              disabled={currentStep === 0}
+              disabled={state.currentStep === 0}
               className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
 
-            {currentStep < STEPS.length - 1 ? (
+            {state.currentStep < STEPS.length - 1 ? (
               <button
                 onClick={handleNext}
                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center"
@@ -153,20 +162,18 @@ export function CalendarBuilderRoute() {
 }
 
 // Step Components
-function ChildProfileStep() {
-  const [formData, setFormData] = useState({
-    childName: '',
-    chatPersona: 'daddy' as 'mummy' | 'daddy' | 'custom',
-    customPrompt: '',
-    heroPhoto: null as File | null,
-    heroPhotoPreview: null as string | null,
-    theme: 'snow' as 'snow' | 'warm' | 'candy' | 'forest' | 'starlight',
-  });
+function ChildProfileStep({ wizardState, onUpdate }: {
+  wizardState: WizardState;
+  onUpdate: (updates: Partial<WizardState>) => void;
+}) {
+  const formData = wizardState.childProfile;
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    onUpdate({
+      childProfile: { ...formData, [field]: value }
+    });
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -188,11 +195,13 @@ function ChildProfileStep() {
         return;
       }
 
-      setFormData(prev => ({
-        ...prev,
-        heroPhoto: file,
-        heroPhotoPreview: URL.createObjectURL(file)
-      }));
+      onUpdate({
+        childProfile: {
+          ...formData,
+          heroPhoto: file,
+          heroPhotoPreview: URL.createObjectURL(file)
+        }
+      });
 
       if (errors.heroPhoto) {
         setErrors(prev => ({ ...prev, heroPhoto: '' }));
@@ -204,11 +213,13 @@ function ChildProfileStep() {
     if (formData.heroPhotoPreview) {
       URL.revokeObjectURL(formData.heroPhotoPreview);
     }
-    setFormData(prev => ({
-      ...prev,
-      heroPhoto: null,
-      heroPhotoPreview: null
-    }));
+    onUpdate({
+      childProfile: {
+        ...formData,
+        heroPhoto: null,
+        heroPhotoPreview: null
+      }
+    });
   };
 
   const validateForm = () => {
@@ -362,20 +373,11 @@ function ChildProfileStep() {
   );
 }
 
-function DailyEntriesStep() {
-  const [days, setDays] = useState<Array<{
-    id: number;
-    photo: File | null;
-    photoPreview: string | null;
-    message: string;
-    isGenerating: boolean;
-  }>>(() => Array.from({ length: 24 }, (_, i) => ({
-    id: i + 1,
-    photo: null,
-    photoPreview: null,
-    message: '',
-    isGenerating: false,
-  })));
+function DailyEntriesStep({ wizardState, onUpdate }: {
+  wizardState: WizardState;
+  onUpdate: (updates: Partial<WizardState>) => void;
+}) {
+  const days = wizardState.dailyEntries;
 
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -383,7 +385,7 @@ function DailyEntriesStep() {
   const handlePhotoUpload = (dayId: number, file: File) => {
     if (!file.type.startsWith('image/')) return;
 
-    setDays(prev => prev.map(day =>
+    const updatedDays = days.map(day =>
       day.id === dayId
         ? {
             ...day,
@@ -391,7 +393,8 @@ function DailyEntriesStep() {
             photoPreview: URL.createObjectURL(file)
           }
         : day
-    ));
+    );
+    onUpdate({ dailyEntries: updatedDays });
   };
 
   const removePhoto = (dayId: number) => {

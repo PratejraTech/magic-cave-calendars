@@ -13,7 +13,7 @@ import { adventMemories } from '../../data/adventMemories';
 
 interface AdventCalendarProps {
   days: AdventDay[];
-  onOpenDay: (dayId: number) => void;
+  onOpenDay: (dayId: string) => void;
   theme?: 'christmas' | 'winter' | 'magical';
 }
 
@@ -37,21 +37,21 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
   const isDecember = currentMonth === 11;
 
   // Determine if a day should be unlocked
-  const isDayUnlocked = (dayId: number) => {
+  const isDayUnlocked = (dayNumber: number) => {
     if (!isDecember) return false;
-    if (currentDay >= 25) return dayId <= 24; // All days unlocked after Dec 25
-    return dayId <= currentDay;
+    if (currentDay >= 25) return dayNumber <= 24; // All days unlocked after Dec 25
+    return dayNumber <= currentDay;
   };
 
   const handleButtonClick = (day: AdventDay) => (event: React.MouseEvent) => {
-    const dayId = day.id;
+    const dayId = day.day_id;
     const buttonRect = (event.target as HTMLElement).getBoundingClientRect();
     const origin = {
       x: (buttonRect.left + buttonRect.width / 2) / window.innerWidth,
       y: (buttonRect.top + buttonRect.height / 2) / window.innerHeight
     };
 
-    if (!isDayUnlocked(dayId)) return;
+    if (!isDayUnlocked(day.day_number)) return;
 
     onOpenDay(dayId);
     setIsAnimating(true);
@@ -127,13 +127,13 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
         <Modal
           isOpen={isModalOpen}
           onClose={closeModal}
-          title={selectedMemory.title || `Day ${selectedMemory.id}`}
+          title={selectedMemory.title || `Day ${selectedMemory.day_number}`}
           text={selectedMemory.message}
-          photo={selectedMemory.photo_url}
+          photo={selectedMemory.photo_asset_id || `https://picsum.photos/400/300?random=${selectedMemory.day_number}`} // Temporary fallback
           theme={theme}
-          voiceUrl={selectedMemory.voiceUrl}
-          musicUrl={selectedMemory.musicUrl}
-          confettiType={selectedMemory.confettiType}
+          voiceUrl={selectedMemory.voice_asset_id || undefined}
+          musicUrl={selectedMemory.music_asset_id || undefined}
+          confettiType={selectedMemory.confetti_type}
         />
       )}
 
@@ -181,12 +181,12 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
       </h1>
       <div className="grid grid-cols-5 gap-4">
         {days.map((day) => {
-          const isUnlocked = isDayUnlocked(day.id);
+          const isUnlocked = isDayUnlocked(day.day_number);
           const isLocked = !isUnlocked;
 
           return (
             <motion.button
-              key={day.id}
+              key={day.day_id}
               disabled={isLocked}
               onClick={handleButtonClick(day)}
               className={`relative w-24 h-24 text-white font-bold flex items-center justify-center text-2xl transition-all duration-300 ${
@@ -209,7 +209,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
               }}
               transition={{
                 duration: 0.3,
-                delay: day.id * 0.05
+                delay: day.day_number * 0.05
               }}
             >
               {isLocked && (
@@ -230,9 +230,9 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, delay: day.id * 0.1 }}
+                  transition={{ type: "spring", stiffness: 300, delay: day.day_number * 0.1 }}
                 >
-                  {day.id}
+                  {day.day_number}
                 </motion.span>
               )}
             </motion.button>

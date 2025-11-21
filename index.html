@@ -8,7 +8,29 @@
     <meta property="og:image" content="/assets/love-heart.svg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/assets/love-heart.svg" />
-</head>
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+      font-src 'self' https://fonts.gstatic.com;
+      object-src 'none';
+      media-src 'self' https: blob:;
+      frame-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      upgrade-insecure-requests;
+    ">
+
+    <!-- Security Headers -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="x-content-type-options" content="nosniff" />
+    <meta name="x-frame-options" content="DENY" />
+    <meta name="x-xss-protection" content="1; mode=block" />
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

@@ -65,11 +65,24 @@ export function createChatRoutes(chatService: ChatService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // TODO: Verify child ownership
+      // Verify child ownership
+      const childService = (await import('../child/child.service')).ChildService;
+      const childRepository = (await import('../child/child.repository')).ChildRepository;
+      const supabase = (await import('../../lib/supabaseClient')).supabase;
+      const childRepo = new childRepository(supabase);
+      const childSvc = new childService(childRepo);
+
+      const child = await childSvc.getChildById(childId);
+      if (child.account_id !== accountId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
 
       const history = await chatService.getChatHistory(childId, limit);
       res.json(history);
     } catch (error) {
+      if (error.message === 'Child not found') {
+        return res.status(404).json({ error: 'Child not found' });
+      }
       console.error('Error fetching chat history:', error);
       res.status(500).json({ error: 'Internal server error' });
     }

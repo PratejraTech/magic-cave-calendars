@@ -12,7 +12,7 @@ import { LoveNote } from './LoveNote';
 
 interface VillageSceneProps {
   days: AdventDay[];
-  onOpenDay: (dayId: number) => void;
+  onOpenDay: (dayId: string) => void;
 }
 
 const shouldForceUnlock =
@@ -79,11 +79,11 @@ export function VillageScene({ days, onOpenDay }: VillageSceneProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
             {days.map((day) => {
               const canOpen =
-                allowDevUnlocks || (isAdelaideDecember && currentAdelaideDay >= day.id);
+                allowDevUnlocks || (isAdelaideDecember && currentAdelaideDay >= day.day_number);
 
               return (
                 <HouseCard
-                  key={day.id}
+                  key={day.day_id}
                   day={day}
                   onOpen={onOpenDay}
                   canOpen={canOpen}

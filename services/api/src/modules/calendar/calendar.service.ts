@@ -78,22 +78,22 @@ export class CalendarService {
     return await this.calendarRepository.findDaysByCalendarId(calendarId);
   }
 
-  async getCalendarDay(calendarDayId: string) {
-    const day = await this.calendarRepository.findDayById(calendarDayId);
+  async getCalendarDay(dayId: string) {
+    const day = await this.calendarRepository.findDayById(dayId);
     if (!day) {
       throw new Error('Calendar day not found');
     }
     return day;
   }
 
-  async updateCalendarDay(calendarDayId: string, updateData: UpdateCalendarDayData) {
+  async updateCalendarDay(dayId: string, updateData: UpdateCalendarDayData) {
     // Verify the day exists
-    const existingDay = await this.calendarRepository.findDayById(calendarDayId);
+    const existingDay = await this.calendarRepository.findDayById(dayId);
     if (!existingDay) {
       throw new Error('Calendar day not found');
     }
 
-    return await this.calendarRepository.updateDay(calendarDayId, updateData);
+    return await this.calendarRepository.updateDay(dayId, updateData);
   }
 
   async updateCalendarDays(calendarId: string, dayUpdates: Array<{
@@ -118,7 +118,7 @@ export class CalendarService {
         throw new Error(`Day ${update.day_number} not found in calendar`);
       }
 
-      const result = await this.calendarRepository.updateDay(existingDay.calendar_day_id, {
+      const result = await this.calendarRepository.updateDay(existingDay.day_id, {
         photo_url: update.photo_url,
         text_content: update.text_content,
       });
