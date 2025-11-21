@@ -152,34 +152,34 @@ Update this file *after each subtask*.
 
 ### **3.1 REST server (FastAPI)**
 
-- [ ] 3.1.1 Implement `http_server.py`
-- [ ] 3.1.2 Add routes:
+- [x] 3.1.1 Implement `http_server.py`
+- [x] 3.1.2 Add routes:
   - POST `/chat/stream`
   - POST `/chat/generate_days`
-- [ ] 3.1.3 Add error handling + logging middleware
+- [x] 3.1.3 Add error handling + logging middleware
 
 ### **3.2 Persona prompt + daily message generation**
 
-- [ ] 3.2.1 Implement prompt loading from `packages/prompts`
-- [ ] 3.2.2 Implement `persona_builder.py`
-- [ ] 3.2.3 Implement generator for 24 daily messages
+- [x] 3.2.1 Implement prompt loading from `packages/prompts`
+- [x] 3.2.2 Implement `persona_builder.py`
+- [x] 3.2.3 Implement generator for 24 daily messages
 
 ### **3.3 Chat Engine**
 
-- [ ] 3.3.1 Implement `chat_engine.py`
-- [ ] 3.3.2 Add streaming token pipeline  
-- [ ] 3.3.3 Integrate short-term memory  
-- [ ] 3.3.4 Integrate long-term recall  
+- [x] 3.3.1 Implement `chat_engine.py`
+- [x] 3.3.2 Add streaming token pipeline
+- [x] 3.3.3 Integrate short-term memory
+- [x] 3.3.4 Integrate long-term recall
 
 ### **3.4 Memory subsystem**
 
-- [ ] 3.4.1 Implement `memory_manager.py`:
-  - store last 5 messages  
-  - load last 5 messages  
-- [ ] 3.4.2 Implement `document_store_client.py` (Redis/KV/vector DB)
-- [ ] 3.4.3 Implement `recall_engine.py`:
-  - embedding search  
-  - recency weighting  
+- [x] 3.4.1 Implement `memory_manager.py`:
+  - store last 5 messages
+  - load last 5 messages
+- [x] 3.4.2 Implement `document_store_client.py` (Redis/KV/vector DB)
+- [x] 3.4.3 Implement `recall_engine.py`:
+  - embedding search
+  - recency weighting
   - threshold filtering  
 
 ### **3.5 Intelligence tests**
