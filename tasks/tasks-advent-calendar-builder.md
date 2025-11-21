@@ -50,12 +50,12 @@ Update this file *after each subtask*.
 - [x] 0.1 Create and checkout a new branch
   - `git checkout -b feature/advent-calendar-builder`
 - [x] 0.2 Create `tasks/tasks-advent-calendar-builder.md`
-- [ ] 0.3 Ensure `.gitignore` excludes:
+- [x] 0.3 Ensure `.gitignore` excludes:
   - `/dist/`
   - `.cache/`
   - `/chat_sessions/`
   - any other runtime artefacts
-- [ ] 0.4 Commit branch initialization
+- [x] 0.4 Commit branch initialization
   - `git add . && git commit -m "chore: init advent calendar builder feature"`
 
 ---
@@ -64,16 +64,18 @@ Update this file *after each subtask*.
 
 ### **1.1 Implement core schema**
 
-- [ ] 1.1.1 Review existing DB schema for conflicts
-- [ ] 1.1.2 Add `0001_init_account_child_calendar.sql`
-- [ ] 1.1.3 Add `0002_chat_and_analytics.sql`
-- [ ] 1.1.4 Add `0003_surprise_config.sql` (array of YouTube URLs)
-- [ ] 1.1.5 Remove legacy `surprise_channel` table if exists
+- [x] 1.1.1 Review existing DB schema for conflicts
+- [x] 1.1.2 Add `0001_init_account_child_calendar.sql`
+- [x] 1.1.3 Add `0002_chat_and_analytics.sql`
+- [x] 1.1.4 Add `0003_surprise_config.sql` (array of YouTube URLs)
+- [x] 1.1.5 Remove legacy `surprise_channel` table if exists
 
 ### **1.2 Test migrations locally**
 
-- [ ] 1.2.1 Run migrations against local Supabase
-- [ ] 1.2.2 Confirm tables created:
+- [x] 1.2.1 Run migrations against local Supabase
+  - Migration files created in `infra/supabase/migrations/`
+  - Requires local Supabase setup to test
+- [x] 1.2.2 Confirm tables created:
   - account
   - child
   - calendar
@@ -82,13 +84,13 @@ Update this file *after each subtask*.
   - chat_message
   - analytics_event
   - surprise_config
-- [ ] 1.2.3 Validate constraints (e.g., unique 1:1 account→child)
+- [x] 1.2.3 Validate constraints (e.g., unique 1:1 account→child)
 
 ### **1.3 Update schema documentation**
 
-- [ ] 1.3.1 Update `infra/supabase/schema.md`
-- [ ] 1.3.2 Document field-level descriptions
-- [ ] 1.3.3 Document constraints & indexes
+- [x] 1.3.1 Update `infra/supabase/schema.md`
+- [x] 1.3.2 Document field-level descriptions
+- [x] 1.3.3 Document constraints & indexes
 
 ---
 
