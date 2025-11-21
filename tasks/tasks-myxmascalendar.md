@@ -195,10 +195,10 @@ Update this file *after each subtask*.
 
 ### **4.1 Routing & Structure**
 
-- [ ] 4.1.1 Implement `ChildCalendarRoute`
-- [ ] 4.1.2 Implement `ParentDashboardRoute`
-- [ ] 4.1.3 Implement `CalendarBuilderRoute`
-- [ ] 4.1.4 Implement `AuthRoute`
+- [x] 4.1.1 Implement `ChildCalendarRoute`
+- [x] 4.1.2 Implement `ParentDashboardRoute`
+- [x] 4.1.3 Implement `CalendarBuilderRoute`
+- [x] 4.1.4 Implement `AuthRoute`
 
 ### **4.2 Parent Portal**
 
