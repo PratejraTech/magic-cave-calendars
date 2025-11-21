@@ -202,17 +202,17 @@ Update this file *after each subtask*.
 
 ### **4.2 Parent Portal**
 
-- [ ] 4.2.1 Implement Step 1 – Child Profile  
-- [ ] 4.2.2 Implement Step 2 – Daily Entries  
-  - Photo upload  
-  - Text editor  
+- [x] 4.2.1 Implement Step 1 – Child Profile  
+- [x] 4.2.2 Implement Step 2 – Daily Entries
+  - Photo upload
+  - Text editor
   - AI-generate-all button  
-- [ ] 4.2.3 Implement Step 3 – Surprise URLs editor  
-  - Add URL  
-  - Remove URL  
+- [x] 4.2.3 Implement Step 3 – Surprise URLs editor
+  - Add URL
+  - Remove URL
   - Show thumbnail preview  
-- [ ] 4.2.4 Implement Step 4 – Theme selection  
-- [ ] 4.2.5 Implement Step 5 – Preview & Publish
+- [x] 4.2.4 Implement Step 4 – Theme selection  
+- [x] 4.2.5 Implement Step 5 – Preview & Publish
 
 ### **4.3 Child Calendar Viewer**
 

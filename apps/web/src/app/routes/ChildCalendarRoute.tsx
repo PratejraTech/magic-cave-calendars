@@ -1,39 +1,24 @@
 import { useParams } from 'react-router-dom';
-import { VillageScene } from '../../features/calendar-viewer/components/VillageScene';
-import { MemoryModal } from '../../features/calendar-viewer/components/MemoryModal';
-import { SurprisePortal } from '../../features/calendar-viewer/components/SurprisePortal';
+import { VillageScene } from '../../features/advent/components/VillageScene';
+import { MemoryModal } from '../../features/advent/components/MemoryModal';
+import { SurprisePortal } from '../../features/advent/components/SurprisePortal';
 import { ChatWithDaddy } from '../../features/chat/ChatWithDaddy';
-import { PastMemoryCarousel } from '../../features/calendar-viewer/components/PastMemoryCarousel';
+import { PastMemoryCarousel } from '../../features/advent/components/PastMemoryCarousel';
 import { MusicPlayer, playThemeAtRandomPoint } from '../../components/MusicPlayer';
 import { SoundManager } from '../../features/advent/utils/SoundManager';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-
-// For now, using mock data - will be replaced with API calls
-const mockDays = Array.from({ length: 24 }, (_, i) => ({
-  id: i + 1,
-  title: `Day ${i + 1}`,
-  message: `A magical message for day ${i + 1}!`,
-  photo_url: `https://picsum.photos/400/300?random=${i + 1}`,
-  is_opened: i < 3, // First 3 days opened for demo
-  opened_at: i < 3 ? new Date(Date.UTC(2024, 11, i + 1)).toISOString() : null,
-  created_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
-  confettiType: 'default' as const,
-  unlockEffect: 'sparkle' as const,
-}));
-
-const mockSurpriseUrls = [
-  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  'https://www.youtube.com/watch?v=oHg5SJYRHA0',
-];
+import { fetchCalendarDays, fetchSurpriseUrls, openCalendarDay, trackAnalytics, type CalendarDay } from '../../lib/api';
 
 export function ChildCalendarRoute() {
   const { shareUuid } = useParams<{ shareUuid: string }>();
-  const [days, setDays] = useState(mockDays);
-  const [selectedDay, setSelectedDay] = useState<any>(null);
+  const [days, setDays] = useState<CalendarDay[]>([]);
+  const [surpriseUrls, setSurpriseUrls] = useState<string[]>([]);
+  const [selectedDay, setSelectedDay] = useState<CalendarDay | null>(null);
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const soundManager = SoundManager.getInstance();
 
   const sortOpenedDays = useCallback((opened: any[]) => {
@@ -46,6 +31,33 @@ export function ChildCalendarRoute() {
       return a.id - b.id;
     });
   }, []);
+
+  // Load calendar data on mount
+  useEffect(() => {
+    const loadCalendarData = async () => {
+      if (!shareUuid) return;
+
+      try {
+        setIsLoading(true);
+        const [calendarDays, urls] = await Promise.all([
+          fetchCalendarDays(shareUuid),
+          fetchSurpriseUrls(shareUuid)
+        ]);
+        setDays(calendarDays);
+        setSurpriseUrls(urls);
+
+        // Track calendar view analytics
+        trackAnalytics(shareUuid, 'calendar_open');
+      } catch (error) {
+        console.error('Failed to load calendar data:', error);
+        // Error handling is done in the API functions with fallbacks
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCalendarData();
+  }, [shareUuid]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -61,9 +73,11 @@ export function ChildCalendarRoute() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleOpenDay = (dayId: number) => {
+  const handleOpenDay = async (dayId: number) => {
+    if (!shareUuid) return;
+
     const openedAt = new Date().toISOString();
-    let openedDay: any = null;
+    let openedDay: CalendarDay | null = null;
 
     setDays((prevDays) =>
       prevDays.map((day) => {
@@ -78,6 +92,17 @@ export function ChildCalendarRoute() {
     if (openedDay) {
       setSelectedDay(openedDay);
       setIsMemoryOpen(true);
+
+      // Track day open analytics
+      trackAnalytics(shareUuid, 'day_open', { day_id: dayId });
+
+      // Mark day as opened in backend
+      try {
+        await openCalendarDay(shareUuid, dayId);
+      } catch (error) {
+        console.error('Failed to mark day as opened:', error);
+        // Continue with UI update even if backend call fails
+      }
     }
   };
 
@@ -92,10 +117,15 @@ export function ChildCalendarRoute() {
   );
 
   const openRandomSurprise = () => {
-    if (mockSurpriseUrls.length === 0) return;
-    const nextUrl = mockSurpriseUrls[Math.floor(Math.random() * mockSurpriseUrls.length)];
+    if (surpriseUrls.length === 0) return;
+    const nextUrl = surpriseUrls[Math.floor(Math.random() * surpriseUrls.length)];
     setCurrentSurpriseUrl(nextUrl);
     setIsSurpriseOpen(true);
+
+    // Track surprise open analytics
+    if (shareUuid) {
+      trackAnalytics(shareUuid, 'surprise_open');
+    }
   };
 
   const closeSurprise = () => {

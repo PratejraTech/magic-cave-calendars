@@ -1,0 +1,8 @@
+pyproject.toml
+advent_intelligence.egg-info/PKG-INFO
+advent_intelligence.egg-info/SOURCES.txt
+advent_intelligence.egg-info/dependency_links.txt
+advent_intelligence.egg-info/requires.txt
+advent_intelligence.egg-info/top_level.txt
+src/__init__.py
+src/settings.py
