@@ -6,10 +6,38 @@ interface SurprisePortalProps {
   onClose: () => void;
 }
 
+// Convert YouTube URLs to embed format
+function getEmbedUrl(url: string): string {
+  if (!url) return '';
+
+  // Handle different YouTube URL formats
+  const patterns = [
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^"&?\/\s]{11})/
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`;
+    }
+  }
+
+  // If it's already an embed URL, just add autoplay
+  if (url.includes('youtube.com/embed/')) {
+    return url.includes('?') ? `${url}&autoplay=1&rel=0` : `${url}?autoplay=1&rel=0`;
+  }
+
+  // Return original URL if not recognized as YouTube
+  return url;
+}
+
 export function SurprisePortal({ isOpen, videoUrl, onClose }: SurprisePortalProps) {
+  const embedUrl = videoUrl ? getEmbedUrl(videoUrl) : null;
+
   return (
     <AnimatePresence>
-      {isOpen && videoUrl && (
+      {isOpen && embedUrl && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur"
           data-testid="surprise-portal"
@@ -26,7 +54,7 @@ export function SurprisePortal({ isOpen, videoUrl, onClose }: SurprisePortalProp
             onClick={(event) => event.stopPropagation()}
           >
             <iframe
-              src={videoUrl}
+              src={embedUrl}
               title="Holiday Surprise"
               className="w-full h-full"
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
