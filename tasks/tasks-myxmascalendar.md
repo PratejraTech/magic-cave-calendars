@@ -96,55 +96,55 @@ Update this file *after each subtask*.
 
 ### **2.1 Calendar + Child domain**
 
-- [ ] 2.1.1 Implement `child.repository.ts`
-- [ ] 2.1.2 Enforce “one account → one child” in `child.service.ts`
-- [ ] 2.1.3 Implement `calendar.repository.ts`
-- [ ] 2.1.4 Implement `calendar_day.repository.ts`
-- [ ] 2.1.5 Implement `calendar.service.ts`:
-  - Create calendar  
-  - Update calendar days  
-  - Publish/unpublish calendar  
-- [ ] 2.1.6 Implement routes in `calendar.routes.ts`
+- [x] 2.1.1 Implement `child.repository.ts`
+- [x] 2.1.2 Enforce "one account → one child" in `child.service.ts`
+- [x] 2.1.3 Implement `calendar.repository.ts`
+- [x] 2.1.4 Implement `calendar_day.repository.ts`
+- [x] 2.1.5 Implement `calendar.service.ts`:
+  - Create calendar
+  - Update calendar days
+  - Publish/unpublish calendar
+- [x] 2.1.6 Implement routes in `calendar.routes.ts`
 
 ### **2.2 Surprise YouTube URLs (array model)**
 
-- [ ] 2.2.1 Implement `surprise.repository.ts` (CRUD for a single record)
-- [ ] 2.2.2 Implement `surprise.service.ts`
-- [ ] 2.2.3 Implement `surprise.routes.ts`
-- [ ] 2.2.4 Add validation:
+- [x] 2.2.1 Implement `surprise.repository.ts` (CRUD for a single record)
+- [x] 2.2.2 Implement `surprise.service.ts`
+- [x] 2.2.3 Implement `surprise.routes.ts`
+- [x] 2.2.4 Add validation:
   - HTTPS only
   - YouTube or YouTube Kids only
 
 ### **2.3 Chat API integration**
 
-- [ ] 2.3.1 Implement `chat.repository.ts`
-- [ ] 2.3.2 Implement `chat.service.ts`:
+- [x] 2.3.1 Implement `chat.repository.ts`
+- [x] 2.3.2 Implement `chat.service.ts`:
   - Create chat_record
   - Append child message
   - Append parent_agent message after streaming completes
-- [ ] 2.3.3 Implement `chat.routes.ts`:
-  - POST `/chat/session`  
-  - POST `/chat/message` (stream)  
-- [ ] 2.3.4 Implement streaming fetch wrapper to Python service via `restClient.ts`
+- [x] 2.3.3 Implement `chat.routes.ts`:
+  - POST `/chat/session`
+  - POST `/chat/message` (stream)
+- [x] 2.3.4 Implement streaming fetch wrapper to Python service via `restClient.ts`
 
 ### **2.4 Analytics**
 
-- [ ] 2.4.1 Implement `analytics.repository.ts`
-- [ ] 2.4.2 Implement `analytics.service.ts`
-- [ ] 2.4.3 Add `analytics.routes.ts`:
-  - calendar_open  
-  - day_open  
-  - surprise_open  
-  - chat_message_sent  
-  - chat_modal_open  
+- [x] 2.4.1 Implement `analytics.repository.ts`
+- [x] 2.4.2 Implement `analytics.service.ts`
+- [x] 2.4.3 Add `analytics.routes.ts`:
+  - calendar_open
+  - day_open
+  - surprise_open
+  - chat_message_sent
+  - chat_modal_open
 
 ### **2.5 Backend tests**
 
-- [ ] 2.5.1 Write tests for calendar  
-- [ ] 2.5.2 Write tests for child  
-- [ ] 2.5.3 Write tests for surprise  
-- [ ] 2.5.4 Write chat route tests  
-- [ ] 2.5.5 Write analytics tests  
+- [ ] 2.5.1 Write tests for calendar
+- [ ] 2.5.2 Write tests for child
+- [ ] 2.5.3 Write tests for surprise
+- [ ] 2.5.4 Write chat route tests
+- [ ] 2.5.5 Write analytics tests
 
 ---
 
@@ -152,34 +152,34 @@ Update this file *after each subtask*.
 
 ### **3.1 REST server (FastAPI)**
 
-- [ ] 3.1.1 Implement `http_server.py`
-- [ ] 3.1.2 Add routes:
+- [x] 3.1.1 Implement `http_server.py`
+- [x] 3.1.2 Add routes:
   - POST `/chat/stream`
   - POST `/chat/generate_days`
-- [ ] 3.1.3 Add error handling + logging middleware
+- [x] 3.1.3 Add error handling + logging middleware
 
 ### **3.2 Persona prompt + daily message generation**
 
-- [ ] 3.2.1 Implement prompt loading from `packages/prompts`
-- [ ] 3.2.2 Implement `persona_builder.py`
-- [ ] 3.2.3 Implement generator for 24 daily messages
+- [x] 3.2.1 Implement prompt loading from `packages/prompts`
+- [x] 3.2.2 Implement `persona_builder.py`
+- [x] 3.2.3 Implement generator for 24 daily messages
 
 ### **3.3 Chat Engine**
 
-- [ ] 3.3.1 Implement `chat_engine.py`
-- [ ] 3.3.2 Add streaming token pipeline  
-- [ ] 3.3.3 Integrate short-term memory  
-- [ ] 3.3.4 Integrate long-term recall  
+- [x] 3.3.1 Implement `chat_engine.py`
+- [x] 3.3.2 Add streaming token pipeline
+- [x] 3.3.3 Integrate short-term memory
+- [x] 3.3.4 Integrate long-term recall
 
 ### **3.4 Memory subsystem**
 
-- [ ] 3.4.1 Implement `memory_manager.py`:
-  - store last 5 messages  
-  - load last 5 messages  
-- [ ] 3.4.2 Implement `document_store_client.py` (Redis/KV/vector DB)
-- [ ] 3.4.3 Implement `recall_engine.py`:
-  - embedding search  
-  - recency weighting  
+- [x] 3.4.1 Implement `memory_manager.py`:
+  - store last 5 messages
+  - load last 5 messages
+- [x] 3.4.2 Implement `document_store_client.py` (Redis/KV/vector DB)
+- [x] 3.4.3 Implement `recall_engine.py`:
+  - embedding search
+  - recency weighting
   - threshold filtering  
 
 ### **3.5 Intelligence tests**
