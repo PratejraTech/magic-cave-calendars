@@ -8,8 +8,10 @@ lerna-debug.log*
 
 photos/_original_backup/
 node_modules/
-dist
-dist-ssr
+dist/
+dist-ssr/
+.cache/
+chat_sessions/
 *.local
 
 .vscode/*

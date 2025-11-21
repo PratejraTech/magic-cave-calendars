@@ -1,36 +1,150 @@
-# Agent Instructions: Advent Calendar Project
+# AGENTS.md — Advent Calendar Builder Project
 
-## Project Goal
-To create a delightful and engaging Christmas Advent Calendar for a 3-year-old. The experience should be magical, with a special focus on smooth animations and a user-friendly interface for a young child.
+## Purpose
+This document defines the canonical behavior, responsibilities, and rules for all OpenCode and Cursor agents operating within this repository. All agents must read this file before performing any action.
 
-## Key Features
-- **Advent Calendar UI:** A screen with 25 heart-shaped buttons, representing the days of December leading up to Christmas.
-- **Date-Locked Buttons:** Each button can only be activated on its corresponding day (e.g., button "3" is only active on December 3rd). The timezone for this logic is UTC+1030.
-- **Modal with Memories:** When an active button is pressed, a modal window smoothly opens.
-- **Content:** The modal will display a photo and a short text memory. Initially, this will be placeholder content.
-- **Butterfly Animation:** A beautiful butterfly animation should play when a button is successfully pressed.
-- **Slow Text Reveal:** The text inside the modal should appear with a slow, engaging animation.
+Agents exist to:
+- Follow tasks/prd-* as the source of truth
+- Execute tasks located in the /tasks/ directory
+- Respect domain boundaries and folder structure
+- Produce safe, incremental, high-quality contributions
+- Maintain architectural and conceptual integrity of the system
 
-## Design & Theme
-- **Theme:** The overall theme is "butterflies" and "love hearts."
-- **Color Palette:** Use bright, engaging, and cheerful colors suitable for a toddler.
-- **Interactions:** All animations should be smooth and enjoyable. Interactions should be simple and intuitive.
+---
 
-## Technical Stack
-- **Framework:** React with TypeScript
-- **Bundler:** Vite
-- **Styling:** Tailwind CSS
-- **Testing:** Vitest and React Testing Library
+## 1. Required Pre-Checks (Mandatory Before Every Action)
 
-## Development Workflow
-1.  **Follow `tasks.md`:** Use the `tasks.md` file as a guide for the development process.
-2.  **Installation:** Run `npm install` to install dependencies.
-3.  **Development Server:** Run `npm run dev` to start the local development server.
-4.  **Testing:** Run `npm run test` to execute the test suite.
-5.  **Linting & Type-checking:** Before committing, ensure the code passes linting (`npm run lint`) and type-checking (`npm run typecheck`).
+Before modifying any file, an agent MUST:
 
-## File Structure
-- **Components:** Reusable components are located in `src/components`.
-- **Features:** Feature-specific components and logic are in `src/features`.
-- **Static Assets:** Place images in a `public/photos` directory.
-- **Tests:** Tests are co-located with the components they are testing or in the `src/__tests__` directory.
+1. Read the canonical task list:
+   - `/tasks/tasks-myxmascalendar.md`
+
+2. Read `.cursor/rules/` directory to understand:
+   - File boundary rules
+   - Refactoring safety constraints
+   - Naming conventions
+   - Protected files
+
+3. Read or re-read the project PRD:
+   - `/tasks-prd-myxmascalendar.md`
+
+4. Review the architecture and folder structure:
+   - `.cursor/rules/folder-structure.mdc`
+   - `.cursor/rules/data_model.mdc
+
+5. Assess whether the requested task stays within:
+   - Domain boundaries (frontend/backend/intelligence/infra)
+   - Safety restrictions
+   - Correct file placement
+
+If any of these documents conflict, the PRD and folder-structure.mdc take precedence.
+
+---
+
+## 2. General Agent Behavior Rules
+
+All agents must:
+- Use tasks as the execution schedule
+- Complete tasks sequentially unless explicitly told otherwise
+- Update the task file after each sub-task by switching `[ ]` → `[x]`
+- Ask clarifying questions when information is missing or ambiguous
+- Prefer minimal, precise diffs
+- Never guess APIs—derive them from PRD, data models, or existing code
+- Maintain consistency with TypeScript types and Python schemas
+- Avoid side effects in unrelated modules
+
+Agents must NOT:
+- Remove or rewrite task lists unless instructed
+- Modify compiled artefacts or build outputs
+- Create new root-level folders unless instructed
+- Make stylistic rewrites without PRD or rules backing
+- Inject prompts or comments irrelevant to the codebase
+
+---
+
+## 3. Domain-Specific Rules
+
+### 3.1 Frontend Agents (React + Vite)
+
+- Place new UI code in `apps/web/src/features/<feature-name>`
+- Use the shared components in `packages/ui` when possible
+- API calls MUST go through feature-level `api/` modules or `lib/httpClient.ts`
+- Follow Tailwind + Framer Motion conventions
+- Do not embed backend logic or LLM prompts in the frontend
+
+### 3.2 Backend Agents (Typescript)
+
+- Follow domain separation via `services/api/src/modules/*`
+- All DB operations must go through `*.repository.ts`
+- Business logic goes into `*.service.ts`
+- REST endpoints go inside `http/routes`
+- Never call the LLM directly—always call the intelligence REST service
+
+### 3.3 Intelligence Agents (Python)
+
+- Operate only within `services/intelligence`
+- Use prompts from `packages/prompts`
+- Use `memory_manager.py` and `recall_engine.py` for memory flows
+- No direct database access; rely on inputs from backend
+
+### 3.4 Infra Agents (Supabase, n8n, CI/CD)
+
+- Add database migrations under `infra/supabase/migrations`
+- Update `schema.md` after applying migrations
+- Maintain clean and atomic migrations
+- n8n workflows must be added under `infra/n8n/workflows`
+
+---
+
+## 4. The Task Execution Loop
+
+Agents must always:
+
+1. Identify the next unchecked sub-task  
+2. Execute it following all rules  
+3. Modify only the files needed  
+4. Update the task list in place  
+5. Produce a summary of changes  
+6. Stop and wait for the next instruction or continue if autonomous mode is enabled
+
+---
+
+## 5. Protection Rules
+
+These files are protected:
+- `.cursor/rules/*`
+- `/meta/docs/*`
+- `/meta/folder-structure.mdc`
+- `/tasks/*` (except for changing `[ ]` to `[x]`)
+- Any migrations already applied
+
+Modify them **only** when explicitly instructed.
+
+---
+
+## 6. Communication Protocol
+
+Agents must:
+- Communicate clearly and precisely
+- Propose alternatives only when necessary
+- Reference specific files when suggesting changes
+- Avoid verbose speculation
+
+If an agent is unsure:
+- Ask
+- Do not assume
+
+---
+
+## 7. Completion Criteria
+
+A task is complete when:
+- All subtasks are marked complete
+- Relevant code is implemented
+- Tests pass or stubs are added
+- Documentation updated when needed
+- Architecture remains intact
+
+---
+
+All agents MUST adhere to the guidelines herein.

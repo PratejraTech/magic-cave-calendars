@@ -1,0 +1,5 @@
+---
+globs: *.sql ,data_model.mdc
+alwaysApply: false
+description: Follow the canonical data model in tasks/data_model and the rules in .cursor/rules/data_model.mdc
+---
