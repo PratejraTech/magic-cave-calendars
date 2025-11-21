@@ -1,4 +1,4 @@
-export type ConfettiType = 'snow' | 'stars' | 'candy' | 'reindeer';
+export type ConfettiType = 'snow' | 'stars' | 'candy' | 'reindeer' | 'hearts' | 'leaves';
 export type UnlockEffect = 'fireworks' | 'snowstorm' | 'aurora' | 'gingerbread';
 
 export interface AdventDay {

@@ -1,0 +1,49 @@
+name: Database Migration
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'infra/supabase/migrations/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to Supabase project
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "production" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            supabase link --project-ref ${{ secrets.SUPABASE_PROD_REF }}
+          else
+            supabase link --project-ref ${{ secrets.SUPABASE_STAGING_REF }}
+          fi
+
+      - name: Run database migrations
+        run: supabase db push
+
+      - name: Generate types
+        run: supabase gen types typescript --local > src/types/supabase.ts
+
+      - name: Commit generated types
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update generated types after migration"
+          file_pattern: src/types/supabase.ts

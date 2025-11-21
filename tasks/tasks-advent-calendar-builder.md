@@ -256,13 +256,12 @@ Update this file *after each subtask*.
   - Remove chat data on Feb 1 of following year
 
 ### **5.2 CI/CD**
-
-- [ ] 5.2.1 GitHub Actions for:
+- [x] 5.2.1 GitHub Actions for:
   - Lint
   - Test
   - Build
   - Deploy
-- [ ] 5.2.2 Environment variables documented in `infra/ops/env.example`
+- [x] 5.2.2 Environment variables documented in `infra/ops/env.example`
 
 ---
 
@@ -270,12 +269,12 @@ Update this file *after each subtask*.
 
 ### **6.1 QA Testing**
 
-- [ ] 6.1.1 Manual parent flow QA
-- [ ] 6.1.2 Manual child flow QA
-- [ ] 6.1.3 Chat memory QA
-- [ ] 6.1.4 Surprise modal QA
-- [ ] 6.1.5 Publish/unpublish QA
-- [ ] 6.1.6 Analytics event flow QA
+- [x] 6.1.1 Manual parent flow QA
+- [x] 6.1.2 Manual child flow QA
+- [x] 6.1.3 Chat memory QA
+- [x] 6.1.4 Surprise modal QA
+- [x] 6.1.5 Publish/unpublish QA
+- [x] 6.1.6 Analytics event flow QA
 
 ### **6.2 Update documentation**
 

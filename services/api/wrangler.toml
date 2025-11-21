@@ -1,0 +1,29 @@
+name = "advent-calendar-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[env.staging]
+routes = [
+  { pattern = "api-staging.adventcalendar.dev/*", zone_name = "adventcalendar.dev" }
+]
+
+[env.production]
+routes = [
+  { pattern = "api.adventcalendar.dev/*", zone_name = "adventcalendar.dev" }
+]
+
+[vars]
+SUPABASE_URL = ""
+SUPABASE_ANON_KEY = ""
+SUPABASE_SERVICE_ROLE_KEY = ""
+OPENAI_API_KEY = ""
+
+# Database connection (D1 for production, local for dev)
+[[d1_databases]]
+binding = "DB"
+database_name = "advent-calendar"
+database_id = ""
+preview_database_id = ""
+# Uncomment and fill in when D1 is set up
+# database_id = "your-production-database-id"
+# preview_database_id = "your-staging-database-id"

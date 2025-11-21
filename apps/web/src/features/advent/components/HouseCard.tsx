@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { gsap } from 'gsap';
-import { AdventDay } from '../../../types/advent';
+import { CalendarDay } from '../../../lib/api';
 import { ConfettiSystem } from '../utils/ConfettiSystem';
 import { SoundManager } from '../utils/SoundManager';
 import { useCurrentTheme } from '../../../themes/ThemeProvider';
+import { ThemeAnimationSystem } from '../animations/ThemeAnimationSystem';
+import { AnimationPerformanceMonitor } from '../animations/AnimationPerformanceMonitor';
 
 interface HouseCardProps {
-  day: AdventDay;
+  day: CalendarDay;
   onOpen: (dayId: string) => void;
   canOpen: boolean;
 }
@@ -18,6 +20,8 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
   const controls = useAnimation();
   const soundManager = SoundManager.getInstance();
   const currentTheme = useCurrentTheme();
+  const animationSystem = ThemeAnimationSystem.getInstance();
+  const performanceMonitor = AnimationPerformanceMonitor.getInstance();
 
   useEffect(() => {
     soundManager.init();
@@ -26,37 +30,63 @@ export function HouseCard({ day, onOpen, canOpen }: HouseCardProps) {
   const handleClick = async () => {
     if (!canOpen || isOpened) return;
 
-    soundManager.duckMusic(2000);
-    soundManager.play('door-creak');
+    const themeId = currentTheme?.id || 'snow';
 
-    // GSAP explosive sequence
+    // Check if animations should run
+    if (performanceMonitor.shouldReduceMotion()) {
+      // Simple animation for reduced motion
+      setIsOpened(true);
+      onOpen(day.day_id);
+      return;
+    }
+
+    soundManager.duckMusic(2000);
+
+    // Get theme-specific unlock animation sequence
+    const unlockSequence = animationSystem.getUnlockAnimation(themeId);
+
+    // Play theme-appropriate sound
+    const unlockSound = currentTheme?.sounds.unlock || 'door-creak';
+    soundManager.play(unlockSound);
+
+    // Execute unlock animation sequence
     const tl = gsap.timeline();
-    tl.to(doorRef.current, {
-      scale: 1.5,
-      rotation: 5,
-      duration: 0.3,
-      ease: "back.out(1.7)",
-      yoyo: true,
-      repeat: 3
-    })
-    .to(doorRef.current, {
-      scale: 2,
-      duration: 0.5,
-      ease: "elastic.out(1, 0.3)"
-    }, "-=0.2")
-    .call(() => {
+
+    unlockSequence.forEach((animation, index) => {
+      tl.to(doorRef.current, {
+        scale: index === 0 ? 1.2 : index === 1 ? 1.1 : 1.5,
+        rotation: index === 0 ? 3 : index === 1 ? -2 : 0,
+        duration: animation.duration,
+        ease: animation.ease,
+        delay: animation.delay || 0,
+      });
+    });
+
+    // Final reveal and effects
+    tl.call(() => {
       soundManager.play('magical-ding');
+
+      // Theme-specific confetti effect
+      const confettiType = currentTheme?.animations.confetti || day.confetti_type || 'snow';
       ConfettiSystem.burst({
-        type: currentTheme?.animations.confetti || day.confetti_type || 'snow',
-        count: 100,
+        type: confettiType,
+        count: 80,
         origin: { x: 0.5, y: 0.3 }
       });
+
+      // Additional theme-specific effects
+      if ((confettiType as string) === 'hearts') {
+        setTimeout(() => ConfettiSystem.heartBurst({ x: 0.5, y: 0.3 }, 0.3), 200);
+      } else if ((confettiType as string) === 'stars') {
+        setTimeout(() => ConfettiSystem.sparkle({ x: 0.5, y: 0.3 }, 1000), 300);
+      }
+
       soundManager.play('confetti-burst');
       setIsOpened(true);
       onOpen(day.day_id);
     });
 
-    // Framer Motion for smooth reveal
+    // Framer Motion door opening animation
     await controls.start({
       rotateY: 180,
       transition: { duration: 0.8, ease: "easeInOut" }
