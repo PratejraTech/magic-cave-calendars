@@ -95,7 +95,7 @@ export function CalendarBuilderRoute() {
 
           const calendarResult = await createCalendar(calendarData);
           updateState({ calendarId: calendarResult.calendar_id });
-        } catch (error) {
+        } catch (_error) {
           alert('Failed to create calendar. Please try again.');
           return;
         }
@@ -147,7 +147,7 @@ export function CalendarBuilderRoute() {
 
         // Navigate to the created product
         navigate(`/product/${result.share_uuid}`);
-      } catch (error) {
+      } catch (_error) {
         alert('Failed to create product. Please try again.');
       }
     } else {
@@ -183,7 +183,7 @@ export function CalendarBuilderRoute() {
             // Show loading state for AI generation
             updateState({ isPublishing: true });
 
-            const generationResult = await generateCalendarContent(calendarResult.calendar_id, state.selectedTemplate.id, state.customData);
+            await generateCalendarContent(calendarResult.calendar_id, state.selectedTemplate.id, state.customData);
 
           } catch (error) {
             // Continue with manual content if AI generation fails
@@ -224,8 +224,7 @@ export function CalendarBuilderRoute() {
 
         // Navigate to the created calendar
         navigate(`/calendar/${calendarResult.share_uuid}`);
-      } catch (error) {
-        console.error('Failed to create calendar:', error);
+      } catch (_error) {
         alert('Failed to create calendar. Please try again.');
         updateState({ isPublishing: false });
       }
