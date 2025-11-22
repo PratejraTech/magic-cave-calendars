@@ -143,16 +143,16 @@ Follow this file and record state in **bridge.md**
 
 ---
 
-* [ ] 5.0 Frontend Portal Generalization & Product Selection
+* [x] 5.0 Frontend Portal Generalization & Product Selection
 
-  * [ ] 5.1 Create ProductTypeSelectionStep component: fetch available product types, display with descriptions and previews.
-  * [ ] 5.2 Update TemplateSelectionStep: filter templates by selected product type, show compatibility indicators.
-  * [ ] 5.3 Implement ProductSpecificCustomDataStep: dynamically render forms based on product type schema (e.g., calendar days vs storybook chapters).
-  * [ ] 5.4 Generalize wizard state management: add productType, productConfig to wizard context.
-  * [ ] 5.5 Add product preview functionality: show how selected template will render for the chosen product type.
-  * [ ] 5.6 Update API client: add product type endpoints, generalize calendar creation to product creation.
-  * [ ] 5.7 Implement feature flags: conditionally show generalized product options based on flags.
-  * [ ] 5.8 Write unit tests for new components and integration tests for wizard flow.
+   * [x] 5.1 Create ProductTypeSelectionStep component: fetch available product types, display with descriptions and previews.
+   * [x] 5.2 Update TemplateSelectionStep: filter templates by selected product type, show compatibility indicators.
+   * [x] 5.3 Implement ProductSpecificCustomDataStep: dynamically render forms based on product type schema (e.g., calendar days vs storybook chapters).
+   * [x] 5.4 Generalize wizard state management: add productType, productConfig to wizard context.
+   * [x] 5.5 Add product preview functionality: show how selected template will render for the chosen product type.
+   * [x] 5.6 Update API client: add product type endpoints, generalize calendar creation to product creation.
+   * [x] 5.7 Implement feature flags: conditionally show generalized product options based on flags.
+   * [x] 5.8 Write unit tests for new components and integration tests for wizard flow.
 
 ---
 
