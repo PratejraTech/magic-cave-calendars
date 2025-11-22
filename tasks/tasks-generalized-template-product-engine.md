@@ -131,15 +131,15 @@ Follow this file and record state in **bridge.md**
 
 ---
 
-* [ ] 4.0 AI Service Enhancements for Multi-Product Generation
+* [x] 4.0 AI Service Enhancements for Multi-Product Generation
 
-  * [ ] 4.1 Extend generateContent endpoint: add product_type parameter, validate against supported product types.
-  * [ ] 4.2 Create product-specific prompt templates: organize prompts/templates/ by product_type (calendar/, storybook/, etc.).
-  * [ ] 4.3 Implement dynamic structured output schemas: load Pydantic models based on product_type from content_schemas.py.
-  * [ ] 4.4 Update LangGraph workflow: add product_type routing, load appropriate prompt templates and validation schemas.
-  * [ ] 4.5 Enhance error handling: product-specific fallback logic, detailed error messages for unsupported combinations.
-  * [ ] 4.6 Add observability: log product_type, template_id, custom_data size, generation metrics per product type.
-  * [ ] 4.7 Write tests: unit tests for product-specific prompt building, integration tests for multi-product generation.
+  * [x] 4.1 Extend generateContent endpoint: add product_type parameter, validate against supported product types.
+  * [x] 4.2 Create product-specific prompt templates: organize prompts/templates/ by product_type (calendar/, storybook/, etc.).
+  * [x] 4.3 Implement dynamic structured output schemas: load Pydantic models based on product_type from content_schemas.py.
+  * [x] 4.4 Update LangGraph workflow: add product_type routing, load appropriate prompt templates and validation schemas.
+  * [x] 4.5 Enhance error handling: product-specific fallback logic, detailed error messages for unsupported combinations.
+  * [x] 4.6 Add observability: log product_type, template_id, custom_data size, generation metrics per product type.
+  * [x] 4.7 Write tests: unit tests for product-specific prompt building, integration tests for multi-product generation.
 
 ---
 

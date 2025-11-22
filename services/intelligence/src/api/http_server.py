@@ -7,12 +7,16 @@ import structlog
 
 from ..settings import settings
 from ..core.chat_engine import chat_engine
+# from ..core.content_generator import content_generator  # TODO: Enable when content_generator is implemented
 from .schemas import (
     ChatStreamRequest,
     ChatStreamResponse,
     GenerateDaysRequest,
     GenerateDaysResponse,
-    ErrorResponse
+    GenerateContentRequest,
+    GenerateContentResponse,
+    ErrorResponse,
+    ContentGenerationError
 )
 
 # Configure structured logging
@@ -132,6 +136,13 @@ async def generate_days(request: GenerateDaysRequest):
     except Exception as e:
         logger.error("Generate days failed", error=str(e))
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# TODO: Enable when content_generator is fully implemented
+# @app.post("/generate-content", response_model=GenerateContentResponse)
+# async def generate_content(request: GenerateContentRequest):
+#     """Generate content for any supported product type using templates and custom data."""
+#     pass
 
 
 @app.on_event("startup")
