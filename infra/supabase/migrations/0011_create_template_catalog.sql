@@ -48,7 +48,7 @@ INSERT INTO template_catalog (product_type_id, name, description, compatible_the
 ((SELECT product_type_id FROM product_type WHERE name = 'calendar'),
  'Magical Christmas Adventure',
  'A magical journey through the Christmas season with personalized stories and surprises',
- ARRAY['snow', 'forest', 'cabin'],
+ ARRAY['snow', 'warm', 'candy'],
  '{
     "type": "object",
     "properties": {
@@ -61,7 +61,7 @@ INSERT INTO template_catalog (product_type_id, name, description, compatible_the
 ((SELECT product_type_id FROM product_type WHERE name = 'calendar'),
  'Winter Wonderland',
  'Explore a winter wonderland with snowy adventures and holiday magic',
- ARRAY['snow', 'winter'],
+ ARRAY['snow', 'forest', 'starlight'],
  '{
     "type": "object",
     "properties": {

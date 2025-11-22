@@ -45,7 +45,7 @@ export interface JSONSchema {
 
 // API Response types
 export interface ChildProfileResponse {
-  id: string;
+  child_id: string;
   child_name: string;
   chat_persona: 'mummy' | 'daddy' | 'custom';
   custom_chat_prompt?: string;
@@ -56,11 +56,12 @@ export interface ChildProfileResponse {
 }
 
 export interface CreateCalendarResponse {
-  id: string;
+  calendar_id: string;
   child_id: string;
   year: number;
   share_uuid: string;
   is_published: boolean;
+  template_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -77,7 +78,14 @@ export interface PublishCalendarResponse {
 
 export interface UpdateSurpriseVideosResponse {
   success: boolean;
-  updated_urls: string[];
+  message: string;
+}
+
+export interface GenerateCalendarContentResponse {
+  calendar_id: string;
+  generated_days: number;
+  chat_persona_prompt: string;
+  surprise_urls: string[];
 }
 
 export interface CreateProductResponse {
@@ -294,6 +302,8 @@ export async function getChildProfile(): Promise<ChildProfileResponse> {
 export async function createCalendar(data: {
   child_id: string;
   year: number;
+  template_id?: string;
+  custom_data?: Record<string, unknown>;
 }): Promise<CreateCalendarResponse> {
   try {
     return await httpClient.post<CreateCalendarResponse>('/calendars', data);
@@ -330,6 +340,20 @@ export async function publishCalendar(calendarId: string): Promise<PublishCalend
 export async function updateSurpriseVideos(calendarId: string, youtubeUrls: string[]): Promise<UpdateSurpriseVideosResponse> {
   try {
     return await httpClient.put<UpdateSurpriseVideosResponse>(`/surprise/${calendarId}`, { youtube_urls: youtubeUrls });
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
+  }
+}
+
+/**
+ * Generate AI content for calendar using template and custom data
+ */
+export async function generateCalendarContent(calendarId: string, templateId: string, customData?: Record<string, unknown>): Promise<GenerateCalendarContentResponse> {
+  try {
+    return await httpClient.post<GenerateCalendarContentResponse>(`/calendars/${calendarId}/generate-content`, {
+      template_id: templateId,
+      custom_data: customData || {}
+    });
   } catch (_error) {
     // Error handled silently - could implement user notification here
   }
@@ -381,7 +405,7 @@ export async function getProductTypes(): Promise<ProductType[]> {
  */
 export async function getTemplatesByProductType(productTypeId: string): Promise<Template[]> {
   try {
-    return await httpClient.get<Template[]>(`/templates?product_type_id=${productTypeId}`);
+    return await httpClient.get<Template[]>(`/templates/product-type/${productTypeId}`);
   } catch (_error) {
     // Error handled silently - could implement user notification here
     // Return mock data for development

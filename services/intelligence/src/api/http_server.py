@@ -7,7 +7,7 @@ import structlog
 
 from ..settings import settings
 from ..core.chat_engine import chat_engine
-# from ..core.content_generator import content_generator  # TODO: Enable when content_generator is implemented
+from ..core.content_generator import content_generator
 from .schemas import (
     ChatStreamRequest,
     ChatStreamResponse,
@@ -138,11 +138,35 @@ async def generate_days(request: GenerateDaysRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# TODO: Enable when content_generator is fully implemented
-# @app.post("/generate-content", response_model=GenerateContentResponse)
-# async def generate_content(request: GenerateContentRequest):
-#     """Generate content for any supported product type using templates and custom data."""
-#     pass
+@app.post("/generate-content", response_model=GenerateContentResponse)
+async def generate_content(request: GenerateContentRequest):
+    """Generate content for any supported product type using templates and custom data."""
+
+    try:
+        logger.info(
+            "Generate content request",
+            template_id=request.template_id,
+            product_type=request.product_type.value,
+            custom_data_keys=list(request.custom_data.keys()) if request.custom_data else []
+        )
+
+        content = await content_generator.generate_content(
+            template_id=request.template_id,
+            custom_data=request.custom_data,
+            product_type=request.product_type,
+            product_config=request.product_config
+        )
+
+        return GenerateContentResponse(
+            product_type=request.product_type,
+            template_id=request.template_id,
+            content=content,
+            metadata={"generated_at": "2025-01-01T00:00:00Z"}  # TODO: Add proper timestamp
+        )
+
+    except Exception as e:
+        logger.error("Generate content failed", error=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.on_event("startup")

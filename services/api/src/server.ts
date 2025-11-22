@@ -49,12 +49,12 @@ const productRepository = new ProductRepository(supabase);
 
 // Initialize services
 const childService = new ChildService(childRepository);
-const calendarService = new CalendarService(calendarRepository);
+const templatesService = new TemplatesService(productRepository);
+const calendarService = new CalendarService(calendarRepository, templatesService);
 const surpriseService = new SurpriseService(surpriseRepository);
 const restClient = new RestClient(INTELLIGENCE_SERVICE_URL);
 const chatServiceInstance = new ChatService(chatRepository, restClient);
 const analyticsService = new AnalyticsService(analyticsRepository);
-const templatesService = new TemplatesService(productRepository);
 
 // Initialize Express app
 const app = express();

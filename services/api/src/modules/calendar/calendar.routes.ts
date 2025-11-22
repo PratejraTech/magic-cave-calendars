@@ -53,7 +53,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const { child_id, year } = req.body;
+      const { child_id, year, template_id, custom_data } = req.body;
 
       if (!child_id || !year) {
         return res.status(400).json({ error: 'child_id and year are required' });
@@ -69,6 +69,8 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
         account_id: accountId,
         child_id,
         year,
+        template_id,
+        custom_data,
       });
 
       res.status(201).json(calendar);
@@ -264,6 +266,31 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
         return res.json({ youtube_urls: [] });
       }
       // Error logged:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // POST /calendars/:calendarId/generate-content - Generate AI content for calendar
+  router.post('/:calendarId/generate-content', async (req, res) => {
+    try {
+      const { calendarId } = req.params;
+      const accountId = req.user?.id;
+      const { template_id, custom_data } = req.body;
+
+      if (!template_id) {
+        return res.status(400).json({ error: 'template_id is required' });
+      }
+
+      // Verify ownership
+      const calendar = await calendarService.getCalendarById(calendarId);
+      if (calendar.account_id !== accountId) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+
+      const result = await calendarService.generateCalendarContent(calendarId, template_id, custom_data || {});
+      res.json(result);
+    } catch (error) {
+      console.error('Calendar generate content error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

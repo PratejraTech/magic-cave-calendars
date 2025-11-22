@@ -17,10 +17,16 @@ export interface FeatureFlags {
   // Template system features
   enableTemplateSelection: boolean;
   enableCustomDataForms: boolean;
+  enableTemplateEngine: boolean;
+  enableTemplateAIFlow: boolean;
 
   // Advanced features
   enableProductPreview: boolean;
   enableBulkOperations: boolean;
+
+  // AI Content Generation features
+  enableAiContentGeneration: boolean;
+  enableTemplateBasedGeneration: boolean;
 }
 
 // Default feature flags (conservative approach)
@@ -31,8 +37,12 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
   enableProductTypeInteractiveGame: false,
   enableTemplateSelection: false,
   enableCustomDataForms: false,
+  enableTemplateEngine: false,
+  enableTemplateAIFlow: false,
   enableProductPreview: false,
   enableBulkOperations: false,
+  enableAiContentGeneration: false,
+  enableTemplateBasedGeneration: false,
 };
 
 // Environment-based overrides (can be controlled via environment variables)
@@ -50,8 +60,12 @@ export const FEATURE_FLAGS: FeatureFlags = {
   enableProductTypeInteractiveGame: getEnvFlag('VITE_ENABLE_PRODUCT_TYPE_INTERACTIVE_GAME', DEFAULT_FEATURE_FLAGS.enableProductTypeInteractiveGame),
   enableTemplateSelection: getEnvFlag('VITE_ENABLE_TEMPLATE_SELECTION', DEFAULT_FEATURE_FLAGS.enableTemplateSelection),
   enableCustomDataForms: getEnvFlag('VITE_ENABLE_CUSTOM_DATA_FORMS', DEFAULT_FEATURE_FLAGS.enableCustomDataForms),
+  enableTemplateEngine: getEnvFlag('VITE_ENABLE_TEMPLATE_ENGINE', DEFAULT_FEATURE_FLAGS.enableTemplateEngine),
+  enableTemplateAIFlow: getEnvFlag('VITE_ENABLE_TEMPLATE_AI_FLOW', DEFAULT_FEATURE_FLAGS.enableTemplateAIFlow),
   enableProductPreview: getEnvFlag('VITE_ENABLE_PRODUCT_PREVIEW', DEFAULT_FEATURE_FLAGS.enableProductPreview),
   enableBulkOperations: getEnvFlag('VITE_ENABLE_BULK_OPERATIONS', DEFAULT_FEATURE_FLAGS.enableBulkOperations),
+  enableAiContentGeneration: getEnvFlag('VITE_ENABLE_AI_CONTENT_GENERATION', DEFAULT_FEATURE_FLAGS.enableAiContentGeneration),
+  enableTemplateBasedGeneration: getEnvFlag('VITE_ENABLE_TEMPLATE_BASED_GENERATION', DEFAULT_FEATURE_FLAGS.enableTemplateBasedGeneration),
 };
 
 // Utility functions for checking feature availability
@@ -74,9 +88,17 @@ export const isTemplateSelectionEnabled = (): boolean => FEATURE_FLAGS.enableTem
 
 export const isCustomDataFormsEnabled = (): boolean => FEATURE_FLAGS.enableCustomDataForms;
 
+export const isTemplateEngineEnabled = (): boolean => FEATURE_FLAGS.enableTemplateEngine;
+
+export const isTemplateAIFlowEnabled = (): boolean => FEATURE_FLAGS.enableTemplateAIFlow;
+
 export const isProductPreviewEnabled = (): boolean => FEATURE_FLAGS.enableProductPreview;
 
 export const isBulkOperationsEnabled = (): boolean => FEATURE_FLAGS.enableBulkOperations;
+
+export const isAiContentGenerationEnabled = (): boolean => FEATURE_FLAGS.enableAiContentGeneration;
+
+export const isTemplateBasedGenerationEnabled = (): boolean => FEATURE_FLAGS.enableTemplateBasedGeneration;
 
 // Helper to get all enabled product types
 export const getEnabledProductTypes = (): string[] => {

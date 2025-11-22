@@ -75,6 +75,12 @@ INSERT INTO template_catalog (id, name, description, theme, difficulty_level, es
 ('cc0e8400-e29b-41d4-a716-446655440002', 'Animal Friends', 'Meet adorable animals from around the world', 'animals', 'easy', 25, '["animals", "nature", "cute", "educational"]', true, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
+-- Insert feature flags for template engine and AI flow
+INSERT INTO feature_flags (flag_id, flag_name, flag_description, enabled, rollout_percentage, target_accounts, created_at, updated_at) VALUES
+('dd0e8400-e29b-41d4-a716-446655440000', 'enableTemplateEngine', 'Enable the template engine for calendar creation', false, 0, '[]', NOW(), NOW()),
+('dd0e8400-e29b-41d4-a716-446655440001', 'enableTemplateAIFlow', 'Enable AI-powered content generation for templates', false, 0, '[]', NOW(), NOW())
+ON CONFLICT (flag_id) DO NOTHING;
+
 -- Log completion
 DO $$
 BEGIN

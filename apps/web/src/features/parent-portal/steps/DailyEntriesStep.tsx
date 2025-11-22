@@ -37,6 +37,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
   const [dayEntries, setDayEntries] = useState<DayEntry[]>(initializeDayEntries);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [calendarData, setCalendarData] = useState<any>(null);
 
   // Debounced auto-save refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,8 +64,16 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
 
       setIsLoading(true);
       try {
-        const response = await httpClient.get(`/calendars/${calendarId}/days`) as { data: { days?: any[] } };
-        const existingDays = response.data.days || [];
+        // Load calendar metadata and days
+        const [calendarResponse, daysResponse] = await Promise.all([
+          httpClient.get(`/calendars/${calendarId}`),
+          httpClient.get(`/calendars/${calendarId}/days`)
+        ]);
+
+        const calendar = calendarResponse.data;
+        const existingDays = daysResponse.data.days || [];
+
+        setCalendarData(calendar);
 
         setDayEntries(prevEntries =>
           prevEntries.map(entry => {
@@ -246,6 +255,8 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
         onBulkUpdate={handleBulkUpdate}
         onSaveAll={handleSaveAll}
         calendarId={calendarId}
+        templateId={calendarData?.template_id}
+        customData={calendarData?.custom_data}
       />
 
       {/* Error Display */}

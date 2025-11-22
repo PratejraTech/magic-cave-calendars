@@ -30,6 +30,9 @@ export interface WizardState {
   selectedProductType: ProductType | null;
   selectedTemplate: Template | null;
   customData: Record<string, unknown>;
+  // AI Generation
+  calendarId?: string;
+  generationComplete?: boolean;
   // Legacy calendar fields (for backward compatibility)
   childProfile: ChildProfileData;
   dailyEntries: DailyEntry[];
@@ -37,6 +40,8 @@ export interface WizardState {
   selectedTheme: 'snow' | 'warm' | 'candy' | 'forest' | 'starlight';
   isDirty: boolean;
   lastSaved: Date | null;
+  // Publishing state
+  isPublishing?: boolean;
 }
 
 const WIZARD_STORAGE_KEY = 'advent-calendar-wizard-state';

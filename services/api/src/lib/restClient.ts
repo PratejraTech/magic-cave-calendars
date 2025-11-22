@@ -36,6 +36,32 @@ export interface GenerateDaysResponse {
   }>;
 }
 
+export interface GenerateContentRequest {
+  template_id: string;
+  custom_data: Record<string, any>;
+  product_type: 'calendar' | 'storybook' | 'interactive_game';
+  product_config?: Record<string, any>;
+}
+
+export interface CalendarDayEntry {
+  day: number;
+  photo_url?: string;
+  text: string;
+}
+
+export interface CalendarContent {
+  day_entries: CalendarDayEntry[];
+  chat_persona_prompt: string;
+  surprise_urls: string[];
+}
+
+export interface GenerateContentResponse {
+  product_type: string;
+  template_id: string;
+  content: CalendarContent;
+  metadata: Record<string, any>;
+}
+
 export class RestClient {
   constructor(private baseUrl: string) {}
 
@@ -76,6 +102,13 @@ export class RestClient {
    */
   async generateCalendarDays(request: GenerateDaysRequest): Promise<GenerateDaysResponse> {
     return this.makeRequest<GenerateDaysResponse>('/chat/generate_days', 'POST', request);
+  }
+
+  /**
+   * Generate content for any supported product type using templates and custom data
+   */
+  async generateContent(request: GenerateContentRequest): Promise<GenerateContentResponse> {
+    return this.makeRequest<GenerateContentResponse>('/generate-content', 'POST', request);
   }
 
   /**

@@ -60,6 +60,7 @@ export interface Calendar {
   account_id: string;
   child_id: string;
   template_id: string | null; // Added template support
+  custom_data: unknown | null; // Custom data from template forms
   share_uuid: string;
   is_published: boolean;
   year: number;

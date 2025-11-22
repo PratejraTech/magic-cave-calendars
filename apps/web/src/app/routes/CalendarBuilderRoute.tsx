@@ -8,6 +8,7 @@ import { isGeneralizedProductsEnabled } from '../../lib/featureFlags';
 import { ProductTypeSelectionStep } from '../../features/parent-portal/steps/ProductTypeSelectionStep';
 import { TemplateSelectionStep } from '../../features/parent-portal/steps/TemplateSelectionStep';
 import { ProductSpecificCustomDataStep } from '../../features/parent-portal/steps/ProductSpecificCustomDataStep';
+import { ContentGenerationStep } from '../../features/parent-portal/steps/ContentGenerationStep';
 import { ProductPreview } from '../../features/parent-portal/components/ProductPreview';
 
 // Dynamic steps based on feature flags
@@ -17,12 +18,16 @@ const getSteps = () => {
       { id: 'product-type', title: 'Product Type', icon: Sparkles, description: 'Choose your product type' },
       { id: 'template', title: 'Template', icon: Palette, description: 'Select a template' },
       { id: 'custom-data', title: 'Customize', icon: User, description: 'Fill in custom details' },
+      { id: 'generate', title: 'Generate Content', icon: Sparkles, description: 'Create AI-powered content' },
       { id: 'preview', title: 'Preview', icon: Eye, description: 'Review your product' },
       { id: 'publish', title: 'Publish', icon: Check, description: 'Share with your child' },
     ];
   } else {
     return [
       { id: 'profile', title: 'Child Profile', icon: User, description: 'Set up your child\'s information' },
+      { id: 'template', title: 'Template', icon: Palette, description: 'Choose a calendar template' },
+      { id: 'custom-data', title: 'Customize', icon: User, description: 'Fill in template details' },
+      { id: 'generate', title: 'Generate Content', icon: Sparkles, description: 'Create AI-powered content' },
       { id: 'entries', title: 'Daily Entries', icon: Calendar, description: 'Create 24 magical days' },
       { id: 'surprises', title: 'Surprise Videos', icon: Video, description: 'Add YouTube video surprises' },
       { id: 'theme', title: 'Theme & Style', icon: Palette, description: 'Choose the visual theme' },
@@ -44,7 +49,72 @@ export function CalendarBuilderRoute() {
     );
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Validate current step before proceeding
+    if (isGeneralizedProductsEnabled()) {
+      if (state.currentStep === 1 && !state.selectedTemplate) {
+        // Template selection step - require template selection
+        alert('Please select a template to continue.');
+        return;
+      }
+      if (state.currentStep === 2 && state.selectedTemplate && Object.keys(state.customData || {}).length === 0) {
+        // Custom data step - require custom data if template is selected
+        alert('Please fill in the template customization details to continue.');
+        return;
+      }
+
+      // Create calendar before generation step
+      if (state.currentStep === 2 && !state.calendarId) {
+        try {
+          const { createCalendar, createChildProfile } = await import('../../lib/api');
+
+          if (!state.selectedTemplate) {
+            alert('Please select a template before proceeding.');
+            return;
+          }
+
+          // For template-based flow, we need a child profile first
+          // Use default child profile for now - in production this would come from auth
+          const childProfileData = {
+            child_name: state.customData?.child_name as string || 'Child',
+            chat_persona: 'daddy' as const,
+            custom_chat_prompt: undefined,
+            theme: 'snow' as const,
+            hero_photo_url: undefined,
+          };
+
+          const childResult = await createChildProfile(childProfileData);
+
+          // Create calendar with template
+          const calendarData = {
+            child_id: childResult.child_id,
+            year: new Date().getFullYear(),
+            template_id: state.selectedTemplate.id,
+            custom_data: state.customData || {},
+          };
+
+          const calendarResult = await createCalendar(calendarData);
+          updateState({ calendarId: calendarResult.calendar_id });
+        } catch (error) {
+          console.error('Failed to create calendar:', error);
+          alert('Failed to create calendar. Please try again.');
+          return;
+        }
+      }
+    } else {
+      // Legacy calendar flow validation
+      if (state.currentStep === 1 && !state.selectedTemplate) {
+        // Template selection step - require template selection
+        alert('Please select a template to continue.');
+        return;
+      }
+      if (state.currentStep === 2 && state.selectedTemplate && Object.keys(state.customData || {}).length === 0) {
+        // Custom data step - require custom data if template is selected
+        alert('Please fill in the template customization details to continue.');
+        return;
+      }
+    }
+
     if (state.currentStep < STEPS.length - 1) {
       updateState({ currentStep: state.currentStep + 1 });
     }
@@ -56,9 +126,113 @@ export function CalendarBuilderRoute() {
     }
   };
 
-  const handleComplete = () => {
-    // Navigate to child calendar view with the created calendar
-    navigate('/calendar/demo-share-uuid');
+  const handleComplete = async () => {
+    if (isGeneralizedProductsEnabled()) {
+      // Phase 5: Generalized Product Flow - Create product with template
+      try {
+        const { createProduct } = await import('../../lib/api');
+
+        if (!state.selectedProductType || !state.selectedTemplate) {
+          alert('Please select a product type and template before publishing.');
+          return;
+        }
+
+        const productData = {
+          product_type_id: state.selectedProductType.id,
+          template_id: state.selectedTemplate.id,
+          custom_data: state.customData,
+          title: `${state.selectedProductType.name} for ${state.customData.childName || 'Your Child'}`,
+        };
+
+        const result = await createProduct(productData);
+
+        // Navigate to the created product
+        navigate(`/product/${result.share_uuid}`);
+      } catch (error) {
+        console.error('Failed to create product:', error);
+        alert('Failed to create product. Please try again.');
+      }
+    } else {
+      // Legacy Calendar Flow - Create calendar with optional template support
+      try {
+        const { createCalendar, updateCalendarDays, publishCalendar, createChildProfile, generateCalendarContent } = await import('../../lib/api');
+
+        // Step 1: Create child profile
+        const childProfileData = {
+          child_name: state.childProfile.childName,
+          chat_persona: state.childProfile.chatPersona,
+          custom_chat_prompt: state.childProfile.customPrompt || undefined,
+          theme: state.childProfile.theme,
+          hero_photo_url: state.childProfile.heroPhotoPreview || undefined,
+        };
+
+        const childResult = await createChildProfile(childProfileData);
+
+        // Step 2: Create calendar (now with template support)
+        const currentYear = new Date().getFullYear();
+        const calendarData = {
+          child_id: childResult.child_id,
+          year: currentYear,
+          template_id: state.selectedTemplate?.id || undefined, // Include template if selected
+          custom_data: state.customData, // Include custom data
+        };
+
+        const calendarResult = await createCalendar(calendarData);
+
+        // Step 3: Generate AI content if template is selected and has custom data
+        if (state.selectedTemplate && Object.keys(state.customData).length > 0) {
+          try {
+            // Show loading state for AI generation
+            updateState({ isPublishing: true });
+
+            const generationResult = await generateCalendarContent(calendarResult.calendar_id, state.selectedTemplate.id, state.customData);
+            console.log('AI content generation completed:', generationResult);
+
+          } catch (error) {
+            console.warn('AI content generation failed, falling back to manual content:', error);
+            // Continue with manual content if AI generation fails
+            const calendarDays = state.dailyEntries.map((entry, index) => ({
+              day_number: index + 1,
+              title: entry.title || `Day ${index + 1}`,
+              message: entry.message,
+              photo_asset_id: entry.photoPreview || undefined,
+              voice_asset_id: undefined, // Not implemented yet
+              music_asset_id: undefined, // Not implemented yet
+              confetti_type: 'snow' as const, // Default for now
+              unlock_effect: 'snowstorm' as const, // Default for now
+            }));
+
+            await updateCalendarDays(calendarResult.calendar_id, calendarDays);
+          } finally {
+            updateState({ isPublishing: false });
+          }
+        } else {
+          // Step 4: Update calendar days (manual content)
+          const calendarDays = state.dailyEntries.map((entry, index) => ({
+            day_number: index + 1,
+            title: entry.title || `Day ${index + 1}`,
+            message: entry.message,
+            photo_asset_id: entry.photoPreview || undefined,
+            voice_asset_id: undefined, // Not implemented yet
+            music_asset_id: undefined, // Not implemented yet
+            confetti_type: 'snow' as const, // Default for now
+            unlock_effect: 'snowstorm' as const, // Default for now
+          }));
+
+          await updateCalendarDays(calendarResult.calendar_id, calendarDays);
+        }
+
+        // Step 5: Publish calendar
+        await publishCalendar(calendarResult.calendar_id);
+
+        // Navigate to the created calendar
+        navigate(`/calendar/${calendarResult.share_uuid}`);
+      } catch (error) {
+        console.error('Failed to create calendar:', error);
+        alert('Failed to create calendar. Please try again.');
+        updateState({ isPublishing: false });
+      }
+    }
   };
 
   const renderStepContent = () => {
@@ -91,6 +265,19 @@ export function CalendarBuilderRoute() {
           );
         case 3:
           return (
+            <ContentGenerationStep
+              selectedProductType={state.selectedProductType}
+              selectedTemplate={state.selectedTemplate}
+              customData={state.customData}
+              calendarId={state.calendarId}
+              onGenerationComplete={() => {
+                // Mark generation as complete and move to next step
+                updateState({ generationComplete: true });
+              }}
+            />
+          );
+        case 4:
+          return (
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Preview Your Product</h2>
@@ -103,7 +290,7 @@ export function CalendarBuilderRoute() {
               />
             </div>
           );
-        case 4:
+        case 5:
           // For now, use the legacy preview step but it needs to be updated for generalized products
           return <PreviewStep wizardState={state} onComplete={handleComplete} />;
         default:
@@ -115,12 +302,29 @@ export function CalendarBuilderRoute() {
         case 0:
           return <ChildProfileStep wizardState={state} onUpdate={updateState} />;
         case 1:
-          return <DailyEntriesStep wizardState={state} onUpdate={updateState} />;
+          return (
+            <TemplateSelectionStep
+              selectedProductType={null} // No product type for legacy calendars
+              selectedTemplate={state.selectedTemplate}
+              onTemplateSelect={(template) => updateState({ selectedTemplate: template })}
+            />
+          );
         case 2:
-          return <SurpriseVideosStep wizardState={state} onUpdate={updateState} />;
+          return (
+            <ProductSpecificCustomDataStep
+              selectedProductType={null} // No product type for legacy calendars
+              selectedTemplate={state.selectedTemplate}
+              customData={state.customData}
+              onCustomDataChange={(data) => updateState({ customData: data })}
+            />
+          );
         case 3:
-          return <ThemeStep wizardState={state} onUpdate={updateState} />;
+          return <DailyEntriesStep wizardState={state} onUpdate={updateState} />;
         case 4:
+          return <SurpriseVideosStep wizardState={state} onUpdate={updateState} />;
+        case 5:
+          return <ThemeStep wizardState={state} onUpdate={updateState} />;
+        case 6:
           return <PreviewStep wizardState={state} onComplete={handleComplete} />;
         default:
           return null;
@@ -217,14 +421,22 @@ export function CalendarBuilderRoute() {
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
               </button>
-            ) : (
-              <button
-                onClick={handleComplete}
-                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-              >
-                Publish Calendar
-              </button>
-            )}
+             ) : (
+               <button
+                 onClick={handleComplete}
+                 disabled={state.isPublishing}
+                 className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+               >
+                 {state.isPublishing ? (
+                   <>
+                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                     {state.selectedTemplate ? 'Generating Content...' : 'Publishing...'}
+                   </>
+                 ) : (
+                   'Publish Calendar'
+                 )}
+               </button>
+             )}
           </div>
         </div>
       </div>
