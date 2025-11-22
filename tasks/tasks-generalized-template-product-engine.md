@@ -118,16 +118,16 @@ Follow this file and record state in **bridge.md**
 
 ---
 
-* [ ] 3.0 Backend API Generalization & Product Abstraction
+* [x] 3.0 Backend API Generalization & Product Abstraction
 
-  * [ ] 3.1 Create product_types service: CRUD operations for managing product types and their configurations.
-  * [ ] 3.2 Refactor templates service: add product_type filtering, validate template compatibility with product types.
-  * [ ] 3.3 Create products service: generalize calendar creation/update logic to support multiple product types.
-  * [ ] 3.4 Update HTTP routes: add /product-types endpoints, generalize /calendars to /products with backward compatibility.
-  * [ ] 3.5 Implement product-specific validation: ensure custom data schemas match product type requirements.
-  * [ ] 3.6 Add multi-tenant isolation: ensure products respect account boundaries and admin access controls.
-  * [ ] 3.7 Update analytics service: track product type usage, template adoption across different product types.
-  * [ ] 3.8 Write unit tests for generalized services and API endpoints.
+  * [x] 3.1 Create product_types service: CRUD operations for managing product types and their configurations.
+  * [x] 3.2 Refactor templates service: add product_type filtering, validate template compatibility with product types.
+  * [x] 3.3 Create products service: generalize calendar creation/update logic to support multiple product types.
+  * [x] 3.4 Update HTTP routes: add /product-types endpoints, generalize /calendars to /products with backward compatibility.
+  * [x] 3.5 Implement product-specific validation: ensure custom data schemas match product type requirements.
+  * [x] 3.6 Add multi-tenant isolation: ensure products respect account boundaries and admin access controls.
+  * [x] 3.7 Update analytics service: track product type usage, template adoption across different product types.
+  * [x] 3.8 Write unit tests for generalized services and API endpoints.
 
 ---
 
