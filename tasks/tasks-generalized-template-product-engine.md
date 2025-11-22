@@ -89,19 +89,19 @@ Follow this file and record state in **bridge.md**
   * [x] 0.1 Confirm feature name (e.g., `generalized-template-product-engine`) and any Jira ticket IDs to reference in commits.
   * [x] 0.2 Create and checkout a new branch (e.g., `git checkout -b feature/generalized-template-product-engine`).
   * [x] 0.3 Add this task file as `tasks/tasks-generalized-template-product-engine.md` to the repo.
-  * [ ] 0.4 Commit the initial tasks file (`git commit -am "chore: add tasks for generalized template product engine"`).
+  * [x] 0.4 Commit the initial tasks file (`git commit -am "chore: add tasks for generalized template product engine"`).
 
 ---
 
 * [ ] 1.0 Phase 0 – Architecture Analysis & Generalization Strategy
 
-  * [ ] 1.1 Review existing calendar-specific template implementation and identify hardcoded assumptions (e.g., 24 days, advent theme, specific content structure).
-  * [ ] 1.2 Define product type abstraction: create enum/interface for product types (calendar, storybook, interactive_game, etc.) with shared and type-specific properties.
-  * [ ] 1.3 Analyze data model impacts: assess how calendar tables (calendar, calendar_day) can be generalized to product/product_content while maintaining backward compatibility.
-  * [ ] 1.4 Evaluate AI generation pipeline: determine how prompt templates and structured output can be made product-agnostic (e.g., configurable content schemas per product type).
-  * [ ] 1.5 Design feature flagging: define flags for enabling generalized products (e.g., `enableGeneralizedProducts`, `enableProductTypeCalendar`) with gradual rollout strategy.
-  * [ ] 1.6 Document risks and breaking changes: identify potential issues with child view rendering, API contracts, and theme compatibility.
-  * [ ] 1.7 Get sign-off on generalization approach before implementation.
+  * [x] 1.1 Review existing calendar-specific template implementation and identify hardcoded assumptions (e.g., 24 days, advent theme, specific content structure).
+  * [x] 1.2 Define product type abstraction: create enum/interface for product types (calendar, storybook, interactive_game, etc.) with shared and type-specific properties.
+  * [x] 1.3 Analyze data model impacts: assess how calendar tables (calendar, calendar_day) can be generalized to product/product_content while maintaining backward compatibility.
+  * [x] 1.4 Evaluate AI generation pipeline: determine how prompt templates and structured output can be made product-agnostic (e.g., configurable content schemas per product type).
+  * [x] 1.5 Design feature flagging: define flags for enabling generalized products (e.g., `enableGeneralizedProducts`, `enableProductTypeCalendar`) with gradual rollout strategy.
+  * [x] 1.6 Document risks and breaking changes: identify potential issues with child view rendering, API contracts, and theme compatibility.
+  * [x] 1.7 Get sign-off on generalization approach before implementation.
 
 ---
 
