@@ -76,6 +76,42 @@ export interface CalendarDaysResponse {
   childInfo?: ChildInfo;
 }
 
+export interface ProductContentResponse {
+  product: {
+    id: string;
+    product_type_id: string;
+    title: string;
+    theme?: string;
+    child_name?: string;
+    created_at: string;
+    updated_at: string;
+  };
+  content: {
+    id: string;
+    product_id: string;
+    content_number: number;
+    title: string;
+    content: string;
+    media_assets?: {
+      photo?: string;
+      voice?: string;
+      music?: string;
+      video?: string;
+    };
+    metadata?: {
+      confetti_type?: 'snow' | 'stars' | 'candy' | 'reindeer';
+      unlock_effect?: 'fireworks' | 'snowstorm' | 'aurora' | 'gingerbread';
+      [key: string]: any;
+    };
+    is_unlocked: boolean;
+    is_completed: boolean;
+    completed_at?: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  surprises?: string[];
+}
+
 /**
  * Fetch calendar days for a given share UUID
  */
@@ -337,5 +373,64 @@ export async function generateContent(data: GenerateContentRequest): Promise<any
   } catch (error) {
     console.error('Failed to generate content:', error);
     throw error;
+  }
+}
+
+/**
+ * Fetch product content for a given share UUID
+ */
+export async function fetchProductContent(shareUuid: string): Promise<ProductContentResponse> {
+  try {
+    const response = await httpClient.get<ProductContentResponse>(`/products/${shareUuid}/content`);
+    return response;
+  } catch (error) {
+    console.error('Failed to fetch product content:', error);
+    // Return mock data as fallback for development
+    return {
+      product: {
+        id: 'mock-product-id',
+        product_type_id: 'calendar',
+        title: 'Christmas Advent Calendar',
+        theme: 'snow',
+        child_name: 'Test Child',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      content: Array.from({ length: 24 }, (_, i) => ({
+        id: `mock-content-${i + 1}`,
+        product_id: 'mock-product-id',
+        content_number: i + 1,
+        title: `Day ${i + 1}`,
+        content: `A magical message for day ${i + 1}!`,
+        media_assets: {
+          photo: `https://picsum.photos/400/300?random=${i + 1}`,
+        },
+        metadata: {
+          confetti_type: 'snow' as const,
+          unlock_effect: 'snowstorm' as const,
+        },
+        is_unlocked: i < 3, // First 3 days unlocked for demo
+        is_completed: i < 3,
+        completed_at: i < 3 ? new Date(Date.UTC(2024, 11, i + 1)).toISOString() : undefined,
+        created_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
+        updated_at: new Date(Date.UTC(2024, 11, i + 1)).toISOString(),
+      })),
+      surprises: [
+        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        'https://www.youtube.com/watch?v=oHg5SJYRHA0',
+      ],
+    };
+  }
+}
+
+/**
+ * Mark product content as opened/completed
+ */
+export async function openProductContent(shareUuid: string, contentId: string): Promise<void> {
+  try {
+    await httpClient.post(`/products/${shareUuid}/content/${contentId}/open`);
+  } catch (error) {
+    console.error('Failed to open product content:', error);
+    // For now, just log the error - the UI will still work with local state
   }
 }

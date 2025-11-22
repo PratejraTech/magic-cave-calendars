@@ -7,7 +7,8 @@ import { AuthGuard } from './app/components/AuthGuard';
 import { AuthRoute } from './app/routes/AuthRoute';
 import { ParentDashboardRoute } from './app/routes/ParentDashboardRoute';
 import { CalendarBuilderRoute } from './app/routes/CalendarBuilderRoute';
-import { ChildCalendarRoute } from './app/routes/ChildCalendarRoute';
+import { ProductViewRoute } from './app/routes/ProductViewRoute';
+import { CalendarRedirect } from './app/routes/CalendarRedirect';
 
 function App() {
   return (
@@ -42,7 +43,10 @@ function App() {
                     </AuthGuard>
                   }
                 />
-                <Route path="/calendar/:shareUuid" element={<ChildCalendarRoute />} />
+                {/* New generalized product route */}
+                <Route path="/product/:shareUuid" element={<ProductViewRoute />} />
+                {/* Backward compatibility: redirect calendar URLs to product URLs */}
+                <Route path="/calendar/:shareUuid" element={<CalendarRedirect />} />
                 <Route path="*" element={<Navigate to="/auth" replace />} />
               </Routes>
             </RootLayout>
