@@ -96,7 +96,6 @@ export function CalendarBuilderRoute() {
           const calendarResult = await createCalendar(calendarData);
           updateState({ calendarId: calendarResult.calendar_id });
         } catch (error) {
-          console.error('Failed to create calendar:', error);
           alert('Failed to create calendar. Please try again.');
           return;
         }
@@ -149,7 +148,6 @@ export function CalendarBuilderRoute() {
         // Navigate to the created product
         navigate(`/product/${result.share_uuid}`);
       } catch (error) {
-        console.error('Failed to create product:', error);
         alert('Failed to create product. Please try again.');
       }
     } else {
@@ -186,10 +184,9 @@ export function CalendarBuilderRoute() {
             updateState({ isPublishing: true });
 
             const generationResult = await generateCalendarContent(calendarResult.calendar_id, state.selectedTemplate.id, state.customData);
-            console.log('AI content generation completed:', generationResult);
 
           } catch (error) {
-            console.warn('AI content generation failed, falling back to manual content:', error);
+            // Continue with manual content if AI generation fails
             // Continue with manual content if AI generation fails
             const calendarDays = state.dailyEntries.map((entry, index) => ({
               day_number: index + 1,
