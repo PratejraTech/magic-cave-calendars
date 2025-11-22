@@ -171,11 +171,11 @@ export const requestDaddyResponseStreaming = (
 
     await readStream();
   })
-  .catch((error) => {
-    if (error.name === 'AbortError') {
+  .catch((_error) => {
+    if (_error.name === 'AbortError') {
       return; // Request was cancelled
     }
-    onError(error.message || 'Connection failed');
+    onError(_error.message || 'Connection failed');
   });
 
   // Return cleanup function

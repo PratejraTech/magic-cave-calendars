@@ -4,7 +4,6 @@ import {
   fetchDaddyQuotes,
   loadStoredMessages,
   persistMessages,
-  requestDaddyResponse,
   requestDaddyResponseStreaming,
   logChatInput,
   resetSessionId,
@@ -105,7 +104,7 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
       const payloadHistory = [...storedHistoryRef.current, ...newMessages];
       const payload = [{ role: 'system' as const, content: CHAT_SYSTEM_PROMPT }, ...payloadHistory];
 
-      const cleanup = requestDaddyResponseStreaming(
+      const _cleanup = requestDaddyResponseStreaming(
         payload,
         quotes,
         (chunk) => {
@@ -125,7 +124,7 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
           persistMessages(persisted);
           setLoading(false);
         },
-        (error) => {
+        (_error) => {
           setStreaming(false);
           setLoading(false);
           const fallbackQuote =
