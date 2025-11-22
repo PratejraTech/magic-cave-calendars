@@ -66,7 +66,7 @@ export function AuthRoute() {
         }
       }
     } catch (error) {
-      console.error('Auth error:', error);
+      // TODO: Implement proper error logging service
       setAuthError('An unexpected error occurred. Please try again.');
     }
 

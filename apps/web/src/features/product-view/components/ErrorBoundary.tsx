@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Product Error Boundary caught an error:', error, errorInfo);
+    // TODO: Implement proper logging service
 
     // Log to analytics/monitoring service
     this.logError(error, errorInfo);
@@ -55,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
       url: window.location.href
     };
 
-    console.error('Error logged:', errorData);
+    // TODO: Implement proper logging service
 
     // Could send to analytics service here
     // analytics.track('product_error', errorData);

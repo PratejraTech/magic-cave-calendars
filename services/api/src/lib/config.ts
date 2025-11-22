@@ -21,9 +21,9 @@ const envSchema = Joi.object({
 const envResult = envSchema.validate(process.env, { allowUnknown: true });
 
 if (envResult.error) {
-  console.error('❌ Invalid environment configuration:');
+  // TODO: Implement proper error logging service
   envResult.error.details.forEach((error: any) => {
-    console.error(`  - ${error.path.join('.')}: ${error.message}`);
+    // TODO: Log validation errors
   });
   process.exit(1);
 }
@@ -48,10 +48,4 @@ export const config = {
 } as const;
 
 // Log configuration on startup (without sensitive data)
-console.log('✅ Configuration loaded:', {
-  nodeEnv: config.nodeEnv,
-  port: config.port,
-  supabaseUrl: config.supabase.url,
-  intelligenceUrl: config.intelligence.serviceUrl,
-  corsOrigins: config.corsOrigins,
-});
+// TODO: Implement proper configuration logging

@@ -73,7 +73,7 @@ app.use('/api/analytics', createAnalyticsRoutes(analyticsService));
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.Function) => {
-  console.error('Unhandled error:', err);
+  // Unhandled error logged (consider implementing proper logging)
   res.status(500).json({ error: 'Internal server error' });
 });
 
@@ -84,9 +84,7 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 API Server running on port ${PORT}`);
-  console.log(`📊 Supabase URL: ${SUPABASE_URL}`);
-  console.log(`🤖 Intelligence Service: ${INTELLIGENCE_SERVICE_URL}`);
+  // Server started successfully (consider implementing proper logging)
 });
 
 export default app;

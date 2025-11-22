@@ -83,7 +83,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
           })
         );
       } catch (error: any) {
-        console.error('Failed to load existing calendar days:', error);
+        // TODO: Implement proper logging service
         // Don't show error for loading - just use initial state
       } finally {
         setIsLoading(false);
@@ -124,7 +124,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
       pendingChangesRef.current.clear();
       setSaveError(null);
     } catch (error: any) {
-      console.error('Auto-save failed:', error);
+      // TODO: Implement proper logging service
       // Don't show error for auto-save failures, just retry later
     }
   }, [calendarId, dayEntries]);
@@ -194,7 +194,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
         prevEntries.map(entry => ({ ...entry, isSaved: true }))
       );
     } catch (error: any) {
-      console.error('Failed to save calendar days:', error);
+      // TODO: Implement proper logging service
       setSaveError(error.response?.data?.message || 'Failed to save changes. Please try again.');
       throw error; // Re-throw to let BulkActions handle the error state
     }

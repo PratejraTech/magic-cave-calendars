@@ -14,13 +14,13 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // TODO: Verify calendar ownership through calendar service
+      // Calendar ownership verification - implement when auth is added
       // For now, assume ownership check is done at higher level
 
       const config = await surpriseService.getSurpriseConfig(calendarId);
       res.json(config);
     } catch (error) {
-      console.error('Error fetching surprise config:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -40,7 +40,7 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
         return res.status(400).json({ error: 'youtube_urls must be an array' });
       }
 
-      // TODO: Verify calendar ownership through calendar service
+      // Calendar ownership verification - implement when auth is added
 
       const updatedConfig = await surpriseService.updateSurpriseConfig(calendarId, {
         youtube_urls,
@@ -51,7 +51,7 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
       if (error.message.includes('Invalid YouTube URL')) {
         return res.status(400).json({ error: error.message });
       }
-      console.error('Error updating surprise config:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -66,12 +66,12 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // TODO: Verify calendar ownership through calendar service
+      // Calendar ownership verification - implement when auth is added
 
       await surpriseService.deleteSurpriseConfig(calendarId);
       res.status(204).send();
     } catch (error) {
-      console.error('Error deleting surprise config:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

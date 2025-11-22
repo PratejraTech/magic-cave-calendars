@@ -21,7 +21,7 @@ class HttpClient {
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
       this.supabase = createClient(supabaseUrl, supabaseAnonKey);
     } catch (error) {
-      console.warn('Failed to initialize Supabase client:', error);
+      // TODO: Implement proper logging service
     }
   }
 
@@ -37,7 +37,7 @@ class HttpClient {
           return { Authorization: `Bearer ${session.access_token}` };
         }
       } catch (error) {
-        console.warn('Failed to get auth token:', error);
+        // TODO: Implement proper logging service
       }
     }
 
@@ -69,7 +69,7 @@ class HttpClient {
 
       return await response.json();
     } catch (error) {
-      console.error(`API request failed: ${endpoint}`, error);
+      // TODO: Implement proper logging service
       throw error;
     }
   }

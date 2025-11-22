@@ -130,8 +130,8 @@ export function PreviewPublishStep({ onComplete, wizardData }: PreviewPublishSte
       setShareUrl(shareUrl);
       onComplete({ published: true, shareUrl });
     } catch (error) {
-      console.error('Failed to publish calendar:', error);
-      // TODO: Show error message to user
+      // Error handled silently - could show user notification
+      // Error message display - implement user notification system
       alert('Failed to publish calendar. Please try again.');
     } finally {
       setIsPublishing(false);
@@ -143,7 +143,7 @@ export function PreviewPublishStep({ onComplete, wizardData }: PreviewPublishSte
       await navigator.clipboard.writeText(shareUrl);
       // Could show a toast notification here
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      // Error handled silently - clipboard copy failed
     }
   };
 

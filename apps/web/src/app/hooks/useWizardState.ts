@@ -103,7 +103,7 @@ export function useWizardState() {
         }
       }
     } catch (error) {
-      console.warn('Failed to load wizard state:', error);
+      // Warning handled silently - could implement fallback
     } finally {
       setIsLoaded(true);
     }
@@ -133,7 +133,7 @@ export function useWizardState() {
       };
       localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(stateToSave));
     } catch (error) {
-      console.warn('Failed to save wizard state:', error);
+      // Warning handled silently - could implement retry logic
     }
   }, []);
 

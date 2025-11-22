@@ -26,8 +26,8 @@ export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
         } else if (!requireAuth && authenticated) {
           navigate('/parent-portal', { replace: true });
         }
-      } catch (error) {
-        console.error('Auth check failed:', error);
+       } catch (error) {
+        // TODO: Implement proper error logging service
         if (requireAuth) {
           navigate('/auth', { replace: true });
         }

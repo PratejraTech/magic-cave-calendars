@@ -43,7 +43,7 @@ export function ProductViewRoute() {
         // Track product view analytics
         trackAnalytics(shareUuid, 'product_open');
       } catch (error) {
-        console.error('Failed to load product data:', error);
+        // Error handled silently - could show user notification
         setError('Failed to load product. Please try again.');
       } finally {
         setIsLoading(false);
@@ -76,7 +76,7 @@ export function ProductViewRoute() {
     try {
       await openProductContent(shareUuid, contentId);
     } catch (error) {
-      console.error('Failed to mark content as opened:', error);
+      // Error handled silently - could show user notification
       // Continue with UI update even if backend call fails
     }
   };

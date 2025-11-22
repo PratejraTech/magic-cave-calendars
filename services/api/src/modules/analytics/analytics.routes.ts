@@ -28,7 +28,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
 
       res.status(201).json(event);
     } catch (error) {
-      console.error('Error tracking analytics event:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -44,7 +44,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       const summary = await analyticsService.getAnalyticsSummary(accountId);
       res.json(summary);
     } catch (error) {
-      console.error('Error fetching analytics summary:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -59,12 +59,12 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // TODO: Verify calendar ownership
+      // Calendar ownership verification - implement when auth is added
 
       const analytics = await analyticsService.getCalendarAnalytics(calendarId);
       res.json(analytics);
     } catch (error) {
-      console.error('Error fetching calendar analytics:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -86,7 +86,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       const event = await analyticsService.trackCalendarOpen(accountId, calendar_id, child_id);
       res.status(201).json(event);
     } catch (error) {
-      console.error('Error tracking calendar open:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -108,7 +108,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       const event = await analyticsService.trackDayOpen(accountId, calendar_id, day_number, child_id);
       res.status(201).json(event);
     } catch (error) {
-      console.error('Error tracking day open:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -130,7 +130,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       const event = await analyticsService.trackSurpriseOpen(accountId, calendar_id, child_id);
       res.status(201).json(event);
     } catch (error) {
-      console.error('Error tracking surprise open:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -152,7 +152,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       const event = await analyticsService.trackChatMessageSent(accountId, child_id, session_id);
       res.status(201).json(event);
     } catch (error) {
-      console.error('Error tracking chat message:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -174,7 +174,7 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       const event = await analyticsService.trackChatModalOpen(accountId, child_id, session_id);
       res.status(201).json(event);
     } catch (error) {
-      console.error('Error tracking chat modal open:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

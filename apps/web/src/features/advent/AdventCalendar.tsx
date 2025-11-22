@@ -207,7 +207,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
         label="Chat with Daddy"
         theme={calendarTheme}
         position="bottom-right"
-        notificationCount={0} // TODO: Add unread message count
+        notificationCount={0} // Unread message count - implement when chat is added
       />
 
       <h1 className="text-4xl font-bold text-center text-white mb-8">

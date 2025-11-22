@@ -29,7 +29,7 @@ export function createChildRoutes(childService: ChildService) {
 >>>>>>> feature/parent-portal
       res.json(child);
     } catch (error) {
-      console.error('Error fetching child:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -53,7 +53,7 @@ export function createChildRoutes(childService: ChildService) {
       if (error.message === 'Child not found') {
         return res.status(404).json({ error: 'Child not found' });
       }
-      console.error('Error fetching child:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -112,7 +112,7 @@ export function createChildRoutes(childService: ChildService) {
       }
 =======
 >>>>>>> feature/parent-portal
-      console.error('Error creating child:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -153,7 +153,7 @@ export function createChildRoutes(childService: ChildService) {
 
       res.json(child);
     } catch (error) {
-      console.error('Error fetching child:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -185,7 +185,7 @@ export function createChildRoutes(childService: ChildService) {
       }
 =======
 >>>>>>> feature/parent-portal
-      console.error('Error updating child:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -228,7 +228,7 @@ export function createChildRoutes(childService: ChildService) {
       }
 =======
 >>>>>>> feature/parent-portal
-      console.error('Error deleting child:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

@@ -59,7 +59,7 @@ export function ChildCalendarRoute() {
         // Track calendar view analytics
         trackAnalytics(shareUuid, 'calendar_open');
       } catch (error) {
-        console.error('Failed to load calendar data:', error);
+        // Error handled silently - could show error page
         // Error handling is done in the API functions with fallbacks
       } finally {
         setIsLoading(false);
@@ -110,7 +110,7 @@ export function ChildCalendarRoute() {
       try {
         await openCalendarDay(shareUuid, dayId);
       } catch (error) {
-        console.error('Failed to mark day as opened:', error);
+        // Error handled silently - day opening failed
         // Continue with UI update even if backend call fails
       }
     }

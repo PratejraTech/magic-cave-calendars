@@ -88,7 +88,7 @@ export function DayCard({ dayEntry, onUpdate, onPhotoUpload }: DayCardProps) {
         error.message?.includes('timeout') ||
         error.code === 'NETWORK_ERROR'
       )) {
-        console.warn(`Photo upload failed, retrying in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        // TODO: Implement proper logging service
         await new Promise(resolve => setTimeout(resolve, retryDelay));
         return uploadPhoto(file, retryCount + 1);
       }
@@ -111,7 +111,7 @@ export function DayCard({ dayEntry, onUpdate, onPhotoUpload }: DayCardProps) {
       onUpdate({ photo: file, photoUrl });
       onPhotoUpload?.(dayEntry.dayNumber, photoUrl);
     } catch (error: any) {
-      console.error('Failed to upload photo:', error);
+      // TODO: Implement proper logging service
       setPhotoError(error.message || 'Failed to upload photo');
     } finally {
       setIsUploading(false);

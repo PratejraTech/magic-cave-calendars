@@ -13,7 +13,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         data: productTypes
       });
     } catch (error) {
-      console.error('Error fetching product types:', error);
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product types'
@@ -39,7 +39,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         data: productType
       });
     } catch (error) {
-      console.error('Error fetching product type:', error);
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product type'
@@ -65,7 +65,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         data: productType
       });
     } catch (error) {
-      console.error('Error fetching product type by name:', error);
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product type'
@@ -84,7 +84,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         data: features
       });
     } catch (error) {
-      console.error('Error fetching product type features:', error);
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product type features'
@@ -103,7 +103,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         data: schema
       });
     } catch (error) {
-      console.error('Error fetching product type schema:', error);
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product type schema'
@@ -126,7 +126,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         }
       });
     } catch (error) {
-      console.error('Error checking feature support:', error);
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to check feature support'

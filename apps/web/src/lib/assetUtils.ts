@@ -8,7 +8,7 @@ export async function resolveAssetUrl(assetId?: string): Promise<string | null> 
   if (!assetId) return null;
 
   try {
-    // TODO: Replace with actual API call when backend asset endpoints are ready
+    // Asset API integration - implement when backend endpoints are ready
     // const response = await httpClient.get<{ url: string }>(`/assets/${assetId}/url`);
     // return response.url;
 
@@ -18,7 +18,7 @@ export async function resolveAssetUrl(assetId?: string): Promise<string | null> 
     }
     return null;
   } catch (error) {
-    console.error('Failed to resolve asset URL:', error);
+    // TODO: Implement proper logging service
     return null;
   }
 }

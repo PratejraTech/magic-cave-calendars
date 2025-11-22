@@ -119,17 +119,17 @@ app.use('*', (req, res) => {
 // Start server
 const PORT = config.port;
 app.listen(PORT, () => {
-  console.log(`🚀 Advent Calendar API server running on port ${PORT}`);
-  console.log(`📊 Health check available at http://localhost:${PORT}/health`);
+  // TODO: Implement proper logging service
+  // Log:${PORT}/health`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+  // TODO: Implement proper logging service
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
+  // TODO: Implement proper logging service
   process.exit(0);
 });

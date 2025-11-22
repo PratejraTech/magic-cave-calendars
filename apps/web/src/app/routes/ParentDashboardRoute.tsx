@@ -36,7 +36,7 @@ export function ParentDashboardRoute() {
       try {
         return await httpClient.get<Child>('/child');
       } catch (error) {
-        console.error('Failed to fetch child:', error);
+        // TODO: Implement proper error logging service
         return null;
       }
     },
@@ -50,7 +50,7 @@ export function ParentDashboardRoute() {
       try {
         return await httpClient.get<Calendar[]>('/calendars');
       } catch (error) {
-        console.error('Failed to fetch calendars:', error);
+        // TODO: Implement proper error logging service
         return [];
       }
     },

@@ -36,7 +36,7 @@ export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId }:
 
       onBulkUpdate(updates);
     } catch (error: any) {
-      console.error('Failed to generate messages:', error);
+      // TODO: Implement proper logging service
       setGenerationError(error.response?.data?.message || 'Failed to generate messages. Please try again.');
     } finally {
       setIsGenerating(false);

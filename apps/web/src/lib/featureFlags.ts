@@ -89,10 +89,10 @@ export const getEnabledProductTypes = (): string[] => {
 
 // Development helpers
 export const logFeatureFlags = (): void => {
-  console.log('Current Feature Flags:', FEATURE_FLAGS);
+  // Feature flags logged for debugging (remove in production)
 };
 
 export const resetToDefaults = (): void => {
   // This would typically update environment variables or a configuration service
-  console.warn('Feature flag reset not implemented - update environment variables manually');
+  // Feature flag reset not implemented - update environment variables manually
 };

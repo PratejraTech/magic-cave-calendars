@@ -56,7 +56,7 @@ export function ProductPreview({
         onPreviewUpdate(mockPreview);
       }
     } catch (err) {
-      console.error('Failed to generate preview:', err);
+      // TODO: Implement proper logging service
       setError('Failed to generate preview. Please try again.');
     } finally {
       setLoading(false);

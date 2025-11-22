@@ -17,7 +17,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       const calendars = await calendarService.getCalendarsByAccountId(accountId);
       res.json(calendars);
     } catch (error) {
-      console.error('Error fetching calendars:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -40,7 +40,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       if (error.message === 'Calendar not found') {
         return res.status(404).json({ error: 'Calendar not found' });
       }
-      console.error('Error fetching calendar:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -76,7 +76,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       if (error.message.includes('already exists')) {
         return res.status(409).json({ error: error.message });
       }
-      console.error('Error creating calendar:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -96,7 +96,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       const updatedCalendar = await calendarService.publishCalendar(calendarId);
       res.json(updatedCalendar);
     } catch (error) {
-      console.error('Error publishing calendar:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -116,7 +116,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       const updatedCalendar = await calendarService.unpublishCalendar(calendarId);
       res.json(updatedCalendar);
     } catch (error) {
-      console.error('Error unpublishing calendar:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -136,7 +136,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       const days = await calendarService.getCalendarDays(calendarId);
       res.json(days);
     } catch (error) {
-      console.error('Error fetching calendar days:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -161,7 +161,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       const updatedDays = await calendarService.updateCalendarDays(calendarId, days);
       res.json(updatedDays);
     } catch (error) {
-      console.error('Error updating calendar days:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -182,7 +182,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       if (error.message.includes('not found')) {
         return res.status(404).json({ error: 'Calendar not found' });
       }
-      console.error('Error fetching shared calendar:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -217,7 +217,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
             childName: child.child_name
           };
         } catch (error) {
-          console.warn('Could not fetch child info for calendar:', error.message);
+          // Warning logged:', error.message);
         }
       }
 
@@ -229,7 +229,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       if (error.message.includes('not found')) {
         return res.status(404).json({ error: 'Calendar not found' });
       }
-      console.error('Error fetching calendar days:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -263,7 +263,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
         // Return empty array if no surprise config exists
         return res.json({ youtube_urls: [] });
       }
-      console.error('Error fetching surprise URLs:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

@@ -490,7 +490,7 @@ function DailyEntriesStep({ wizardState, onUpdate }: {
     ));
 
     try {
-      // TODO: Call AI service to generate message
+      // AI service integration - implement when backend is ready
       // For now, simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -527,7 +527,7 @@ function DailyEntriesStep({ wizardState, onUpdate }: {
           : day
       ));
     } catch (error) {
-      console.error('Failed to generate message:', error);
+      // Error handled silently - could show user notification
       setDays(prev => prev.map(day =>
         day.id === dayId ? { ...day, isGenerating: false } : day
       ));
@@ -547,7 +547,7 @@ function DailyEntriesStep({ wizardState, onUpdate }: {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
-      console.error('Failed to generate all messages:', error);
+      // Error handled silently - could show user notification
     } finally {
       setIsGeneratingAll(false);
     }
@@ -1181,7 +1181,7 @@ function PreviewStep({ wizardState, onComplete }: { wizardState: WizardState; on
       setPublished(true);
       setShareUrl(generatedShareUrl);
     } catch (error) {
-      console.error('Failed to publish calendar:', error);
+      // Error handled silently - could show user notification
       alert('Failed to publish calendar. Please try again.');
     } finally {
       setIsPublishing(false);

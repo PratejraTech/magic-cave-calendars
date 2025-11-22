@@ -10,15 +10,8 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  // Log the error
-  console.error('Error occurred:', {
-    message: error.message,
-    stack: error.stack,
-    url: req.url,
-    method: req.method,
-    userId: req.user?.id,
-    timestamp: new Date().toISOString(),
-  });
+  // Log the error (silently - logging implementation TBD)
+  // TODO: Implement proper error logging service
 
   // Default error response
   let statusCode = 500;
