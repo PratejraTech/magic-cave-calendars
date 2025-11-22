@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ProductType, Template } from '../../lib/api';
 
 export interface ChildProfileData {
   childName: string;
@@ -25,6 +26,11 @@ export interface SurpriseVideo {
 
 export interface WizardState {
   currentStep: number;
+  // Product selection
+  selectedProductType: ProductType | null;
+  selectedTemplate: Template | null;
+  customData: Record<string, any>;
+  // Legacy calendar fields (for backward compatibility)
   childProfile: ChildProfileData;
   dailyEntries: DailyEntry[];
   surpriseVideos: SurpriseVideo[];
@@ -57,6 +63,9 @@ const createDefaultDailyEntries = (): DailyEntry[] => {
 
 const defaultWizardState: WizardState = {
   currentStep: 0,
+  selectedProductType: null,
+  selectedTemplate: null,
+  customData: {},
   childProfile: defaultChildProfile,
   dailyEntries: createDefaultDailyEntries(),
   surpriseVideos: [],
@@ -117,6 +126,10 @@ export function useWizardState() {
           photo: null,
           photoPreview: null,
         })),
+        // Don't save complex objects that can't be serialized
+        selectedProductType: newState.selectedProductType,
+        selectedTemplate: newState.selectedTemplate,
+        customData: newState.customData,
       };
       localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(stateToSave));
     } catch (error) {

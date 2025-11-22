@@ -1,19 +1,40 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, User, Calendar, Video, Palette, Eye, Upload, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, User, Calendar, Video, Palette, Eye, Upload, X, Sparkles } from 'lucide-react';
 import { useWizardState, WizardState } from '../hooks/useWizardState';
+import { isGeneralizedProductsEnabled } from '../../lib/featureFlags';
 
-const STEPS = [
-  { id: 'profile', title: 'Child Profile', icon: User, description: 'Set up your child\'s information' },
-  { id: 'entries', title: 'Daily Entries', icon: Calendar, description: 'Create 24 magical days' },
-  { id: 'surprises', title: 'Surprise Videos', icon: Video, description: 'Add YouTube video surprises' },
-  { id: 'theme', title: 'Theme & Style', icon: Palette, description: 'Choose the visual theme' },
-  { id: 'preview', title: 'Preview & Publish', icon: Eye, description: 'Review and share your calendar' },
-];
+// Import new Phase 5 components
+import { ProductTypeSelectionStep } from '../../features/parent-portal/steps/ProductTypeSelectionStep';
+import { TemplateSelectionStep } from '../../features/parent-portal/steps/TemplateSelectionStep';
+import { ProductSpecificCustomDataStep } from '../../features/parent-portal/steps/ProductSpecificCustomDataStep';
+import { ProductPreview } from '../../features/parent-portal/components/ProductPreview';
+
+// Dynamic steps based on feature flags
+const getSteps = () => {
+  if (isGeneralizedProductsEnabled()) {
+    return [
+      { id: 'product-type', title: 'Product Type', icon: Sparkles, description: 'Choose your product type' },
+      { id: 'template', title: 'Template', icon: Palette, description: 'Select a template' },
+      { id: 'custom-data', title: 'Customize', icon: User, description: 'Fill in custom details' },
+      { id: 'preview', title: 'Preview', icon: Eye, description: 'Review your product' },
+      { id: 'publish', title: 'Publish', icon: Check, description: 'Share with your child' },
+    ];
+  } else {
+    return [
+      { id: 'profile', title: 'Child Profile', icon: User, description: 'Set up your child\'s information' },
+      { id: 'entries', title: 'Daily Entries', icon: Calendar, description: 'Create 24 magical days' },
+      { id: 'surprises', title: 'Surprise Videos', icon: Video, description: 'Add YouTube video surprises' },
+      { id: 'theme', title: 'Theme & Style', icon: Palette, description: 'Choose the visual theme' },
+      { id: 'preview', title: 'Preview & Publish', icon: Eye, description: 'Review and share your calendar' },
+    ];
+  }
+};
 
 export function CalendarBuilderRoute() {
   const { state, isLoaded, updateState, clearState, markSaved } = useWizardState();
   const navigate = useNavigate();
+  const STEPS = getSteps();
 
   if (!isLoaded) {
     return (
@@ -41,19 +62,69 @@ export function CalendarBuilderRoute() {
   };
 
   const renderStepContent = () => {
-    switch (state.currentStep) {
-      case 0:
-        return <ChildProfileStep wizardState={state} onUpdate={updateState} />;
-      case 1:
-        return <DailyEntriesStep wizardState={state} onUpdate={updateState} />;
-      case 2:
-        return <SurpriseVideosStep wizardState={state} onUpdate={updateState} />;
-      case 3:
-        return <ThemeStep wizardState={state} onUpdate={updateState} />;
-      case 4:
-        return <PreviewStep wizardState={state} onComplete={handleComplete} />;
-      default:
-        return null;
+    if (isGeneralizedProductsEnabled()) {
+      // Phase 5: Generalized Product Flow
+      switch (state.currentStep) {
+        case 0:
+          return (
+            <ProductTypeSelectionStep
+              selectedProductType={state.selectedProductType}
+              onProductTypeSelect={(productType) => updateState({ selectedProductType: productType })}
+            />
+          );
+        case 1:
+          return (
+            <TemplateSelectionStep
+              selectedProductType={state.selectedProductType}
+              selectedTemplate={state.selectedTemplate}
+              onTemplateSelect={(template) => updateState({ selectedTemplate: template })}
+            />
+          );
+        case 2:
+          return (
+            <ProductSpecificCustomDataStep
+              selectedProductType={state.selectedProductType}
+              selectedTemplate={state.selectedTemplate}
+              customData={state.customData}
+              onCustomDataChange={(data) => updateState({ customData: data })}
+            />
+          );
+        case 3:
+          return (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Preview Your Product</h2>
+                <p className="text-gray-600">See how your customized product will look before publishing.</p>
+              </div>
+              <ProductPreview
+                selectedProductType={state.selectedProductType}
+                selectedTemplate={state.selectedTemplate}
+                customData={state.customData}
+              />
+            </div>
+          );
+        case 4:
+          // For now, use the legacy preview step but it needs to be updated for generalized products
+          return <PreviewStep wizardState={state} onComplete={handleComplete} />;
+        default:
+          return null;
+      }
+    } else {
+      // Legacy Calendar Flow
+      switch (state.currentStep) {
+        case 0:
+          return <ChildProfileStep wizardState={state} onUpdate={updateState} />;
+        case 1:
+          return <DailyEntriesStep wizardState={state} onUpdate={updateState} />;
+        case 2:
+          return <SurpriseVideosStep wizardState={state} onUpdate={updateState} />;
+        case 3:
+          return <ThemeStep wizardState={state} onUpdate={updateState} />;
+        case 4:
+          return <PreviewStep wizardState={state} onComplete={handleComplete} />;
+        default:
+          return null;
+      }
     }
   };
 
