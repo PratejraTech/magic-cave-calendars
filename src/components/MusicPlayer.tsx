@@ -26,7 +26,7 @@ export function MusicPlayer() {
         setIsPlaying(true);
         setHasUnlocked(true);
         window.removeEventListener('pointerdown', handlePointerUnlock);
-      } catch (error) {
+      } catch (_error) {
         setIsPlaying(false);
       }
     };

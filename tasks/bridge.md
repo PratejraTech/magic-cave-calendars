@@ -10,22 +10,68 @@ This file serves as the **canonical state file**, production-ready, and suitable
 PHASE GENERALIZED TEMPLATE ENGINE START - [TIMESTAMP: 2025-11-22 12:00]
 Generalized Template Product Engine
 
-## Current Work - Phase 4 Complete ✅
-**Completed:** ✅ Phase 4 - AI Service Enhancements for Multi-Product Generation
-- Extended API schemas with multi-product generation support (GenerateContentRequest/Response, ProductType enum)
-- Created product-specific prompt templates for calendar, storybook, and interactive_game product types
-- Implemented dynamic structured output schemas with Pydantic models for each product type (CalendarContent, StorybookContent, GameContent)
-- Built ContentGenerationEngine with product-aware prompt loading, custom data injection, and AI integration
-- Added comprehensive error handling with specific error types for unsupported combinations and validation failures
-- Implemented observability with structured logging for product type, template usage, and generation metrics
-- Created extensible prompt template system supporting variable substitution and product-specific customization
+## Current Work - Phase 5 Complete ✅
+**Completed:** ✅ Phase 5 - Frontend Portal Generalization & Product Selection
+- ✅ Created ProductTypeSelectionStep component: fetch available product types, display with descriptions and previews
+- ✅ Updated TemplateSelectionStep: filter templates by selected product type, show compatibility indicators
+- ✅ Implemented ProductSpecificCustomDataStep: dynamically render forms based on product type schema
+- ✅ Generalized wizard state management: added productType, productConfig to wizard context
+- ✅ Added product preview functionality: show how selected template will render for the chosen product type
+- ✅ Updated API client: added product type endpoints, generalized calendar creation to product creation
+- ✅ Implemented feature flags: conditionally show generalized product options based on flags
+- ✅ Integrated Phase 5 components into CalendarBuilderRoute with conditional rendering based on feature flags
+- ✅ Enabled generalized products feature flag in environment configuration
 
-**Next Phase:** Phase 5 - Frontend Portal Generalization & Product Selection
-- Create ProductTypeSelectionStep component for product type selection
-- Update TemplateSelectionStep with product type filtering
-- Implement ProductSpecificCustomDataStep with dynamic form rendering
-- Generalize wizard state management for multi-product support
-- Add product preview functionality and compatibility validation
+**Next Phase:** Phase 6 - Child Experience & Product Rendering Engine
+- Design ProductRenderer component: factory pattern to render different product types (CalendarRenderer, StorybookRenderer, etc.)
+- Implement CalendarRenderer: maintain existing calendar functionality as specialized product renderer
+- Create base ProductView API: generalize calendar API to fetch product content by type
+- Add product-specific navigation: calendar days vs storybook pages vs game levels
+- Ensure theme compatibility: templates and themes work across product types
+- Implement backward compatibility: existing calendar URLs redirect to product view
+- Add loading states and error handling for different product types
+- Test child experience: verify rendering works for calendar products and prepare for future product types
+
+-------------------
+PHASE TEMPLATE ENGINE START - [TIMESTAMP: 2025-11-23 12:00]
+Template Engine & AI Content Generation
+
+## Current Work - Phase 0 Complete ✅
+**Completed:** ✅ Phase 0 - Architecture, Data Model & LLM Strategy
+- ✅ Created feature branch 'feature/template-engine-and-ai-content'
+- ✅ Added task file tasks/tasks-template-engine-and-ai-content.md
+- ✅ Committed initial setup
+- ✅ Reviewed existing schema and identified integration points
+- ✅ Designed template_catalog table with form schema support
+- ✅ Designed calendar-template linkage (nullable template_id)
+- ✅ Defined structured AI output contract (dayEntries, chatPersonaPrompt, surpriseUrls)
+- ✅ Designed prompt engineering strategy with versioning
+- ✅ Defined LLM-Ops tooling (logging, metrics, dashboards)
+- ✅ Defined feature flags (enableTemplateEngine, enableTemplateAIFlow)
+- ✅ Documented risks and breaking changes
+- ✅ Created comprehensive design document at meta/docs/template-schema-design.md
+
+## Current Work - Phase 1 Complete ✅
+**Completed:** ✅ Phase 1 - Implement Template & Custom Data Engine (Backend + DB)
+- ✅ Design final SQL for template_catalog table (existing generalized system used)
+- ✅ Design final SQL for form_definition and calendar linkage (migration 0014 created)
+- ✅ Create Supabase migrations for new tables and columns (0014_add_calendar_template_fk.sql)
+- ✅ Update backend types/ORM models for new tables (Calendar interface updated)
+- ✅ Implement services/api/modules/templates core service functions (existing service used)
+- ✅ Implement template validation logic for custom data schemas (existing validation used)
+- ✅ Implement REST routes in templates.routes.ts (existing routes used)
+- ✅ Extend calendar module to accept template_id in create/update (CreateCalendarData updated)
+- ✅ Ensure backward compatibility when template_id is NULL (nullable field)
+- ✅ Add RLS/auth checks for templates and calendar linkage (migration includes policies)
+- ✅ Implement backend schema validation for custom data payload (existing validation used)
+
+**Next Phase:** Phase 2 - Frontend Template Selection & AI Content Generation
+- Implement TemplateSelectionStep component for parent portal wizard
+- Add custom data form rendering based on template schemas
+- Integrate template selection into calendar creation flow
+- Add AI content generation endpoints and orchestration
+- Implement structured output processing for calendar days
+- Add feature flags for gradual rollout
 
 -------------------
 PHASE 1 START - [TIMESTAMP: 2025-11-21 12:00]

@@ -9,6 +9,7 @@ import { CalendarRepository } from './modules/calendar/calendar.repository';
 import { SurpriseRepository } from './modules/surprise/surprise.repository';
 import { ChatRepository } from './modules/chat/chat.repository';
 import { AnalyticsRepository } from './modules/analytics/analytics.repository';
+import { ProductRepository } from './modules/product/product.repository';
 
 // Import services
 import { ChildService } from './modules/child/child.service';
@@ -16,6 +17,7 @@ import { CalendarService } from './modules/calendar/calendar.service';
 import { SurpriseService } from './modules/surprise/surprise.service';
 import { ChatService } from './modules/chat/chat.service';
 import { AnalyticsService } from './modules/analytics/analytics.service';
+import { TemplatesService } from './modules/templates/templates.service';
 
 // Import routes
 import { createChildRoutes } from './modules/child/child.routes';
@@ -23,6 +25,7 @@ import { createCalendarRoutes } from './modules/calendar/calendar.routes';
 import { createSurpriseRoutes } from './modules/surprise/surprise.routes';
 import { createChatRoutes } from './modules/chat/chat.routes';
 import { createAnalyticsRoutes } from './modules/analytics/analytics.routes';
+import { createTemplatesRoutes } from './modules/templates/templates.routes';
 
 // Import utilities
 import { RestClient } from './lib/restClient';
@@ -42,6 +45,7 @@ const calendarRepository = new CalendarRepository(supabase);
 const surpriseRepository = new SurpriseRepository(supabase);
 const chatRepository = new ChatRepository(supabase);
 const analyticsRepository = new AnalyticsRepository(supabase);
+const productRepository = new ProductRepository(supabase);
 
 // Initialize services
 const childService = new ChildService(childRepository);
@@ -50,6 +54,7 @@ const surpriseService = new SurpriseService(surpriseRepository);
 const restClient = new RestClient(INTELLIGENCE_SERVICE_URL);
 const chatServiceInstance = new ChatService(chatRepository, restClient);
 const analyticsService = new AnalyticsService(analyticsRepository);
+const templatesService = new TemplatesService(productRepository);
 
 // Initialize Express app
 const app = express();
@@ -70,6 +75,7 @@ app.use('/api/calendars', createCalendarRoutes(calendarService, surpriseService)
 app.use('/api/surprise', createSurpriseRoutes(surpriseService));
 app.use('/api/chat', createChatRoutes(chatServiceInstance));
 app.use('/api/analytics', createAnalyticsRoutes(analyticsService));
+app.use('/api/templates', createTemplatesRoutes(templatesService));
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.Function) => {

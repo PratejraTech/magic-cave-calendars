@@ -22,7 +22,7 @@ const envResult = envSchema.validate(process.env, { allowUnknown: true });
 
 if (envResult.error) {
   // TODO: Implement proper error logging service
-  envResult.error.details.forEach((error: any) => {
+  envResult.error.details.forEach((error: unknown) => {
     // TODO: Log validation errors
   });
   process.exit(1);

@@ -35,8 +35,8 @@ export function createFeedbackRoutes(
       });
 
       res.status(201).json(feedback);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -52,8 +52,8 @@ export function createFeedbackRoutes(
       const limit = parseInt(req.query.limit as string) || 10;
       const summary = await feedbackService.getFeedbackSummary(accountId, limit);
       res.json(summary);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -66,8 +66,8 @@ export function createFeedbackRoutes(
 
       const feedback = await feedbackService.getTemplateFeedback(templateId, limit);
       res.json(feedback);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -80,8 +80,8 @@ export function createFeedbackRoutes(
 
       const feedback = await feedbackService.getProductFeedback(productId, limit);
       res.json(feedback);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -97,8 +97,8 @@ export function createFeedbackRoutes(
       const { feedbackId } = req.params;
       await feedbackService.deleteFeedback(feedbackId, accountId);
       res.status(204).send();
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -113,8 +113,8 @@ export function createFeedbackRoutes(
 
       const enabled = await featureFlagService.checkFeatureFlag(flagName, accountId);
       res.json({ flag_name: flagName, enabled, account_id: accountId });
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -130,8 +130,8 @@ export function createFeedbackRoutes(
       // Admin role check - implement when authentication is added
       const flags = await featureFlagService.listFeatureFlags();
       res.json(flags);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -156,8 +156,8 @@ export function createFeedbackRoutes(
       });
 
       res.status(201).json(flag);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -176,8 +176,8 @@ export function createFeedbackRoutes(
 
       const flag = await featureFlagService.updateFeatureFlag(flagId, updates);
       res.json(flag);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -200,8 +200,8 @@ export function createFeedbackRoutes(
         account_id: accountId,
         variant: variant || 'control'
       });
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -218,8 +218,8 @@ export function createFeedbackRoutes(
       const status = req.query.status as string;
       const experiments = await featureFlagService.listExperiments(status);
       res.json(experiments);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -245,8 +245,8 @@ export function createFeedbackRoutes(
       });
 
       res.status(201).json(experiment);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -263,8 +263,8 @@ export function createFeedbackRoutes(
       const { experimentId } = req.params;
       await featureFlagService.completeExperiment(experimentId);
       res.json({ message: 'Experiment completed successfully' });
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Feedback error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

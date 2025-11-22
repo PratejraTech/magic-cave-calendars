@@ -12,8 +12,8 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         success: true,
         data: productTypes
       });
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Product error:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product types'
@@ -38,7 +38,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         success: true,
         data: productType
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -64,7 +64,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         success: true,
         data: productType
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -83,7 +83,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         success: true,
         data: features
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -102,7 +102,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
         success: true,
         data: schema
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -125,7 +125,7 @@ export function createProductTypesRoutes(productTypesService: ProductTypesServic
           supported: supports
         }
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,

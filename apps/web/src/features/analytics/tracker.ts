@@ -71,9 +71,9 @@ class AnalyticsTracker {
       if (!response.ok) {
         // Analytics tracking failed silently
       }
-    } catch (error) {
-        // Analytics tracking failed silently
-      // Don't throw - analytics failures shouldn't break the app
+       } catch {
+          // Error handled silently - analytics failures shouldn't break the app
+          // Don't throw - analytics failures shouldn't break the app
     }
   }
 

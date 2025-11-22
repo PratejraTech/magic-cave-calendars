@@ -16,7 +16,7 @@ export interface FeedbackRecord {
   feedback_type: string;
   feedback_content: string;
   rating_value?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
 }
 

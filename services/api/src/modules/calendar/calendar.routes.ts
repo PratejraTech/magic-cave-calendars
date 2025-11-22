@@ -16,8 +16,8 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
 
       const calendars = await calendarService.getCalendarsByAccountId(accountId);
       res.json(calendars);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Calendar error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -36,7 +36,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       }
 
       res.json(calendar);
-    } catch (error) {
+    } catch {
       if (error.message === 'Calendar not found') {
         return res.status(404).json({ error: 'Calendar not found' });
       }
@@ -72,7 +72,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       });
 
       res.status(201).json(calendar);
-    } catch (error) {
+    } catch {
       if (error.message.includes('already exists')) {
         return res.status(409).json({ error: error.message });
       }
@@ -95,8 +95,8 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
 
       const updatedCalendar = await calendarService.publishCalendar(calendarId);
       res.json(updatedCalendar);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Calendar error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -115,8 +115,8 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
 
       const updatedCalendar = await calendarService.unpublishCalendar(calendarId);
       res.json(updatedCalendar);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Calendar error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -135,8 +135,8 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
 
       const days = await calendarService.getCalendarDays(calendarId);
       res.json(days);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Calendar error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -160,8 +160,8 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
 
       const updatedDays = await calendarService.updateCalendarDays(calendarId, days);
       res.json(updatedDays);
-    } catch (error) {
-      // Error logged:', error);
+    } catch {
+      console.error('Calendar error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -178,7 +178,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
         calendar,
         days,
       });
-    } catch (error) {
+    } catch {
       if (error.message.includes('not found')) {
         return res.status(404).json({ error: 'Calendar not found' });
       }
@@ -196,7 +196,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       let calendar;
       try {
         calendar = await calendarService.getCalendarByShareUuid(shareUuid);
-      } catch (error) {
+      } catch {
         // If not found as share UUID, try as regular calendar ID (for development/testing)
         calendar = await calendarService.getCalendarById(shareUuid);
         // Only allow access if calendar is published
@@ -216,7 +216,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
             theme: child.theme,
             childName: child.child_name
           };
-        } catch (error) {
+        } catch {
           // Warning logged:', error.message);
         }
       }
@@ -225,7 +225,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
         days,
         childInfo
       });
-    } catch (error) {
+    } catch {
       if (error.message.includes('not found')) {
         return res.status(404).json({ error: 'Calendar not found' });
       }
@@ -247,7 +247,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
       let calendar;
       try {
         calendar = await calendarService.getCalendarByShareUuid(shareUuid);
-      } catch (error) {
+      } catch {
         // If not found as share UUID, try as regular calendar ID (for development/testing)
         calendar = await calendarService.getCalendarById(shareUuid);
         // Only allow access if calendar is published
@@ -258,7 +258,7 @@ export function createCalendarRoutes(calendarService: CalendarService, childServ
 
       const config = await surpriseService.getSurpriseConfig(calendar.calendar_id);
       res.json({ youtube_urls: config.youtube_urls });
-    } catch (error) {
+    } catch {
       if (error.message.includes('not found')) {
         // Return empty array if no surprise config exists
         return res.json({ youtube_urls: [] });

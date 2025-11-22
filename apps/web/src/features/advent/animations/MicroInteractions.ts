@@ -19,6 +19,20 @@ export interface MicroInteractionConfig {
   };
 }
 
+interface MicroAnimationConfig {
+  themeId: string;
+  [key: string]: unknown;
+}
+
+interface MicroAnimationOptions {
+  scale?: number;
+  rotation?: number;
+  duration?: number;
+  ease?: string;
+  delay?: number;
+  [key: string]: unknown;
+}
+
 export class MicroInteractions {
   private static instance: MicroInteractions;
   private animationSystem = ThemeAnimationSystem.getInstance();
@@ -300,24 +314,24 @@ export class MicroInteractions {
 
     switch (type) {
       case 'hover':
-        this.applyHoverEffect(element, animationConfig, options);
+        this.applyHoverEffect(element, animationConfig as unknown as MicroAnimationConfig, options);
         break;
       case 'tap':
-        this.applyTapEffect(element, animationConfig, options);
+        this.applyTapEffect(element, animationConfig as unknown as MicroAnimationConfig, options);
         break;
       case 'focus':
-        this.applyFocusEffect(element, animationConfig, options);
+        this.applyFocusEffect(element, animationConfig as unknown as MicroAnimationConfig, options);
         break;
       case 'enter':
-        this.applyEnterEffect(element, animationConfig, options);
+        this.applyEnterEffect(element, animationConfig as unknown as MicroAnimationConfig, options);
         break;
       case 'exit':
-        this.applyExitEffect(element, animationConfig, options);
+        this.applyExitEffect(element, animationConfig as unknown as MicroAnimationConfig, options);
         break;
     }
   }
 
-  private applyHoverEffect(element: Element, _config: any, options: any): void {
+  private applyHoverEffect(element: Element, _config: MicroAnimationConfig, options: MicroAnimationOptions): void {
     const hoverIn = () => {
       gsap.to(element, {
         scale: options.scale || 1.05,
@@ -345,7 +359,7 @@ export class MicroInteractions {
     };
   }
 
-  private applyTapEffect(element: Element, _config: any, options: any): void {
+  private applyTapEffect(element: Element, _config: MicroAnimationConfig, options: MicroAnimationOptions): void {
     const tapHandler = () => {
       gsap.to(element, {
         scale: options.scale || 0.95,
@@ -363,7 +377,7 @@ export class MicroInteractions {
     };
   }
 
-  private applyFocusEffect(element: Element, _config: any, options: any): void {
+  private applyFocusEffect(element: Element, _config: MicroAnimationConfig, options: MicroAnimationOptions): void {
     const focusIn = () => {
       gsap.to(element, {
         scale: options.scale || 1.02,
@@ -389,7 +403,7 @@ export class MicroInteractions {
     };
   }
 
-  private applyEnterEffect(element: Element, _config: any, options: any): void {
+  private applyEnterEffect(element: Element, _config: MicroAnimationConfig, options: MicroAnimationOptions): void {
     gsap.fromTo(element,
       {
         opacity: 0,
@@ -407,7 +421,7 @@ export class MicroInteractions {
     );
   }
 
-  private applyExitEffect(element: Element, _config: any, options: any): void {
+  private applyExitEffect(element: Element, _config: MicroAnimationConfig, options: MicroAnimationOptions): void {
     gsap.to(element, {
       opacity: 0,
       scale: 0.8,

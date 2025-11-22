@@ -1,4 +1,4 @@
-import { httpClient } from './httpClient';
+// import { httpClient } from './httpClient'; // TODO: Uncomment when backend asset API is implemented
 
 /**
  * Resolve an asset ID to a publicly accessible URL
@@ -17,9 +17,10 @@ export async function resolveAssetUrl(assetId?: string): Promise<string | null> 
       return `https://picsum.photos/400/300?random=${assetId.slice(-1)}`;
     }
     return null;
-  } catch (error) {
-    // TODO: Implement proper logging service
-    return null;
+   } catch {
+     // Log error for debugging but return null as fallback
+     console.warn('Failed to resolve asset URL:', error);
+     return null;
   }
 }
 

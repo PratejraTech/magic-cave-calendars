@@ -26,11 +26,11 @@ export function AuthGuard({ children, requireAuth = true }: AuthGuardProps) {
         } else if (!requireAuth && authenticated) {
           navigate('/parent-portal', { replace: true });
         }
-       } catch (error) {
-        // TODO: Implement proper error logging service
-        if (requireAuth) {
-          navigate('/auth', { replace: true });
-        }
+          } catch {
+           // Error handled silently - could implement user notification here
+          if (requireAuth) {
+           navigate('/auth', { replace: true });
+         }
       } finally {
         setIsLoading(false);
       }

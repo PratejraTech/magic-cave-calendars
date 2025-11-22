@@ -22,14 +22,21 @@ vi.mock('../../../../app/providers/SupabaseProvider', () => ({
 }));
 
 // Mock FileReader
-const mockFileReader = {
+interface MockFileReader {
+  readAsDataURL: ReturnType<typeof vi.fn>;
+  onload: ((event: { target: { result: string } }) => void) | null;
+  onerror: ((event: { target: { error: Error } }) => void) | null;
+  result: string;
+}
+
+const mockFileReader: MockFileReader = {
   readAsDataURL: vi.fn(),
-  onload: null as any,
-  onerror: null as any,
+  onload: null,
+  onerror: null,
   result: 'data:image/jpeg;base64,mockdata'
 };
 
-global.FileReader = vi.fn(() => mockFileReader) as any;
+global.FileReader = vi.fn(() => mockFileReader) as unknown as typeof FileReader;
 
 const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
@@ -228,7 +235,7 @@ describe('DayCard', () => {
     fireEvent.change(fileInput, { target: { files: [validFile] } });
 
     // Trigger FileReader onload
-    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } } as any);
+    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } });
 
     await waitFor(() => {
       expect(mockSupabase.storage.from).toHaveBeenCalledWith('photos');
@@ -257,7 +264,7 @@ describe('DayCard', () => {
     const fileInput = screen.getByLabelText('Photo (Optional)').nextElementSibling as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [validFile] } });
 
-    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } } as any);
+    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } });
 
     await waitFor(() => {
       expect(screen.getByText('Failed to upload photo')).toBeInTheDocument();
@@ -349,7 +356,7 @@ describe('DayCard', () => {
       dataTransfer: mockDataTransfer
     });
 
-    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } } as any);
+    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } });
 
     await waitFor(() => {
       expect(mockOnUpdate).toHaveBeenCalledWith({
@@ -429,7 +436,7 @@ describe('DayCard', () => {
     const fileInput = screen.getByLabelText('Photo (Optional)').nextElementSibling as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [validFile] } });
 
-    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } } as any);
+    mockFileReader.onload?.({ target: { result: 'data:image/jpeg;base64,mockdata' } });
 
     expect(screen.getByText('Uploading...')).toBeInTheDocument();
 

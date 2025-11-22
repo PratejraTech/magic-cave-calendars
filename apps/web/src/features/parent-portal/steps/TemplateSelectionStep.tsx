@@ -38,7 +38,7 @@ export function TemplateSelectionStep({
         setError(null);
         const templateList = await getTemplatesByProductType(selectedProductType.id);
         setTemplates(templateList);
-      } catch (err) {
+      } catch (_err) {
         // Error handled silently - could show user notification
         setError('Failed to load templates. Please try again.');
       } finally {

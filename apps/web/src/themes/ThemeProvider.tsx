@@ -34,9 +34,9 @@ export function ThemeProvider({ children, defaultThemeId = 'snow' }: ThemeProvid
         setIsLoading(true);
         const theme = resolveThemeInheritance(defaultThemeId);
         setCurrentTheme(theme);
-      } catch (error) {
-        // Error handled silently - could fallback to default theme
-        // Fallback to snow theme
+       } catch (error) {
+         // Log error for debugging but fallback to default theme
+         // Fallback to snow theme
         const fallbackTheme = getThemeById('snow');
         if (fallbackTheme) {
           setCurrentTheme(fallbackTheme);
@@ -56,9 +56,9 @@ export function ThemeProvider({ children, defaultThemeId = 'snow' }: ThemeProvid
 
       // Store theme preference (could be localStorage or user preferences)
       localStorage.setItem('advent-calendar-theme', themeId);
-    } catch (error) {
-        // Error handled silently - theme change failed
-    }
+     } catch (error) {
+         // Log error for debugging but don't break theme change
+     }
   };
 
   const value: ThemeContextType = {

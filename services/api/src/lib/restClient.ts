@@ -42,7 +42,7 @@ export class RestClient {
   private async makeRequest<T>(
     endpoint: string,
     method: 'GET' | 'POST' = 'POST',
-    body?: any
+    body?: unknown
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 

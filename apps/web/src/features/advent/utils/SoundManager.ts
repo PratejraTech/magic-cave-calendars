@@ -47,7 +47,7 @@ export class SoundManager {
     try {
       this.audioContext = new AudioContextConstructor();
       this.isInitialized = true;
-    } catch (error) {
+    } catch {
       // TODO: Implement proper logging service
     }
   }
@@ -66,7 +66,7 @@ export class SoundManager {
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
       this.sounds.set(name, audioBuffer);
-    } catch (error) {
+    } catch {
       // TODO: Implement proper logging service
     }
   }

@@ -32,7 +32,7 @@ const getSteps = () => {
 };
 
 export function CalendarBuilderRoute() {
-  const { state, isLoaded, updateState, clearState, markSaved } = useWizardState();
+  const { state, isLoaded, updateState } = useWizardState();
   const navigate = useNavigate();
   const STEPS = getSteps();
 
@@ -383,7 +383,7 @@ function ChildProfileStep({ wizardState, onUpdate }: {
           </label>
           <select
             value={formData.theme}
-            onChange={(e) => handleInputChange('theme', e.target.value as any)}
+            onChange={(e) => handleInputChange('theme', e.target.value as 'snow' | 'warm' | 'candy' | 'forest' | 'starlight')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="snow">Snow ❄️</option>
@@ -526,7 +526,7 @@ function DailyEntriesStep({ wizardState, onUpdate }: {
           ? { ...day, message: sampleMessages[dayId - 1] || `Day ${dayId} message`, isGenerating: false }
           : day
       ));
-    } catch (error) {
+    } catch {
       // Error handled silently - could show user notification
       setDays(prev => prev.map(day =>
         day.id === dayId ? { ...day, isGenerating: false } : day
@@ -546,7 +546,7 @@ function DailyEntriesStep({ wizardState, onUpdate }: {
         // Small delay between generations to avoid overwhelming the API
         await new Promise(resolve => setTimeout(resolve, 500));
       }
-    } catch (error) {
+    } catch {
       // Error handled silently - could show user notification
     } finally {
       setIsGeneratingAll(false);
@@ -688,21 +688,24 @@ function DailyEntriesStep({ wizardState, onUpdate }: {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Photo (Optional)
                   </label>
-                  {days.find(d => d.id === selectedDay)?.photoPreview ? (
-                    <div className="relative mb-4">
-                      <img
-                        src={days.find(d => d.id === selectedDay)?.photoPreview!}
-                        alt={`Day ${selectedDay}`}
-                        className="w-full h-48 object-cover rounded-lg border"
-                      />
-                      <button
-                        onClick={() => removePhoto(selectedDay)}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : null}
+                  {(() => {
+                    const selectedDayData = days.find(d => d.id === selectedDay);
+                    return selectedDayData?.photoPreview ? (
+                      <div className="relative mb-4">
+                        <img
+                          src={selectedDayData.photoPreview}
+                          alt={`Day ${selectedDay}`}
+                          className="w-full h-48 object-cover rounded-lg border"
+                        />
+                        <button
+                          onClick={() => removePhoto(selectedDay)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : null;
+                  })()}
 
                   <input
                     type="file"
@@ -1093,10 +1096,8 @@ function ThemeStep() {
   );
 }
 
-function PreviewStep({ wizardState, onComplete }: { wizardState: WizardState; onComplete: () => void }) {
+function PreviewStep({ wizardState }: { wizardState: WizardState; onComplete: () => void }) {
   const [isPublishing, setIsPublishing] = useState(false);
-  const [published, setPublished] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string>('');
 
   // Build preview data from actual wizard state
   const previewData = {
@@ -1173,14 +1174,11 @@ function PreviewStep({ wizardState, onComplete }: { wizardState: WizardState; on
       }
 
       // Step 5: Publish calendar
-      const publishResult = await publishCalendar(calendarResult.calendar_id);
+      await publishCalendar(calendarResult.calendar_id);
 
-      // Generate share URL
-      const generatedShareUrl = `${window.location.origin}/calendar/${publishResult.share_uuid}`;
-
-      setPublished(true);
-      setShareUrl(generatedShareUrl);
-    } catch (error) {
+      // TODO: Show success message and share URL to user
+      // Share URL: `${window.location.origin}/calendar/${result.share_uuid}`
+    } catch {
       // Error handled silently - could show user notification
       alert('Failed to publish calendar. Please try again.');
     } finally {

@@ -29,7 +29,7 @@ export interface WizardState {
   // Product selection
   selectedProductType: ProductType | null;
   selectedTemplate: Template | null;
-  customData: Record<string, any>;
+  customData: Record<string, unknown>;
   // Legacy calendar fields (for backward compatibility)
   childProfile: ChildProfileData;
   dailyEntries: DailyEntry[];
@@ -102,7 +102,7 @@ export function useWizardState() {
           localStorage.removeItem(WIZARD_STORAGE_KEY);
         }
       }
-    } catch (error) {
+    } catch {
       // Warning handled silently - could implement fallback
     } finally {
       setIsLoaded(true);
@@ -132,7 +132,7 @@ export function useWizardState() {
         customData: newState.customData,
       };
       localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(stateToSave));
-    } catch (error) {
+    } catch {
       // Warning handled silently - could implement retry logic
     }
   }, []);

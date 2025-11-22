@@ -12,8 +12,8 @@ export const useFeedback = () => {
     try {
       await feedbackService.submitFeedback(feedback);
       return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to submit feedback';
+    } catch (_err) {
+      const errorMessage = _err instanceof Error ? _err.message : 'Failed to submit feedback';
       setError(errorMessage);
       return false;
     } finally {
@@ -24,7 +24,7 @@ export const useFeedback = () => {
   const getFeedbackSummary = useCallback(async (): Promise<FeedbackSummary | null> => {
     try {
       return await feedbackService.getFeedbackSummary();
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch feedback summary');
       return null;
     }
@@ -33,7 +33,7 @@ export const useFeedback = () => {
   const checkFeatureFlag = useCallback(async (flagName: string): Promise<boolean> => {
     try {
       return await feedbackService.checkFeatureFlag(flagName);
-    } catch (err) {
+    } catch (_err) {
       // Default to false if feature flag check fails
       return false;
     }
@@ -42,7 +42,7 @@ export const useFeedback = () => {
   const checkExperimentVariant = useCallback(async (experimentName: string): Promise<string> => {
     try {
       return await feedbackService.checkExperimentVariant(experimentName);
-    } catch (err) {
+    } catch (_err) {
       // Default to 'control' if experiment check fails
       return 'control';
     }

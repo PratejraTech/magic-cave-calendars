@@ -25,5 +25,12 @@ export default tseslint.config(
       ],
       'no-console': 'error',
     },
+  },
+  // Allow console statements in backend services
+  {
+    files: ['services/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'off',
+    },
   }
 );

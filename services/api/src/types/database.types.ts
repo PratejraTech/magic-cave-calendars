@@ -4,7 +4,7 @@ export interface ProductType {
   product_type_id: string;
   name: string;
   description: string | null;
-  default_content_schema: any; // JSONB
+  default_content_schema: unknown; // JSONB
   supported_features: string[];
   created_at: string;
   updated_at: string;
@@ -27,7 +27,7 @@ export interface ProductContent {
   product_id: string;
   day_number: number;
   content_type: 'text' | 'image' | 'video' | 'interactive';
-  content_data: any; // JSONB
+  content_data: unknown; // JSONB
   generated_at: string | null;
   created_at: string;
 }
@@ -39,8 +39,8 @@ export interface TemplateCatalog {
   description: string | null;
   preview_image_url: string | null;
   compatible_themes: string[];
-  default_custom_data_schema: any; // JSONB
-  product_specific_config: any; // JSONB
+  default_custom_data_schema: unknown; // JSONB
+  product_specific_config: unknown; // JSONB
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -50,7 +50,7 @@ export interface ProductTemplateLinkage {
   product_template_id: string;
   product_id: string;
   template_id: string;
-  custom_data: any; // JSONB
+  custom_data: unknown; // JSONB
   applied_at: string;
 }
 
@@ -59,6 +59,7 @@ export interface Calendar {
   calendar_id: string;
   account_id: string;
   child_id: string;
+  template_id: string | null; // Added template support
   share_uuid: string;
   is_published: boolean;
   year: number;

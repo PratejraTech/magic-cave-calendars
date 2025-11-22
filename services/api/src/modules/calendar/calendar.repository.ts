@@ -5,6 +5,7 @@ export interface Calendar {
   calendar_id: string;
   account_id: string;
   child_id: string;
+  template_id: string | null;
   share_uuid: string;
   is_published: boolean;
   year: number;
@@ -24,6 +25,7 @@ export interface CreateCalendarData {
   account_id: string;
   child_id: string;
   year: number;
+  template_id?: string | null; // Optional template selection
 }
 
 export interface UpdateCalendarData {

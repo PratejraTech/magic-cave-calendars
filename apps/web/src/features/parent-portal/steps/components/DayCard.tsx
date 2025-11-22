@@ -82,7 +82,7 @@ export function DayCard({ dayEntry, onUpdate, onPhotoUpload }: DayCardProps) {
         .getPublicUrl(filePath);
 
       return data.publicUrl;
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (retryCount < maxRetries && (
         error.message?.includes('network') ||
         error.message?.includes('timeout') ||
@@ -110,7 +110,7 @@ export function DayCard({ dayEntry, onUpdate, onPhotoUpload }: DayCardProps) {
       const photoUrl = await uploadPhoto(file);
       onUpdate({ photo: file, photoUrl });
       onPhotoUpload?.(dayEntry.dayNumber, photoUrl);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // TODO: Implement proper logging service
       setPhotoError(error.message || 'Failed to upload photo');
     } finally {

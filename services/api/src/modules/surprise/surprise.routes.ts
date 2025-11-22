@@ -19,7 +19,7 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
 
       const config = await surpriseService.getSurpriseConfig(calendarId);
       res.json(config);
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -47,7 +47,7 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
       });
 
       res.json(updatedConfig);
-    } catch (error) {
+    } catch {
       if (error.message.includes('Invalid YouTube URL')) {
         return res.status(400).json({ error: error.message });
       }
@@ -70,7 +70,7 @@ export function createSurpriseRoutes(surpriseService: SurpriseService) {
 
       await surpriseService.deleteSurpriseConfig(calendarId);
       res.status(204).send();
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }

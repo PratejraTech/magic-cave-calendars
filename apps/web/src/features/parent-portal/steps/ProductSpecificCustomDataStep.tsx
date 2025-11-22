@@ -5,14 +5,14 @@ import { Template, ProductType } from '../../../lib/api';
 interface ProductSpecificCustomDataStepProps {
   selectedProductType: ProductType | null;
   selectedTemplate: Template | null;
-  customData: Record<string, any>;
-  onCustomDataChange: (data: Record<string, any>) => void;
+  customData: Record<string, unknown>;
+  onCustomDataChange: (data: Record<string, unknown>) => void;
 }
 
 interface FormField {
   key: string;
-  schema: any;
-  value: any;
+  schema: unknown;
+  value: unknown;
   error?: string;
 }
 

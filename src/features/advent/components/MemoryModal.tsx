@@ -19,7 +19,6 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
   const heroNickname = markdownTitle.split(' ')[0] ?? (day ? `Day ${day.id}` : '');
   const [subtitle, setSubtitle] = useState<string | null>(null);
   const [subtitleLoading, setSubtitleLoading] = useState(false);
-  const [isLoadingMarkdown, setIsLoadingMarkdown] = useState(false);
 
   useEffect(() => {
     if (!day || !isOpen) return;
@@ -27,7 +26,6 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
     setMarkdownMessage(day.message ?? '');
     if (!day.photoMarkdownPath) return;
     let cancelled = false;
-    setIsLoadingMarkdown(true);
     fetch(day.photoMarkdownPath)
       .then((res) => (res.ok ? res.text() : Promise.reject()))
       .then((text) => {
@@ -40,10 +38,7 @@ export function MemoryModal({ isOpen, day, onNext, onClose }: MemoryModalProps) 
           setMarkdownMessage(rest.join('\n') || day.message || '');
         }
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setIsLoadingMarkdown(false);
-      });
+      .catch(() => {});
     return () => {
       cancelled = true;
     };

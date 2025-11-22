@@ -2,11 +2,13 @@
  * HTTP client for API communication
  */
 
+import { SupabaseClient } from '@supabase/supabase-js';
+
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001';
 
 class HttpClient {
   private baseURL: string;
-  private supabase: any = null;
+  private supabase: SupabaseClient | null = null;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
@@ -17,10 +19,10 @@ class HttpClient {
   private async initializeSupabase() {
     try {
       const { createClient } = await import('@supabase/supabase-js');
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+      const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'http://localhost:54321';
+      const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
       this.supabase = createClient(supabaseUrl, supabaseAnonKey);
-    } catch (error) {
+    } catch {
       // TODO: Implement proper logging service
     }
   }
@@ -36,7 +38,7 @@ class HttpClient {
         if (session?.access_token) {
           return { Authorization: `Bearer ${session.access_token}` };
         }
-      } catch (error) {
+      } catch {
         // TODO: Implement proper logging service
       }
     }
@@ -78,14 +80,14 @@ class HttpClient {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,

@@ -35,7 +35,7 @@ export function ParentDashboardRoute() {
     queryFn: async () => {
       try {
         return await httpClient.get<Child>('/child');
-      } catch (error) {
+      } catch {
         // TODO: Implement proper error logging service
         return null;
       }
@@ -49,7 +49,7 @@ export function ParentDashboardRoute() {
     queryFn: async () => {
       try {
         return await httpClient.get<Calendar[]>('/calendars');
-      } catch (error) {
+      } catch {
         // TODO: Implement proper error logging service
         return [];
       }
@@ -57,7 +57,6 @@ export function ParentDashboardRoute() {
     enabled: !!user
   });
 
-  const publishedCalendars = calendars.filter(cal => cal.is_published);
   const totalDaysConfigured = calendars.length * 24; // Rough estimate
 
   const menuItems = [

@@ -3,7 +3,8 @@ import {
   CreateCalendarData,
   UpdateCalendarData,
   CreateCalendarDayData,
-  UpdateCalendarDayData
+  UpdateCalendarDayData,
+  CalendarDay
 } from './calendar.repository';
 
 export class CalendarService {
@@ -111,7 +112,7 @@ export class CalendarService {
     );
 
     // Update each day
-    const results: any[] = [];
+    const results: CalendarDay[] = [];
     for (const update of dayUpdates) {
       const existingDay = existingDaysMap.get(update.day_number);
       if (!existingDay) {

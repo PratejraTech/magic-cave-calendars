@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../../types/database.types';
 
 export interface CreateProductData {
   account_id: string;
@@ -28,8 +29,8 @@ export class ProductRepository {
   constructor(private supabase: SupabaseClient) {}
 
   // Product methods
-  async findById(productId: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findById(productId: string): Promise<Database['public']['Tables']['product']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('product')
       .select('*')
       .eq('product_id', productId)
@@ -43,8 +44,8 @@ export class ProductRepository {
     return data;
   }
 
-  async findByShareUuid(shareUuid: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findByShareUuid(shareUuid: string): Promise<Database['public']['Tables']['product']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('product')
       .select('*')
       .eq('share_uuid', shareUuid)
@@ -59,8 +60,8 @@ export class ProductRepository {
     return data;
   }
 
-  async findByAccountId(accountId: string): Promise<any[]> {
-    const { data, error } = await (this.supabase as any)
+  async findByAccountId(accountId: string): Promise<Database['public']['Tables']['product']['Row'][]> {
+    const { data, error } = await this.supabase
       .from('product')
       .select('*')
       .eq('account_id', accountId)
@@ -70,8 +71,8 @@ export class ProductRepository {
     return data || [];
   }
 
-  async create(productData: CreateProductData): Promise<any> {
-    const { data, error } = await (this.supabase as any)
+  async create(productData: CreateProductData): Promise<Database['public']['Tables']['product']['Row']> {
+    const { data, error } = await this.supabase
       .from('product')
       .insert({
         account_id: productData.account_id,
@@ -85,8 +86,8 @@ export class ProductRepository {
     return data;
   }
 
-  async update(productId: string, updateData: UpdateProductData): Promise<any> {
-    const { data, error } = await (this.supabase as any)
+  async update(productId: string, updateData: UpdateProductData): Promise<Database['public']['Tables']['product']['Row']> {
+    const { data, error } = await this.supabase
       .from('product')
       .update(updateData)
       .eq('product_id', productId)
@@ -107,8 +108,8 @@ export class ProductRepository {
   }
 
   // Product Content methods
-  async findContentById(contentId: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findContentById(contentId: string): Promise<Database['public']['Tables']['product_content']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('product_content')
       .select('*')
       .eq('product_content_id', contentId)
@@ -122,8 +123,8 @@ export class ProductRepository {
     return data;
   }
 
-  async findContentByProductId(productId: string): Promise<any[]> {
-    const { data, error } = await (this.supabase as any)
+  async findContentByProductId(productId: string): Promise<Database['public']['Tables']['product_content']['Row'][]> {
+    const { data, error } = await this.supabase
       .from('product_content')
       .select('*')
       .eq('product_id', productId)
@@ -133,8 +134,8 @@ export class ProductRepository {
     return data || [];
   }
 
-  async createContent(contentData: CreateProductContentData): Promise<any> {
-    const { data, error } = await (this.supabase as any)
+  async createContent(contentData: CreateProductContentData): Promise<Database['public']['Tables']['product_content']['Row']> {
+    const { data, error } = await this.supabase
       .from('product_content')
       .insert({
         product_id: contentData.product_id,
@@ -149,8 +150,8 @@ export class ProductRepository {
     return data;
   }
 
-  async updateContent(contentId: string, updateData: UpdateProductContentData): Promise<any> {
-    const { data, error } = await (this.supabase as any)
+  async updateContent(contentId: string, updateData: UpdateProductContentData): Promise<Database['public']['Tables']['product_content']['Row']> {
+    const { data, error } = await this.supabase
       .from('product_content')
       .update(updateData)
       .eq('product_content_id', contentId)
@@ -186,8 +187,8 @@ export class ProductRepository {
   }
 
   // Product Type methods
-  async findAllProductTypes(): Promise<any[]> {
-    const { data, error } = await (this.supabase as any)
+  async findAllProductTypes(): Promise<Database['public']['Tables']['product_type']['Row'][]> {
+    const { data, error } = await this.supabase
       .from('product_type')
       .select('*')
       .order('name', { ascending: true });
@@ -196,8 +197,8 @@ export class ProductRepository {
     return data || [];
   }
 
-  async findProductTypeById(productTypeId: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findProductTypeById(productTypeId: string): Promise<Database['public']['Tables']['product_type']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('product_type')
       .select('*')
       .eq('product_type_id', productTypeId)
@@ -211,8 +212,8 @@ export class ProductRepository {
     return data;
   }
 
-  async findProductTypeByName(name: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findProductTypeByName(name: string): Promise<Database['public']['Tables']['product_type']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('product_type')
       .select('*')
       .eq('name', name)
@@ -227,8 +228,8 @@ export class ProductRepository {
   }
 
   // Template methods
-  async findAllTemplates(): Promise<any[]> {
-    const { data, error } = await (this.supabase as any)
+  async findAllTemplates(): Promise<Database['public']['Tables']['template_catalog']['Row'][]> {
+    const { data, error } = await this.supabase
       .from('template_catalog')
       .select('*')
       .eq('is_active', true)
@@ -238,8 +239,8 @@ export class ProductRepository {
     return data || [];
   }
 
-  async findTemplatesByProductType(productTypeId: string): Promise<any[]> {
-    const { data, error } = await (this.supabase as any)
+  async findTemplatesByProductType(productTypeId: string): Promise<Database['public']['Tables']['template_catalog']['Row'][]> {
+    const { data, error } = await this.supabase
       .from('template_catalog')
       .select('*')
       .eq('product_type_id', productTypeId)
@@ -250,8 +251,8 @@ export class ProductRepository {
     return data || [];
   }
 
-  async findTemplateById(templateId: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findTemplateById(templateId: string): Promise<Database['public']['Tables']['template_catalog']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('template_catalog')
       .select('*')
       .eq('template_id', templateId)
@@ -266,8 +267,8 @@ export class ProductRepository {
   }
 
   // Product Template Linkage methods
-  async findTemplateLinkageByProductId(productId: string): Promise<any | null> {
-    const { data, error } = await (this.supabase as any)
+  async findTemplateLinkageByProductId(productId: string): Promise<Database['public']['Tables']['product_template_linkage']['Row'] | null> {
+    const { data, error } = await this.supabase
       .from('product_template_linkage')
       .select('*')
       .eq('product_id', productId)
@@ -284,9 +285,9 @@ export class ProductRepository {
   async createTemplateLinkage(linkageData: {
     product_id: string;
     template_id: string;
-    custom_data?: any;
-  }): Promise<any> {
-    const { data, error } = await (this.supabase as any)
+    custom_data?: unknown;
+  }): Promise<Database['public']['Tables']['product_template_linkage']['Row']> {
+    const { data, error } = await this.supabase
       .from('product_template_linkage')
       .insert({
         product_id: linkageData.product_id,
@@ -300,8 +301,8 @@ export class ProductRepository {
     return data;
   }
 
-  async updateTemplateLinkage(productId: string, customData: any): Promise<any> {
-    const { data, error } = await (this.supabase as any)
+  async updateTemplateLinkage(productId: string, customData: unknown): Promise<Database['public']['Tables']['product_template_linkage']['Row']> {
+    const { data, error } = await this.supabase
       .from('product_template_linkage')
       .update({ custom_data: customData })
       .eq('product_id', productId)

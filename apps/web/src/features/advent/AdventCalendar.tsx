@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { getAdelaideDate } from '../../lib/date';
 import { Butterfly } from '../../components/Butterfly';
 import Modal from '../../components/Modal';
@@ -167,7 +167,6 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
           theme={calendarTheme}
           voiceUrl={selectedMemory.voice_asset_id || undefined}
           musicUrl={selectedMemory.music_asset_id || undefined}
-          confettiType={selectedMemory.confetti_type}
         />
       )}
 

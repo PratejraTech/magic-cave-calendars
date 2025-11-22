@@ -49,7 +49,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     };
 
     next();
-   } catch (error) {
+   } catch {
     // TODO: Implement proper error logging service
     return res.status(500).json({
       error: 'Authentication service error',
@@ -80,7 +80,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     }
 
     next();
-   } catch (error) {
+   } catch {
     // For optional auth, we don't fail on errors - just continue without user
     // TODO: Implement proper warning logging service
     next();

@@ -27,7 +27,7 @@ export function createProductsRoutes(
         success: true,
         data: products
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -105,7 +105,7 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -124,7 +124,7 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       if (error.message === 'Product not found') {
         return res.status(404).json({
@@ -155,7 +155,7 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -174,7 +174,7 @@ export function createProductsRoutes(
         success: true,
         message: 'Product deleted successfully'
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -193,7 +193,7 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -212,7 +212,7 @@ export function createProductsRoutes(
         success: true,
         data: content
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -240,7 +240,7 @@ export function createProductsRoutes(
         success: true,
         data: results
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -266,7 +266,7 @@ export function createProductsRoutes(
         success: true,
         data: linkage
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -318,7 +318,7 @@ export function createProductsRoutes(
         success: true,
         data: linkage
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,

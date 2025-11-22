@@ -9,7 +9,7 @@ export interface CalendarAnalyticsEvent {
   session_id?: string;
   ip_address?: string;
   user_agent?: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -23,7 +23,7 @@ export interface DayAnalyticsEvent {
   session_id?: string;
   ip_address?: string;
   user_agent?: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -35,7 +35,7 @@ export interface ChatAnalyticsEvent {
   event_type: 'chat_start' | 'message_sent' | 'chat_end' | 'persona_switch';
   message_count?: number;
   session_duration_seconds?: number;
-  metadata: any;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -47,7 +47,7 @@ export interface UserEngagement {
   engagement_score: number;
   streak_days: number;
   last_engagement_at: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
   created_at: string;
 }
 
@@ -59,7 +59,7 @@ export interface CreateCalendarAnalyticsData {
   session_id?: string;
   ip_address?: string;
   user_agent?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateDayAnalyticsData {
@@ -71,7 +71,7 @@ export interface CreateDayAnalyticsData {
   session_id?: string;
   ip_address?: string;
   user_agent?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateChatAnalyticsData {
@@ -81,7 +81,7 @@ export interface CreateChatAnalyticsData {
   event_type: 'chat_start' | 'message_sent' | 'chat_end' | 'persona_switch';
   message_count?: number;
   session_duration_seconds?: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateUserEngagementData {
@@ -90,7 +90,7 @@ export interface CreateUserEngagementData {
   engagement_type: 'daily_visit' | 'weekly_active' | 'monthly_active' | 'feature_usage';
   engagement_score?: number;
   streak_days?: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export class AnalyticsRepository {

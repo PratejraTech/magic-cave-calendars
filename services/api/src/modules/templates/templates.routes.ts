@@ -12,7 +12,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: templates
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -38,7 +38,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: template
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -57,7 +57,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: templates
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -76,7 +76,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: themes
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -95,7 +95,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: schema
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -123,7 +123,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: validation
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,
@@ -146,7 +146,7 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
           compatible: isCompatible
         }
       });
-    } catch (error) {
+    } catch {
       // Error logged:', error);
       res.status(500).json({
         success: false,

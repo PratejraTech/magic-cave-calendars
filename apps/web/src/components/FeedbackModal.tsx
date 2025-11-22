@@ -87,10 +87,11 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
       setContent('');
       setRating(undefined);
       setSelectedType('comment');
-      onClose();
-    } catch (error) {
-      // Error handled silently - could show user notification
-    } finally {
+       onClose();
+        } catch {
+         // Error handled silently - could implement user notification here
+         // Could show user notification here in the future
+     } finally {
       setIsSubmitting(false);
     }
   };

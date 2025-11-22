@@ -78,7 +78,7 @@ export class ChatService {
   /**
    * Handle streaming chat response from intelligence service
    */
-  async streamChatResponse(sessionId: string, childId: string, message: string, personaConfig?: any) {
+  async streamChatResponse(sessionId: string, childId: string, message: string, personaConfig?: Record<string, unknown>) {
     // Get recent context messages
     const contextMessages = await this.getRecentMessagesForContext(childId);
 

@@ -33,7 +33,7 @@ export function ProductTypeSelectionStep({
         setLoading(true);
         const types = await getProductTypes();
         setProductTypes(types);
-      } catch (err) {
+      } catch (_err) {
         // Error handled silently - could show user notification
         setError('Failed to load product types. Please try again.');
       } finally {

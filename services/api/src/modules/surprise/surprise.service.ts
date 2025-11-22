@@ -55,7 +55,7 @@ export class SurpriseService {
         }
 
         validatedUrls.push(url);
-      } catch (error) {
+      } catch {
         if (error instanceof Error && error.message.includes('Invalid URL')) {
           throw new Error(`Invalid YouTube URL format: ${url}`);
         }

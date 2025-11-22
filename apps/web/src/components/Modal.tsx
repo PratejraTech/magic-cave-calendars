@@ -11,7 +11,6 @@ interface ModalProps {
   theme?: 'christmas' | 'winter' | 'magical' | 'candy' | 'forest';
   voiceUrl?: string;
   musicUrl?: string;
-  confettiType?: 'snow' | 'stars' | 'candy' | 'reindeer';
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -22,8 +21,7 @@ const Modal: React.FC<ModalProps> = ({
   photo,
   theme = 'christmas',
   voiceUrl,
-  musicUrl,
-  confettiType
+  musicUrl
 }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);

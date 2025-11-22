@@ -7,7 +7,7 @@ export interface CreateUserFeedbackData {
   feedback_type: 'rating' | 'comment' | 'suggestion' | 'bug_report' | 'feature_request';
   feedback_content: string;
   rating_value?: number; // 1-5 for rating type
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface UserFeedbackRecord {
@@ -18,7 +18,7 @@ export interface UserFeedbackRecord {
   feedback_type: string;
   feedback_content: string;
   rating_value?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
 }
 

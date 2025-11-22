@@ -3,7 +3,7 @@
  * Provides theme context throughout the application
  */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ThemeTemplate, getThemeById, resolveThemeInheritance, BASE_THEMES } from './definitions';
 
 interface ThemeContextType {

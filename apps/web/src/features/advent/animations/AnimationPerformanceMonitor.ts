@@ -230,7 +230,7 @@ export class AnimationPerformanceMonitor {
       if (this.loadedAnimations.has(id)) {
         try {
           callback();
-        } catch (error) {
+        } catch {
           // Warning logged silently - animation callback failed
           // Remove failing animations
           this.unregisterAnimation(id);
@@ -266,16 +266,16 @@ export class AnimationPerformanceMonitor {
         });
 
         this.performanceObserver.observe({ entryTypes: ['measure'] });
-      } catch (error) {
+      } catch {
         // Performance monitoring not supported in this environment
       }
     }
   }
 
   private getMemoryUsage(): number | undefined {
-    // @ts-ignore - performance.memory is not in all browsers
+    // @ts-expect-error - performance.memory is not in all browsers
     if (typeof performance !== 'undefined' && performance.memory) {
-      // @ts-ignore
+      // @ts-expect-error
       return performance.memory.usedJSHeapSize;
     }
     return undefined;

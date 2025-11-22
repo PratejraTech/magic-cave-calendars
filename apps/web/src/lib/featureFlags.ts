@@ -37,9 +37,9 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
 
 // Environment-based overrides (can be controlled via environment variables)
 const getEnvFlag = (key: string, defaultValue: boolean): boolean => {
-  const envValue = process.env[key];
+  const envValue = (import.meta as any).env?.[key];
   if (envValue === undefined) return defaultValue;
-  return envValue.toLowerCase() === 'true';
+  return String(envValue).toLowerCase() === 'true';
 };
 
 // Current feature flags (with environment overrides)
