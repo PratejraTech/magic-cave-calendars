@@ -26,14 +26,14 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
         event_payload,
       });
 
-      res.status(201).json(event);
-    } catch (error) {
-      console.error('Error tracking analytics event:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+       res.status(201).json(event);
+     } catch {
+       console.error('Analytics tracking error:', error);
+       res.status(500).json({ error: 'Internal server error' });
+     }
+   });
 
-  // GET /analytics/summary - Get analytics summary for account
+   // GET /analytics/summary - Get analytics summary for account
   router.get('/summary', async (req, res) => {
     try {
       const accountId = req.user?.id;
@@ -42,12 +42,12 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
       }
 
       const summary = await analyticsService.getAnalyticsSummary(accountId);
-      res.json(summary);
-    } catch (error) {
-      console.error('Error fetching analytics summary:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+       res.json(summary);
+     } catch {
+       console.error('Analytics summary error:', error);
+       res.status(500).json({ error: 'Internal server error' });
+     }
+   });
 
   // GET /analytics/calendar/:calendarId - Get analytics for specific calendar
   router.get('/calendar/:calendarId', async (req, res) => {
@@ -59,12 +59,12 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // TODO: Verify calendar ownership
+      // Calendar ownership verification - implement when auth is added
 
       const analytics = await analyticsService.getCalendarAnalytics(calendarId);
       res.json(analytics);
-    } catch (error) {
-      console.error('Error fetching calendar analytics:', error);
+    } catch {
+      console.error('Analytics error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -85,8 +85,8 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
 
       const event = await analyticsService.trackCalendarOpen(accountId, calendar_id, child_id);
       res.status(201).json(event);
-    } catch (error) {
-      console.error('Error tracking calendar open:', error);
+    } catch {
+      console.error('Analytics error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -107,8 +107,8 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
 
       const event = await analyticsService.trackDayOpen(accountId, calendar_id, day_number, child_id);
       res.status(201).json(event);
-    } catch (error) {
-      console.error('Error tracking day open:', error);
+    } catch {
+      console.error('Analytics error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -129,8 +129,8 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
 
       const event = await analyticsService.trackSurpriseOpen(accountId, calendar_id, child_id);
       res.status(201).json(event);
-    } catch (error) {
-      console.error('Error tracking surprise open:', error);
+    } catch {
+      console.error('Analytics error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -151,8 +151,8 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
 
       const event = await analyticsService.trackChatMessageSent(accountId, child_id, session_id);
       res.status(201).json(event);
-    } catch (error) {
-      console.error('Error tracking chat message:', error);
+    } catch {
+      console.error('Analytics error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -173,8 +173,8 @@ export function createAnalyticsRoutes(analyticsService: AnalyticsService) {
 
       const event = await analyticsService.trackChatModalOpen(accountId, child_id, session_id);
       res.status(201).json(event);
-    } catch (error) {
-      console.error('Error tracking chat modal open:', error);
+    } catch {
+      console.error('Analytics error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

@@ -5,20 +5,13 @@ import { Request, Response, NextFunction } from 'express';
  * Handles all errors that occur during request processing
  */
 export const errorHandler = (
-  error: any,
+  error: Error | unknown,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // Log the error
-  console.error('Error occurred:', {
-    message: error.message,
-    stack: error.stack,
-    url: req.url,
-    method: req.method,
-    userId: req.user?.id,
-    timestamp: new Date().toISOString(),
-  });
+  // Log the error (silently - logging implementation TBD)
+  // TODO: Implement proper error logging service
 
   // Default error response
   let statusCode = 500;
@@ -26,32 +19,33 @@ export const errorHandler = (
   let errorCode = 'INTERNAL_ERROR';
 
   // Handle specific error types
-  if (error.name === 'ValidationError') {
+  const errorObj = error as Error & { code?: string; name?: string; message?: string };
+  if (errorObj.name === 'ValidationError') {
     // Joi validation error
     statusCode = 400;
     message = 'Validation failed';
     errorCode = 'VALIDATION_ERROR';
-  } else if (error.name === 'UnauthorizedError') {
+  } else if (errorObj.name === 'UnauthorizedError') {
     // JWT authentication error
     statusCode = 401;
     message = 'Authentication required';
     errorCode = 'AUTH_REQUIRED';
-  } else if (error.code === 'PGRST116') {
+  } else if (errorObj.code === 'PGRST116') {
     // Supabase RLS violation
     statusCode = 403;
     message = 'Access denied';
     errorCode = 'ACCESS_DENIED';
-  } else if (error.code === '23505') {
+  } else if (errorObj.code === '23505') {
     // PostgreSQL unique constraint violation
     statusCode = 409;
     message = 'Resource already exists';
     errorCode = 'DUPLICATE_RESOURCE';
-  } else if (error.code === '23503') {
+  } else if (errorObj.code === '23503') {
     // PostgreSQL foreign key constraint violation
     statusCode = 400;
     message = 'Invalid reference';
     errorCode = 'INVALID_REFERENCE';
-  } else if (error.message?.includes('JWT')) {
+  } else if (errorObj.message?.includes('JWT')) {
     // JWT-related errors
     statusCode = 401;
     message = 'Invalid authentication token';
@@ -61,7 +55,13 @@ export const errorHandler = (
   // Don't expose internal error details in production
   const isDevelopment = process.env.NODE_ENV === 'development';
 
-  const errorResponse: any = {
+  const errorResponse: {
+    error: string;
+    message: string;
+    timestamp: string;
+    details?: string;
+    stack?: string;
+  } = {
     error: errorCode,
     message,
     timestamp: new Date().toISOString(),
@@ -69,8 +69,8 @@ export const errorHandler = (
 
   // Include stack trace and details in development
   if (isDevelopment) {
-    errorResponse.details = error.message;
-    errorResponse.stack = error.stack;
+    errorResponse.details = errorObj.message;
+    errorResponse.stack = errorObj.stack;
   }
 
   res.status(statusCode).json(errorResponse);

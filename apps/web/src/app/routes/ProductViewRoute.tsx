@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ProductRenderer, LoadingSkeleton, ErrorBoundary } from '../../features/product-view';
-import { fetchProductContent, openProductContent, fetchSurpriseUrls, trackAnalytics, type ProductContentResponse } from '../../lib/api';
+import { fetchProductContent, openProductContent, trackAnalytics, type ProductContentResponse } from '../../lib/api';
 import { useTheme } from '../../themes/ThemeProvider';
 
 /**
@@ -14,7 +14,7 @@ export function ProductViewRoute() {
   const { shareUuid } = useParams<{ shareUuid: string }>();
   const { setTheme } = useTheme();
   const [productData, setProductData] = useState<ProductContentResponse | null>(null);
-  const [surpriseUrls, setSurpriseUrls] = useState<string[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,13 +27,9 @@ export function ProductViewRoute() {
         setIsLoading(true);
         setError(null);
 
-        const [productResponse, urls] = await Promise.all([
-          fetchProductContent(shareUuid),
-          fetchSurpriseUrls(shareUuid)
-        ]);
+        const productResponse = await fetchProductContent(shareUuid);
 
         setProductData(productResponse);
-        setSurpriseUrls(urls);
 
         // Set theme from product data
         if (productResponse.product.theme) {
@@ -42,8 +38,8 @@ export function ProductViewRoute() {
 
         // Track product view analytics
         trackAnalytics(shareUuid, 'product_open');
-      } catch (error) {
-        console.error('Failed to load product data:', error);
+      } catch {
+        // Error handled silently - could show user notification
         setError('Failed to load product. Please try again.');
       } finally {
         setIsLoading(false);
@@ -75,8 +71,8 @@ export function ProductViewRoute() {
     // Mark content as opened in backend
     try {
       await openProductContent(shareUuid, contentId);
-    } catch (error) {
-      console.error('Failed to mark content as opened:', error);
+    } catch {
+      // Error handled silently - could show user notification
       // Continue with UI update even if backend call fails
     }
   };

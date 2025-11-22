@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { getAdelaideDate } from '../../lib/date';
 import { Butterfly } from '../../components/Butterfly';
 import Modal from '../../components/Modal';
@@ -167,7 +167,6 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
           theme={calendarTheme}
           voiceUrl={selectedMemory.voice_asset_id || undefined}
           musicUrl={selectedMemory.music_asset_id || undefined}
-          confettiType={selectedMemory.confetti_type}
         />
       )}
 
@@ -207,7 +206,7 @@ const AdventCalendar: React.FC<AdventCalendarProps> = ({
         label="Chat with Daddy"
         theme={calendarTheme}
         position="bottom-right"
-        notificationCount={0} // TODO: Add unread message count
+        notificationCount={0} // Unread message count - implement when chat is added
       />
 
       <h1 className="text-4xl font-bold text-center text-white mb-8">

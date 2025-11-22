@@ -146,13 +146,13 @@ export const validateChildProfileUpdate = [
  */
 export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
   // Recursively sanitize string values in request body
-  const sanitizeObject = (obj: any): any => {
+  const sanitizeObject = (obj: unknown): unknown => {
     if (typeof obj === 'string') {
       return sanitizeHtml(obj);
     } else if (Array.isArray(obj)) {
       return obj.map(sanitizeObject);
     } else if (obj && typeof obj === 'object') {
-      const sanitized: any = {};
+      const sanitized: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(obj)) {
         sanitized[key] = sanitizeObject(value);
       }

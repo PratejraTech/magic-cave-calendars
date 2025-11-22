@@ -70,7 +70,7 @@ function App() {
     };
 
     init();
-  }, [sortOpenedDays]);
+  }, [sortOpenedDays, forceUnlock]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

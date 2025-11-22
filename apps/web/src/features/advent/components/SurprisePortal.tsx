@@ -12,8 +12,8 @@ function getEmbedUrl(url: string): string {
 
   // Handle different YouTube URL formats
   const patterns = [
-    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/,
-    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^"&?\/\s]{11})/
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^"&?/\s]{11})/
   ];
 
   for (const pattern of patterns) {

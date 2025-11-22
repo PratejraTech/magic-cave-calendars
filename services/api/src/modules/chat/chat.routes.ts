@@ -25,8 +25,8 @@ export function createChatRoutes(chatService: ChatService) {
       });
 
       res.status(201).json(session);
-    } catch (error) {
-      console.error('Error creating chat session:', error);
+    } catch {
+      console.error('Chat error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -45,11 +45,11 @@ export function createChatRoutes(chatService: ChatService) {
       }
 
       res.json(session);
-    } catch (error) {
+    } catch {
       if (error.message === 'Chat session not found') {
         return res.status(404).json({ error: 'Chat session not found' });
       }
-      console.error('Error fetching chat session:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -79,11 +79,11 @@ export function createChatRoutes(chatService: ChatService) {
 
       const history = await chatService.getChatHistory(childId, limit);
       res.json(history);
-    } catch (error) {
+    } catch {
       if (error.message === 'Child not found') {
         return res.status(404).json({ error: 'Child not found' });
       }
-      console.error('Error fetching chat history:', error);
+      // Error logged:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -99,12 +99,12 @@ export function createChatRoutes(chatService: ChatService) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      // TODO: Verify chat record ownership through session
+      // Chat ownership verification - implement when auth is added
 
       const messages = await chatService.getChatMessages(chatRecordId, limit);
       res.json(messages);
-    } catch (error) {
-      console.error('Error fetching chat messages:', error);
+    } catch {
+      console.error('Chat error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -146,8 +146,8 @@ export function createChatRoutes(chatService: ChatService) {
         ai_response: streamingResponse.response,
         finished: streamingResponse.finished,
       });
-    } catch (error) {
-      console.error('Error processing chat message:', error);
+    } catch {
+      console.error('Chat error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

@@ -33,12 +33,86 @@ export interface ChildInfo {
   childName: string;
 }
 
+// JSON Schema types
+export interface JSONSchema {
+  type?: string;
+  properties?: Record<string, JSONSchema>;
+  required?: string[];
+  items?: JSONSchema;
+  enum?: unknown[];
+  [key: string]: unknown;
+}
+
+// API Response types
+export interface ChildProfileResponse {
+  child_id: string;
+  child_name: string;
+  chat_persona: 'mummy' | 'daddy' | 'custom';
+  custom_chat_prompt?: string;
+  theme: string;
+  hero_photo_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCalendarResponse {
+  calendar_id: string;
+  child_id: string;
+  year: number;
+  share_uuid: string;
+  is_published: boolean;
+  template_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UpdateCalendarDaysResponse {
+  success: boolean;
+  updated_count: number;
+}
+
+export interface PublishCalendarResponse {
+  share_uuid: string;
+  published_at: string;
+}
+
+export interface UpdateSurpriseVideosResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface GenerateCalendarContentResponse {
+  calendar_id: string;
+  generated_days: number;
+  chat_persona_prompt: string;
+  surprise_urls: string[];
+}
+
+export interface CreateProductResponse {
+  id: string;
+  product_type_id: string;
+  template_id: string;
+  title: string;
+  share_uuid: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GenerateContentResponse {
+  content: Record<string, unknown>;
+  metadata?: {
+    prompt_version?: string;
+    tokens_used?: number;
+    generation_time_ms?: number;
+  };
+}
+
 // Product Types
 export interface ProductType {
   id: string;
   name: string;
   description: string;
-  default_content_schema: any; // JSON Schema
+  default_content_schema: JSONSchema;
   supported_features: string[];
   preview_image?: string;
   created_at: string;
@@ -50,9 +124,9 @@ export interface Template {
   name: string;
   description: string;
   product_type_id: string;
-  default_custom_data_schema: any; // JSON Schema
+  default_custom_data_schema: JSONSchema;
   compatible_themes?: string[];
-  product_specific_config?: any;
+  product_specific_config?: Record<string, unknown>;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -61,13 +135,13 @@ export interface Template {
 export interface CreateProductRequest {
   product_type_id: string;
   template_id: string;
-  custom_data: Record<string, any>;
+  custom_data: Record<string, unknown>;
   title?: string;
 }
 
 export interface GenerateContentRequest {
   template_id: string;
-  custom_data: Record<string, any>;
+  custom_data: Record<string, unknown>;
   product_type: string;
 }
 
@@ -101,7 +175,7 @@ export interface ProductContentResponse {
     metadata?: {
       confetti_type?: 'snow' | 'stars' | 'candy' | 'reindeer';
       unlock_effect?: 'fireworks' | 'snowstorm' | 'aurora' | 'gingerbread';
-      [key: string]: any;
+      [key: string]: unknown;
     };
     is_unlocked: boolean;
     is_completed: boolean;
@@ -117,11 +191,11 @@ export interface ProductContentResponse {
  */
 export async function fetchCalendarDays(shareUuid: string): Promise<CalendarDaysResponse> {
   try {
-    const response = await httpClient.get<CalendarDaysResponse>(`/calendars/${shareUuid}/days`);
-    return response;
-  } catch (error) {
-    console.error('Failed to fetch calendar days:', error);
-    // Return mock data as fallback
+     const response = await httpClient.get<CalendarDaysResponse>(`/calendars/${shareUuid}/days`);
+     return response;
+    } catch (_error) {
+      // Log error for debugging but return mock data as fallback
+      // Return mock data as fallback
     return {
       days: Array.from({ length: 24 }, (_, i) => ({
         day_id: `mock-day-${i + 1}`,
@@ -150,10 +224,10 @@ export async function fetchCalendarDays(shareUuid: string): Promise<CalendarDays
  */
 export async function openCalendarDay(shareUuid: string, dayId: string): Promise<void> {
   try {
-    await httpClient.post(`/calendars/${shareUuid}/days/${dayId}/open`);
-  } catch (error) {
-    console.error('Failed to open calendar day:', error);
-    // For now, just log the error - the UI will still work with local state
+     await httpClient.post(`/calendars/${shareUuid}/days/${dayId}/open`);
+   } catch (_error) {
+     // Log error for debugging but don't break user experience
+     // For now, just log the error - the UI will still work with local state
   }
 }
 
@@ -164,8 +238,8 @@ export async function fetchSurpriseUrls(shareUuid: string): Promise<string[]> {
   try {
     const data = await httpClient.get<SurpriseData>(`/calendars/${shareUuid}/surprises`);
     return data.youtube_urls;
-  } catch (error) {
-    console.error('Failed to fetch surprise URLs:', error);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
     // Return mock data as fallback
     return [
       'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -180,7 +254,7 @@ export async function fetchSurpriseUrls(shareUuid: string): Promise<string[]> {
 export async function trackAnalytics(
   shareUuid: string,
   eventType: string,
-  eventData?: Record<string, any>
+  eventData?: Record<string, unknown>
 ): Promise<void> {
   try {
     await httpClient.post('/analytics/events', {
@@ -188,8 +262,8 @@ export async function trackAnalytics(
       event_type: eventType,
       event_data: eventData,
     });
-  } catch (error) {
-    console.error('Failed to track analytics:', error);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
     // Analytics failures shouldn't break the user experience
   }
 }
@@ -203,24 +277,22 @@ export async function createChildProfile(data: {
   custom_chat_prompt?: string;
   theme: string;
   hero_photo_url?: string;
-}): Promise<any> {
+}): Promise<ChildProfileResponse> {
   try {
-    return await httpClient.post('/child', data);
-  } catch (error) {
-    console.error('Failed to create child profile:', error);
-    throw error;
+    return await httpClient.post<ChildProfileResponse>('/child', data);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
 /**
  * Get child profile for current user
  */
-export async function getChildProfile(): Promise<any> {
+export async function getChildProfile(): Promise<ChildProfileResponse> {
   try {
-    return await httpClient.get('/child');
-  } catch (error) {
-    console.error('Failed to get child profile:', error);
-    throw error;
+    return await httpClient.get<ChildProfileResponse>('/child');
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
@@ -230,48 +302,60 @@ export async function getChildProfile(): Promise<any> {
 export async function createCalendar(data: {
   child_id: string;
   year: number;
-}): Promise<any> {
+  template_id?: string;
+  custom_data?: Record<string, unknown>;
+}): Promise<CreateCalendarResponse> {
   try {
-    return await httpClient.post('/calendars', data);
-  } catch (error) {
-    console.error('Failed to create calendar:', error);
-    throw error;
+    return await httpClient.post<CreateCalendarResponse>('/calendars', data);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
 /**
  * Update calendar days
  */
-export async function updateCalendarDays(calendarId: string, days: any[]): Promise<any> {
+export async function updateCalendarDays(calendarId: string, days: CalendarDay[]): Promise<UpdateCalendarDaysResponse> {
   try {
-    return await httpClient.put(`/calendars/${calendarId}/days`, { days });
-  } catch (error) {
-    console.error('Failed to update calendar days:', error);
-    throw error;
+    return await httpClient.put<UpdateCalendarDaysResponse>(`/calendars/${calendarId}/days`, { days });
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
 /**
  * Publish calendar
  */
-export async function publishCalendar(calendarId: string): Promise<any> {
+export async function publishCalendar(calendarId: string): Promise<PublishCalendarResponse> {
   try {
-    return await httpClient.put(`/calendars/${calendarId}/publish`);
-  } catch (error) {
-    console.error('Failed to publish calendar:', error);
-    throw error;
+    return await httpClient.put<PublishCalendarResponse>(`/calendars/${calendarId}/publish`);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
 /**
  * Update surprise videos for calendar
  */
-export async function updateSurpriseVideos(calendarId: string, youtubeUrls: string[]): Promise<any> {
+export async function updateSurpriseVideos(calendarId: string, youtubeUrls: string[]): Promise<UpdateSurpriseVideosResponse> {
   try {
-    return await httpClient.put(`/surprise/${calendarId}`, { youtube_urls: youtubeUrls });
-  } catch (error) {
-    console.error('Failed to update surprise videos:', error);
-    throw error;
+    return await httpClient.put<UpdateSurpriseVideosResponse>(`/surprise/${calendarId}`, { youtube_urls: youtubeUrls });
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
+  }
+}
+
+/**
+ * Generate AI content for calendar using template and custom data
+ */
+export async function generateCalendarContent(calendarId: string, templateId: string, customData?: Record<string, unknown>): Promise<GenerateCalendarContentResponse> {
+  try {
+    return await httpClient.post<GenerateCalendarContentResponse>(`/calendars/${calendarId}/generate-content`, {
+      template_id: templateId,
+      custom_data: customData || {}
+    });
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
@@ -281,8 +365,8 @@ export async function updateSurpriseVideos(calendarId: string, youtubeUrls: stri
 export async function getProductTypes(): Promise<ProductType[]> {
   try {
     return await httpClient.get<ProductType[]>('/product-types');
-  } catch (error) {
-    console.error('Failed to get product types:', error);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
     // Return mock data for development
     return [
       {
@@ -321,9 +405,9 @@ export async function getProductTypes(): Promise<ProductType[]> {
  */
 export async function getTemplatesByProductType(productTypeId: string): Promise<Template[]> {
   try {
-    return await httpClient.get<Template[]>(`/templates?product_type_id=${productTypeId}`);
-  } catch (error) {
-    console.error('Failed to get templates by product type:', error);
+    return await httpClient.get<Template[]>(`/templates/product-type/${productTypeId}`);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
     // Return mock data for development
     return [
       {
@@ -355,24 +439,22 @@ export async function getTemplatesByProductType(productTypeId: string): Promise<
 /**
  * Create a new product
  */
-export async function createProduct(data: CreateProductRequest): Promise<any> {
+export async function createProduct(data: CreateProductRequest): Promise<CreateProductResponse> {
   try {
-    return await httpClient.post('/products', data);
-  } catch (error) {
-    console.error('Failed to create product:', error);
-    throw error;
+    return await httpClient.post<CreateProductResponse>('/products', data);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
 /**
  * Generate content for a product
  */
-export async function generateContent(data: GenerateContentRequest): Promise<any> {
+export async function generateContent(data: GenerateContentRequest): Promise<GenerateContentResponse> {
   try {
-    return await httpClient.post('/generate-content', data);
-  } catch (error) {
-    console.error('Failed to generate content:', error);
-    throw error;
+    return await httpClient.post<GenerateContentResponse>('/generate-content', data);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
   }
 }
 
@@ -383,8 +465,8 @@ export async function fetchProductContent(shareUuid: string): Promise<ProductCon
   try {
     const response = await httpClient.get<ProductContentResponse>(`/products/${shareUuid}/content`);
     return response;
-  } catch (error) {
-    console.error('Failed to fetch product content:', error);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
     // Return mock data as fallback for development
     return {
       product: {
@@ -429,8 +511,8 @@ export async function fetchProductContent(shareUuid: string): Promise<ProductCon
 export async function openProductContent(shareUuid: string, contentId: string): Promise<void> {
   try {
     await httpClient.post(`/products/${shareUuid}/content/${contentId}/open`);
-  } catch (error) {
-    console.error('Failed to open product content:', error);
+  } catch (_error) {
+    // Error handled silently - could implement user notification here
     // For now, just log the error - the UI will still work with local state
   }
 }

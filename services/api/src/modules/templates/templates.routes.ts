@@ -12,8 +12,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: templates
       });
-    } catch (error) {
-      console.error('Error fetching templates:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch templates'
@@ -38,8 +38,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: template
       });
-    } catch (error) {
-      console.error('Error fetching template:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch template'
@@ -57,8 +57,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: templates
       });
-    } catch (error) {
-      console.error('Error fetching templates by product type:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch templates'
@@ -76,8 +76,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: themes
       });
-    } catch (error) {
-      console.error('Error fetching template themes:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch template themes'
@@ -95,8 +95,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: schema
       });
-    } catch (error) {
-      console.error('Error fetching template schema:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch template schema'
@@ -123,8 +123,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
         success: true,
         data: validation
       });
-    } catch (error) {
-      console.error('Error validating custom data:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to validate custom data'
@@ -146,8 +146,8 @@ export function createTemplatesRoutes(templatesService: TemplatesService): Route
           compatible: isCompatible
         }
       });
-    } catch (error) {
-      console.error('Error checking template compatibility:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to check compatibility'

@@ -82,13 +82,13 @@ export function DayCard({ dayEntry, onUpdate, onPhotoUpload }: DayCardProps) {
         .getPublicUrl(filePath);
 
       return data.publicUrl;
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (retryCount < maxRetries && (
         error.message?.includes('network') ||
         error.message?.includes('timeout') ||
         error.code === 'NETWORK_ERROR'
       )) {
-        console.warn(`Photo upload failed, retrying in ${retryDelay}ms (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        // TODO: Implement proper logging service
         await new Promise(resolve => setTimeout(resolve, retryDelay));
         return uploadPhoto(file, retryCount + 1);
       }
@@ -110,8 +110,8 @@ export function DayCard({ dayEntry, onUpdate, onPhotoUpload }: DayCardProps) {
       const photoUrl = await uploadPhoto(file);
       onUpdate({ photo: file, photoUrl });
       onPhotoUpload?.(dayEntry.dayNumber, photoUrl);
-    } catch (error: any) {
-      console.error('Failed to upload photo:', error);
+    } catch (error: unknown) {
+      // TODO: Implement proper logging service
       setPhotoError(error.message || 'Failed to upload photo');
     } finally {
       setIsUploading(false);

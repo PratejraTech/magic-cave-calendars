@@ -35,8 +35,8 @@ export function ParentDashboardRoute() {
     queryFn: async () => {
       try {
         return await httpClient.get<Child>('/child');
-      } catch (error) {
-        console.error('Failed to fetch child:', error);
+      } catch {
+        // TODO: Implement proper error logging service
         return null;
       }
     },
@@ -49,15 +49,14 @@ export function ParentDashboardRoute() {
     queryFn: async () => {
       try {
         return await httpClient.get<Calendar[]>('/calendars');
-      } catch (error) {
-        console.error('Failed to fetch calendars:', error);
+      } catch {
+        // TODO: Implement proper error logging service
         return [];
       }
     },
     enabled: !!user
   });
 
-  const publishedCalendars = calendars.filter(cal => cal.is_published);
   const totalDaysConfigured = calendars.length * 24; // Rough estimate
 
   const menuItems = [

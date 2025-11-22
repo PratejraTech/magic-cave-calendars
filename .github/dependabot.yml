@@ -1,0 +1,67 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "your-team"
+    assignees:
+      - "your-team"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+
+  # API service dependencies
+  - package-ecosystem: "npm"
+    directory: "/services/api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "backend-team"
+    assignees:
+      - "backend-team"
+    commit-message:
+      prefix: "deps-api"
+      prefix-development: "deps-api-dev"
+      include: "scope"
+
+  # Intelligence service Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/services/intelligence"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "ai-team"
+    assignees:
+      - "ai-team"
+    commit-message:
+      prefix: "deps-ai"
+      include: "scope"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "devops-team"
+    assignees:
+      - "devops-team"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

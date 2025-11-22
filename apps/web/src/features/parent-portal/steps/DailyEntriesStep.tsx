@@ -37,6 +37,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
   const [dayEntries, setDayEntries] = useState<DayEntry[]>(initializeDayEntries);
   const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [calendarData, setCalendarData] = useState<any>(null);
 
   // Debounced auto-save refs
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -63,8 +64,16 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
 
       setIsLoading(true);
       try {
-        const response = await httpClient.get(`/calendars/${calendarId}/days`) as { data: { days?: any[] } };
-        const existingDays = response.data.days || [];
+        // Load calendar metadata and days
+        const [calendarResponse, daysResponse] = await Promise.all([
+          httpClient.get(`/calendars/${calendarId}`),
+          httpClient.get(`/calendars/${calendarId}/days`)
+        ]);
+
+        const calendar = calendarResponse.data;
+        const existingDays = daysResponse.data.days || [];
+
+        setCalendarData(calendar);
 
         setDayEntries(prevEntries =>
           prevEntries.map(entry => {
@@ -83,7 +92,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
           })
         );
       } catch (error: any) {
-        console.error('Failed to load existing calendar days:', error);
+        // TODO: Implement proper logging service
         // Don't show error for loading - just use initial state
       } finally {
         setIsLoading(false);
@@ -124,7 +133,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
       pendingChangesRef.current.clear();
       setSaveError(null);
     } catch (error: any) {
-      console.error('Auto-save failed:', error);
+      // TODO: Implement proper logging service
       // Don't show error for auto-save failures, just retry later
     }
   }, [calendarId, dayEntries]);
@@ -194,7 +203,7 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
         prevEntries.map(entry => ({ ...entry, isSaved: true }))
       );
     } catch (error: any) {
-      console.error('Failed to save calendar days:', error);
+      // TODO: Implement proper logging service
       setSaveError(error.response?.data?.message || 'Failed to save changes. Please try again.');
       throw error; // Re-throw to let BulkActions handle the error state
     }
@@ -246,6 +255,8 @@ export function DailyEntriesStep({ calendarId, onNext, onDataChange, initialData
         onBulkUpdate={handleBulkUpdate}
         onSaveAll={handleSaveAll}
         calendarId={calendarId}
+        templateId={calendarData?.template_id}
+        customData={calendarData?.custom_data}
       />
 
       {/* Error Display */}

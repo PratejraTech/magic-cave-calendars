@@ -97,6 +97,78 @@ export const requestDaddyResponse = async (
   return data.reply;
 };
 
+export const streamDaddyResponse = async (
+  messages: ChatMessage[],
+  onChunk: (chunk: string) => void,
+  onComplete: (fullResponse: string) => void,
+  onError: (error: string) => void,
+  sessionOverride?: string
+): Promise<void> => {
+  try {
+    // Use the intelligence service streaming endpoint
+    const intelligenceUrl = import.meta.env.VITE_INTELLIGENCE_API_URL || 'http://localhost:8000';
+    const streamEndpoint = `${intelligenceUrl}/chat/stream`;
+
+    const response = await fetch(streamEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        child_id: 'default-child', // TODO: Get from context
+        session_id: sessionOverride ?? getSessionId(),
+        message: messages[messages.length - 1]?.content || '',
+        persona: 'daddy', // TODO: Get from context
+        custom_prompt: null,
+        conversation_history: messages.slice(0, -1) // All messages except the last one
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Streaming chat service unavailable');
+    }
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let fullResponse = '';
+
+    if (!reader) {
+      throw new Error('No response body reader available');
+    }
+
+    let isDone = false;
+    while (!isDone) {
+      const { done, value } = await reader.read();
+      if (done) {
+        isDone = true;
+        break;
+      }
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim();
+
+          if (data === '[DONE]') {
+            onComplete(fullResponse);
+            return;
+          } else if (data.startsWith('[ERROR]')) {
+            onError(data.slice(7));
+            return;
+          } else {
+            fullResponse += data;
+            onChunk(data);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    onError(error instanceof Error ? error.message : 'Unknown streaming error');
+  }
+};
+
 let subtitleQuotesCache: DaddyQuote[] | null = null;
 
 const SUBTITLE_SYSTEM_PROMPT =

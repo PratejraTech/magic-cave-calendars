@@ -10,8 +10,8 @@ export interface Account {
   updated_at: string;
   last_login_at?: string;
   plan: 'free' | 'premium';
-  settings: any;
-  preferences: any;
+  settings: Record<string, unknown>;
+  preferences: Record<string, unknown>;
   is_active: boolean;
 }
 
@@ -21,16 +21,16 @@ export interface CreateAccountData {
   auth_provider?: string;
   auth_provider_id?: string;
   plan?: 'free' | 'premium';
-  settings?: any;
-  preferences?: any;
+  settings?: Record<string, unknown>;
+  preferences?: Record<string, unknown>;
 }
 
 export interface UpdateAccountData {
   email_verified?: boolean;
   last_login_at?: string;
   plan?: 'free' | 'premium';
-  settings?: any;
-  preferences?: any;
+  settings?: Record<string, unknown>;
+  preferences?: Record<string, unknown>;
   is_active?: boolean;
 }
 

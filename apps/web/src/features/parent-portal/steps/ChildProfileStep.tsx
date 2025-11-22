@@ -234,7 +234,7 @@ export function ChildProfileStep({ onNext, onDataChange, initialData }: ChildPro
 
       onNext(updatedData);
     } catch (error: any) {
-      console.error('Failed to create child profile:', error);
+      // TODO: Implement proper logging service
       setErrors({
         submit: error.response?.data?.message || error.message || 'Failed to create child profile'
       });

@@ -1,123 +1,105 @@
-export interface FeatureFlag {
-  flag_id: string;
-  flag_name: string;
-  flag_description?: string;
-  enabled: boolean;
-  rollout_percentage: number;
-  target_accounts?: string[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CreateFeatureFlagData {
-  flag_name: string;
-  flag_description?: string;
-  enabled?: boolean;
-  rollout_percentage?: number;
-  target_accounts?: string[];
-}
-
-export interface ABLExperiment {
-  experiment_id: string;
-  experiment_name: string;
-  experiment_type: 'template_vs_legacy' | 'ai_generation' | 'ui_variants';
-  status: 'draft' | 'active' | 'completed' | 'cancelled';
-  start_date?: string;
-  end_date?: string;
-  target_percentage: number;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CreateExperimentData {
-  experiment_name: string;
-  experiment_type: 'template_vs_legacy' | 'ai_generation' | 'ui_variants';
-  start_date?: string;
-  end_date?: string;
-  target_percentage?: number;
-  description?: string;
-}
-
-export interface ABAssignment {
-  assignment_id: string;
-  experiment_id: string;
-  account_id: string;
-  variant_name: string;
-  assigned_at: string;
-}
+import { FeatureFlagRepository, FeatureFlag, CreateFeatureFlagData, ABLExperiment, CreateExperimentData, ABAssignment } from './feature-flag.repository';
 
 export class FeatureFlagService {
+  constructor(private featureFlagRepository: FeatureFlagRepository) {}
+
   async checkFeatureFlag(flagName: string, accountId?: string): Promise<boolean> {
-    // This would check the database for feature flag status
-    // For now, return default behavior
-    if (flagName === 'enableTemplateEngine') {
-      return true; // Enable template engine by default for Phase 7
-    }
-    if (flagName === 'enableBetaFeatures') {
-      return false; // Beta features disabled by default
-    }
-    return false;
+    return await this.featureFlagRepository.checkFeatureFlag(flagName, accountId);
   }
 
   async createFeatureFlag(flagData: CreateFeatureFlagData): Promise<FeatureFlag> {
-    // This would create a feature flag in the database
-    return {
-      flag_id: 'mock-id',
-      ...flagData,
-      enabled: flagData.enabled ?? false,
-      rollout_percentage: flagData.rollout_percentage ?? 0,
-      target_accounts: flagData.target_accounts ?? [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    this.validateFeatureFlagData(flagData);
+    return await this.featureFlagRepository.createFeatureFlag(flagData);
   }
 
   async updateFeatureFlag(flagId: string, updates: Partial<CreateFeatureFlagData>): Promise<FeatureFlag> {
-    // This would update a feature flag in the database
-    return {
-      flag_id: flagId,
-      flag_name: updates.flag_name || 'unknown',
-      flag_description: updates.flag_description,
-      enabled: updates.enabled ?? false,
-      rollout_percentage: updates.rollout_percentage ?? 0,
-      target_accounts: updates.target_accounts ?? [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    return await this.featureFlagRepository.updateFeatureFlag(flagId, updates);
   }
 
+  async deleteFeatureFlag(flagId: string): Promise<void> {
+    return await this.featureFlagRepository.deleteFeatureFlag(flagId);
+  }
+
+  async listFeatureFlags(): Promise<FeatureFlag[]> {
+    return await this.featureFlagRepository.listFeatureFlags();
+  }
+
+  async getFeatureFlag(flagName: string): Promise<FeatureFlag | null> {
+    return await this.featureFlagRepository.getFeatureFlag(flagName);
+  }
+
+  // A/B Testing methods
   async assignToExperiment(experimentId: string, accountId: string): Promise<string> {
-    // Simple A/B assignment logic
-    const variant = Math.random() < 0.5 ? 'variant_a' : 'variant_b';
-    return variant;
+    return await this.featureFlagRepository.assignToExperiment(experimentId, accountId);
   }
 
   async createExperiment(experimentData: CreateExperimentData): Promise<ABLExperiment> {
-    // This would create an A/B experiment in the database
-    return {
-      experiment_id: 'mock-experiment-id',
-      ...experimentData,
-      status: 'draft',
-      target_percentage: experimentData.target_percentage ?? 50,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    this.validateExperimentData(experimentData);
+    return await this.featureFlagRepository.createExperiment(experimentData);
+  }
+
+  async updateExperiment(experimentId: string, updates: Partial<CreateExperimentData & { status: string }>): Promise<ABLExperiment> {
+    return await this.featureFlagRepository.updateExperiment(experimentId, updates);
+  }
+
+  async getExperiment(experimentId: string): Promise<ABLExperiment | null> {
+    return await this.featureFlagRepository.getExperiment(experimentId);
+  }
+
+  async getExperimentByName(experimentName: string): Promise<ABLExperiment | null> {
+    return await this.featureFlagRepository.getExperimentByName(experimentName);
   }
 
   async getExperimentVariant(experimentName: string, accountId: string): Promise<string | null> {
-    // This would check if user is assigned to an experiment variant
-    // For now, return null (not in experiment)
-    return null;
+    return await this.featureFlagRepository.getExperimentVariant(experimentName, accountId);
   }
 
-  async getActiveExperiments(): Promise<ABLExperiment[]> {
-    // This would return active experiments
-    return [];
+  async listExperiments(status?: string): Promise<ABLExperiment[]> {
+    return await this.featureFlagRepository.listExperiments(status);
+  }
+
+  async getExperimentAssignments(experimentId: string): Promise<ABAssignment[]> {
+    return await this.featureFlagRepository.getExperimentAssignments(experimentId);
   }
 
   async completeExperiment(experimentId: string): Promise<void> {
-    // This would mark an experiment as completed
-    // Implementation would update the database
+    return await this.featureFlagRepository.completeExperiment(experimentId);
+  }
+
+  async cancelExperiment(experimentId: string): Promise<void> {
+    return await this.featureFlagRepository.cancelExperiment(experimentId);
+  }
+
+  private validateFeatureFlagData(data: CreateFeatureFlagData): void {
+    if (!data.flag_name || data.flag_name.trim().length === 0) {
+      throw new Error('Feature flag name is required');
+    }
+
+    if (data.flag_name.length > 100) {
+      throw new Error('Feature flag name must be less than 100 characters');
+    }
+
+    if (data.rollout_percentage !== undefined && (data.rollout_percentage < 0 || data.rollout_percentage > 100)) {
+      throw new Error('Rollout percentage must be between 0 and 100');
+    }
+  }
+
+  private validateExperimentData(data: CreateExperimentData): void {
+    if (!data.experiment_name || data.experiment_name.trim().length === 0) {
+      throw new Error('Experiment name is required');
+    }
+
+    const validTypes = ['template_vs_legacy', 'ai_generation', 'ui_variants'];
+    if (!validTypes.includes(data.experiment_type)) {
+      throw new Error(`Invalid experiment type. Must be one of: ${validTypes.join(', ')}`);
+    }
+
+    if (data.target_percentage !== undefined && (data.target_percentage < 0 || data.target_percentage > 100)) {
+      throw new Error('Target percentage must be between 0 and 100');
+    }
+
+    if (data.start_date && data.end_date && new Date(data.start_date) >= new Date(data.end_date)) {
+      throw new Error('End date must be after start date');
+    }
   }
 }

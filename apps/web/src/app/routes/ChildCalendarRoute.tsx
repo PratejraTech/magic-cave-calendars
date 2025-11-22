@@ -9,7 +9,7 @@ import { MusicPlayer, playThemeAtRandomPoint } from '../../components/MusicPlaye
 import { SoundManager } from '../../features/advent/utils/SoundManager';
 import { useTheme } from '../../themes/ThemeProvider';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { fetchCalendarDays, fetchSurpriseUrls, openCalendarDay, trackAnalytics, type CalendarDay, type ChildInfo } from '../../lib/api';
+import { fetchCalendarDays, fetchSurpriseUrls, openCalendarDay, trackAnalytics, type CalendarDay } from '../../lib/api';
 
 export function ChildCalendarRoute() {
   const { shareUuid } = useParams<{ shareUuid: string }>();
@@ -21,7 +21,7 @@ export function ChildCalendarRoute() {
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [currentSurpriseUrl, setCurrentSurpriseUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
   const soundManager = SoundManager.getInstance();
 
   const sortOpenedDays = useCallback((opened: any[]) => {
@@ -43,7 +43,6 @@ export function ChildCalendarRoute() {
       if (!shareUuid) return;
 
       try {
-        setIsLoading(true);
         const [calendarResponse, urls] = await Promise.all([
           fetchCalendarDays(shareUuid),
           fetchSurpriseUrls(shareUuid)
@@ -58,11 +57,9 @@ export function ChildCalendarRoute() {
 
         // Track calendar view analytics
         trackAnalytics(shareUuid, 'calendar_open');
-      } catch (error) {
-        console.error('Failed to load calendar data:', error);
+      } catch {
+        // Error handled silently - could show error page
         // Error handling is done in the API functions with fallbacks
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -109,8 +106,8 @@ export function ChildCalendarRoute() {
       // Mark day as opened in backend
       try {
         await openCalendarDay(shareUuid, dayId);
-      } catch (error) {
-        console.error('Failed to mark day as opened:', error);
+      } catch {
+        // Error handled silently - day opening failed
         // Continue with UI update even if backend call fails
       }
     }
@@ -127,7 +124,10 @@ export function ChildCalendarRoute() {
   );
 
   const openRandomSurprise = () => {
-    if (surpriseUrls.length === 0) return;
+    if (surpriseUrls.length === 0) {
+      // No surprise URLs available - could show a message or fallback
+      return;
+    }
     const nextUrl = surpriseUrls[Math.floor(Math.random() * surpriseUrls.length)];
     setCurrentSurpriseUrl(nextUrl);
     setIsSurpriseOpen(true);

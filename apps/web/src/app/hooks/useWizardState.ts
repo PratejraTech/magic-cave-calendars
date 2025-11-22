@@ -29,7 +29,10 @@ export interface WizardState {
   // Product selection
   selectedProductType: ProductType | null;
   selectedTemplate: Template | null;
-  customData: Record<string, any>;
+  customData: Record<string, unknown>;
+  // AI Generation
+  calendarId?: string;
+  generationComplete?: boolean;
   // Legacy calendar fields (for backward compatibility)
   childProfile: ChildProfileData;
   dailyEntries: DailyEntry[];
@@ -37,6 +40,8 @@ export interface WizardState {
   selectedTheme: 'snow' | 'warm' | 'candy' | 'forest' | 'starlight';
   isDirty: boolean;
   lastSaved: Date | null;
+  // Publishing state
+  isPublishing?: boolean;
 }
 
 const WIZARD_STORAGE_KEY = 'advent-calendar-wizard-state';
@@ -102,8 +107,8 @@ export function useWizardState() {
           localStorage.removeItem(WIZARD_STORAGE_KEY);
         }
       }
-    } catch (error) {
-      console.warn('Failed to load wizard state:', error);
+    } catch {
+      // Warning handled silently - could implement fallback
     } finally {
       setIsLoaded(true);
     }
@@ -132,8 +137,8 @@ export function useWizardState() {
         customData: newState.customData,
       };
       localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(stateToSave));
-    } catch (error) {
-      console.warn('Failed to save wizard state:', error);
+    } catch {
+      // Warning handled silently - could implement retry logic
     }
   }, []);
 

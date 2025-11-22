@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { supabaseAuth } from '../../lib/supabaseClient';
 
 // Extend Express Request interface to include user
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare global {
   namespace Express {
     interface Request {
@@ -48,8 +49,8 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     };
 
     next();
-  } catch (error) {
-    console.error('Auth middleware error:', error);
+   } catch {
+    // TODO: Implement proper error logging service
     return res.status(500).json({
       error: 'Authentication service error',
       message: 'Please try again later'
@@ -79,9 +80,9 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     }
 
     next();
-  } catch (error) {
+   } catch {
     // For optional auth, we don't fail on errors - just continue without user
-    console.warn('Optional auth error (continuing without user):', error);
+    // TODO: Implement proper warning logging service
     next();
   }
 };

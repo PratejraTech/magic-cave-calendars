@@ -62,7 +62,7 @@ export class ChildRepository {
   }
 
   async create(childData: CreateChildData): Promise<Child> {
-    // @ts-ignore - Temporarily bypass type checking
+    // @ts-expect-error - Temporarily bypass type checking
     const { data, error } = await this.supabase
       .from('child_profile_v2')
       .insert({
@@ -81,7 +81,7 @@ export class ChildRepository {
   }
 
   async update(childId: string, updateData: UpdateChildData): Promise<Child> {
-    // @ts-ignore - Temporarily bypass type checking
+    // @ts-expect-error - Temporarily bypass type checking
     const { data, error } = await this.supabase
       .from('child_profile_v2')
       .update(updateData)

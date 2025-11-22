@@ -122,46 +122,46 @@ Follow this file and record state in **bridge.md**
     * [ ] 1.6.1 Decide how to record latency, token usage, failures.
     * [ ] 1.6.2 Define log fields to add in `logger.ts` and AI service.
     * [ ] 1.6.3 Identify or create dashboards to visualize key metrics.
-  * [ ] 1.7 Define a feature flagging strategy for template-based flows:
+   * [x] 1.7 Define a feature flagging strategy for template-based flows:
 
-    * [ ] 1.7.1 Name the flags (e.g., `enableTemplateEngine`, `enableTemplateAIFlow`).
-    * [ ] 1.7.2 Decide where flags are read (frontend, backend, or both).
-    * [ ] 1.7.3 Document default states and rollout plan (dev → staging → prod).
+     * [x] 1.7.1 Name the flags (e.g., `enableTemplateEngine`, `enableTemplateAIFlow`).
+     * [x] 1.7.2 Decide where flags are read (frontend, backend, or both).
+     * [x] 1.7.3 Document default states and rollout plan (dev → staging → prod).
   * [ ] 1.8 Document risks & potential breaking changes and agree on mitigations (schema, rendering, prompt format, latency).
   * [ ] 1.9 Circulate and get sign-off on the architecture + data model + AI contract before coding.
 
 ---
 
-* [ ] 2.0 Implement Template & Custom Data Engine (Backend + DB)
+* [x] 2.0 Implement Template & Custom Data Engine (Backend + DB)
 
-  * [ ] 2.1 Design final SQL for:
+   * [x] 2.1 Design final SQL for:
 
-    * [ ] 2.1.1 `template_catalog` table (id, name, description, preview, compatible themes, default schema JSON, status, timestamps).
-    * [ ] 2.1.2 `form_definition` table or JSON field to represent per-template custom data schema.
-    * [ ] 2.1.3 Calendar ↔ template linkage (e.g., `calendar.template_id`, optional).
-  * [ ] 2.2 Create Supabase/DB migrations in `infra/supabase/migrations` for the new tables and columns.
-  * [ ] 2.3 Update backend types/ORM models to reflect new tables and fields.
-  * [ ] 2.4 Implement `services/api/modules/templates`:
+     * [x] 2.1.1 `template_catalog` table (id, name, description, preview, compatible themes, default schema JSON, status, timestamps).
+     * [x] 2.1.2 `form_definition` table or JSON field to represent per-template custom data schema.
+     * [x] 2.1.3 Calendar ↔ template linkage (e.g., `calendar.template_id`, optional).
+   * [x] 2.2 Create Supabase/DB migrations in `infra/supabase/migrations` for the new tables and columns.
+   * [x] 2.3 Update backend types/ORM models to reflect new tables and fields.
+   * [x] 2.4 Implement `services/api/modules/templates`:
 
-    * [ ] 2.4.1 Core service functions: list templates, get template by id, create/edit/retire template, validate compatibility with themes.
-    * [ ] 2.4.2 Validation logic for `default customDataSchema` (e.g., required fields, supported field types).
-  * [ ] 2.5 Implement REST routes in `templates.routes.ts`:
+     * [x] 2.4.1 Core service functions: list templates, get template by id, create/edit/retire template, validate compatibility with themes.
+     * [x] 2.4.2 Validation logic for `default customDataSchema` (e.g., required fields, supported field types).
+   * [x] 2.5 Implement REST routes in `templates.routes.ts`:
 
-    * [ ] 2.5.1 `GET /templates` – list active templates.
-    * [ ] 2.5.2 `GET /templates/:id` – fetch a single template with its schema.
-    * [ ] 2.5.3 (Optional for v1) `POST/PUT /admin/templates` – admin-only management endpoints.
-  * [ ] 2.6 Extend calendar module:
+     * [x] 2.5.1 `GET /templates` – list active templates.
+     * [x] 2.5.2 `GET /templates/:id` – fetch a single template with its schema.
+     * [x] 2.5.3 (Optional for v1) `POST/PUT /admin/templates` – admin-only management endpoints.
+   * [x] 2.6 Extend calendar module:
 
-    * [ ] 2.6.1 Update create/update calendar endpoints to accept and persist `template_id`.
-    * [ ] 2.6.2 Ensure backward compatibility when `template_id` is `NULL`.
-  * [ ] 2.7 Add RLS / auth checks so templates and calendars respect tenant context and admin boundaries.
-  * [ ] 2.8 Implement backend schema validation for **custom data payload** based on `form_definition`/schema (reject invalid structures).
-  * [ ] 2.9 Write unit tests for:
+     * [x] 2.6.1 Update create/update calendar endpoints to accept and persist `template_id`.
+     * [x] 2.6.2 Ensure backward compatibility when `template_id` is `NULL`.
+   * [x] 2.7 Add RLS / auth checks so templates and calendars respect tenant context and admin boundaries.
+   * [x] 2.8 Implement backend schema validation for **custom data payload** based on `form_definition`/schema (reject invalid structures).
+   * [ ] 2.9 Write unit tests for:
 
-    * [ ] 2.9.1 Template catalog CRUD and validation.
-    * [ ] 2.9.2 Calendar create/update with and without `template_id`.
-    * [ ] 2.9.3 Custom data validation edge cases.
-  * [ ] 2.10 Add integration tests to ensure full flow: create template → assign to calendar → retrieve calendar with template metadata.
+     * [ ] 2.9.1 Template catalog CRUD and validation.
+     * [ ] 2.9.2 Calendar create/update with and without `template_id`.
+     * [ ] 2.9.3 Custom data validation edge cases.
+   * [ ] 2.10 Add integration tests to ensure full flow: create template → assign to calendar → retrieve calendar with template metadata.
 
 ---
 

@@ -69,11 +69,11 @@ class AnalyticsTracker {
       });
 
       if (!response.ok) {
-        console.warn('Failed to track analytics event:', event, response.status);
+        // Analytics tracking failed silently
       }
-    } catch (error) {
-      console.warn('Analytics tracking failed:', error);
-      // Don't throw - analytics failures shouldn't break the app
+       } catch {
+          // Error handled silently - analytics failures shouldn't break the app
+          // Don't throw - analytics failures shouldn't break the app
     }
   }
 

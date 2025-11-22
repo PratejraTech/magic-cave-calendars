@@ -11,7 +11,7 @@ export interface MediaAsset {
   storage_path: string;
   public_url?: string;
   signed_url_expires_at?: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
   is_processed: boolean;
   processing_status: 'pending' | 'processing' | 'completed' | 'failed';
   created_at: string;
@@ -52,7 +52,7 @@ export interface CreateMediaAssetData {
   file_size_bytes: number;
   storage_path: string;
   public_url?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateSurpriseCollectionData {

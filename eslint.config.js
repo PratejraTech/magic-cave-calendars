@@ -23,6 +23,14 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      'no-console': 'error',
+    },
+  },
+  // Allow console statements in backend services
+  {
+    files: ['services/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'off',
     },
   }
 );

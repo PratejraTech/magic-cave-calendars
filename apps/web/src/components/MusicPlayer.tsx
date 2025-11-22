@@ -26,8 +26,8 @@ export function MusicPlayer() {
         setIsPlaying(true);
         setHasUnlocked(true);
         window.removeEventListener('pointerdown', handlePointerUnlock);
-      } catch (error) {
-        setIsPlaying(false);
+        } catch {
+         setIsPlaying(false);
       }
     };
 
@@ -46,7 +46,7 @@ export function MusicPlayer() {
       await playThemeAtRandomPoint(soundManager);
       setIsPlaying(true);
       setHasUnlocked(true);
-    } catch (error) {
+    } catch {
       setIsPlaying(false);
     }
   };

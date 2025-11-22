@@ -65,8 +65,8 @@ export function AuthRoute() {
             navigate('/parent-portal');
         }
       }
-    } catch (error) {
-      console.error('Auth error:', error);
+    } catch {
+      // TODO: Implement proper error logging service
       setAuthError('An unexpected error occurred. Please try again.');
     }
 

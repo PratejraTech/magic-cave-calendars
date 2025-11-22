@@ -26,7 +26,6 @@ export class SoundManager {
     this.musicPlayer.loop = true;
     this.musicPlayer.volume = 0.3;
     this.musicPlayer.preload = 'auto';
-    this.musicPlayer.playsInline = true;
   }
 
   static getInstance(): SoundManager {
@@ -40,15 +39,15 @@ export class SoundManager {
     if (this.isInitialized) return;
     const AudioContextConstructor = getAudioContextConstructor();
     if (!AudioContextConstructor) {
-      console.warn('Web Audio API not supported in this environment');
+      // TODO: Implement proper logging service
       return;
     }
 
     try {
       this.audioContext = new AudioContextConstructor();
       this.isInitialized = true;
-    } catch (error) {
-      console.warn('Failed to initialize AudioContext:', error);
+    } catch {
+      // TODO: Implement proper logging service
     }
   }
 
@@ -66,8 +65,8 @@ export class SoundManager {
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
       this.sounds.set(name, audioBuffer);
-    } catch (error) {
-      console.warn(`Failed to load sound ${name}:`, error);
+    } catch {
+      // TODO: Implement proper logging service
     }
   }
 

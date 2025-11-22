@@ -5,15 +5,16 @@ import { Template, ProductType } from '../../../lib/api';
 interface ProductSpecificCustomDataStepProps {
   selectedProductType: ProductType | null;
   selectedTemplate: Template | null;
-  customData: Record<string, any>;
-  onCustomDataChange: (data: Record<string, any>) => void;
+  customData: Record<string, unknown>;
+  onCustomDataChange: (data: Record<string, unknown>) => void;
 }
 
 interface FormField {
   key: string;
-  schema: any;
-  value: any;
+  schema: unknown;
+  value: unknown;
   error?: string;
+  visible: boolean;
 }
 
 export function ProductSpecificCustomDataStep({
@@ -43,13 +44,22 @@ export function ProductSpecificCustomDataStep({
           schema: fieldSchema,
           value: customData[key] || getDefaultValue(fieldSchema),
           error: undefined,
+          visible: true, // Will be updated by conditional logic
         });
       });
     }
 
     setFormFields(fields);
+    updateFieldVisibility(fields);
     validateForm(fields);
   }, [selectedTemplate, customData]);
+
+  // Update field visibility when form data changes
+  useEffect(() => {
+    if (formFields.length > 0) {
+      updateFieldVisibility(formFields);
+    }
+  }, [customData]);
 
   const getDefaultValue = (schema: any): any => {
     if (schema.default !== undefined) return schema.default;
@@ -71,6 +81,61 @@ export function ProductSpecificCustomDataStep({
 
     setFormFields(updatedFields);
     setIsValid(valid);
+  };
+
+  const updateFieldVisibility = (fields: FormField[]) => {
+    const updatedFields = fields.map(field => {
+      const visible = evaluateFieldVisibility(field.key, field.schema, customData);
+      return { ...field, visible };
+    });
+
+    setFormFields(updatedFields);
+  };
+
+  const evaluateFieldVisibility = (fieldKey: string, schema: any, formData: Record<string, unknown>): boolean => {
+    // Check if/then/else conditional logic
+    if (schema.if) {
+      const condition = schema.if;
+      const conditionMet = evaluateCondition(condition, formData);
+
+      if (conditionMet && schema.then) {
+        // Field should be visible based on 'then' clause
+        return true;
+      } else if (!conditionMet && schema.else) {
+        // Field should be hidden based on 'else' clause
+        return false;
+      }
+    }
+
+    // Check dependencies (simpler conditional logic)
+    if (schema.dependencies) {
+      for (const [depField, depValue] of Object.entries(schema.dependencies)) {
+        const currentValue = formData[depField];
+        if (Array.isArray(depValue)) {
+          if (!depValue.includes(currentValue)) {
+            return false;
+          }
+        } else if (currentValue !== depValue) {
+          return false;
+        }
+      }
+    }
+
+    // Default to visible
+    return true;
+  };
+
+  const evaluateCondition = (condition: any, formData: Record<string, unknown>): boolean => {
+    // Simple condition evaluation - can be extended for more complex logic
+    if (condition.properties) {
+      for (const [prop, expectedValue] of Object.entries(condition.properties)) {
+        if (formData[prop] !== expectedValue) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return true;
   };
 
   const validateField = (key: string, value: any, schema: any): string | undefined => {
@@ -376,7 +441,7 @@ export function ProductSpecificCustomDataStep({
               </p>
             </div>
           ) : (
-            formFields.map(renderField)
+             formFields.filter(field => field.visible).map(renderField)
           )}
         </div>
       </div>

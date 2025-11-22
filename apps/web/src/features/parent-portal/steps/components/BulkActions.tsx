@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, Trash2, Save } from 'lucide-react';
 import { httpClient } from '../../../../lib/httpClient';
+import { isAiContentGenerationEnabled } from '../../../../lib/featureFlags';
 import { DayEntry } from './DayCard';
 
 interface BulkActionsProps {
@@ -8,9 +9,11 @@ interface BulkActionsProps {
   onBulkUpdate: (updates: { [dayNumber: number]: Partial<DayEntry> }) => void;
   onSaveAll: () => Promise<void>;
   calendarId: string;
+  templateId?: string;
+  customData?: Record<string, any>;
 }
 
-export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId }: BulkActionsProps) {
+export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId, templateId, customData }: BulkActionsProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -20,24 +23,24 @@ export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId }:
     setGenerationError(null);
 
     try {
-      // Call AI generation endpoint
-      const response = await httpClient.post(`/calendars/${calendarId}/generate-messages`, {
-        // The backend will generate messages for all days
-      }) as { data: { messages: { dayNumber: number; message: string }[] } };
+      // Use template-based generation if template info is available, otherwise fall back to legacy endpoint
+      if (templateId && customData) {
+        // Call new AI content generation endpoint
+        const response = await httpClient.post(`/calendars/${calendarId}/generate-content`, {
+          template_id: templateId,
+          custom_data: customData
+        }) as { data: { generated_days: number; chat_persona_prompt: string; surprise_urls: string[] } };
 
-      // Update all day entries with generated messages
-      const updates: { [dayNumber: number]: Partial<DayEntry> } = {};
-      response.data.messages.forEach((messageData: { dayNumber: number; message: string }) => {
-        updates[messageData.dayNumber] = {
-          message: messageData.message,
-          isValid: true
-        };
-      });
-
-      onBulkUpdate(updates);
+        // Refresh the calendar data to get the newly generated content
+        // The backend has already updated the calendar days, so we need to reload
+        window.location.reload(); // Simple approach - in production, we'd fetch and update the data
+      } else {
+        // Fallback to legacy generation (if still available)
+        setGenerationError('Template information not available. Please ensure you have selected a template.');
+      }
     } catch (error: any) {
-      console.error('Failed to generate messages:', error);
-      setGenerationError(error.response?.data?.message || 'Failed to generate messages. Please try again.');
+      // TODO: Implement proper logging service
+      setGenerationError(error.response?.data?.message || 'Failed to generate content. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -88,7 +91,8 @@ export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId }:
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* AI Generate Messages */}
-        <button
+        {isAiContentGenerationEnabled() && (
+          <button
           onClick={handleGenerateAllMessages}
           disabled={isGenerating}
           className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-medium rounded-lg hover:from-purple-600 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -101,11 +105,12 @@ export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId }:
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
-              Generate All Messages
-            </>
-          )}
-        </button>
+               <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
+               Generate All Messages
+             </>
+           )}
+         </button>
+        )}
 
         {/* Clear All Photos */}
         <button
@@ -159,7 +164,9 @@ export function BulkActions({ dayEntries, onBulkUpdate, onSaveAll, calendarId }:
 
       {/* Help Text */}
       <div className="text-sm text-gray-600 space-y-1">
-        <p id="generate-messages-description"><strong>AI Generation:</strong> Automatically create personalized messages for all 24 days based on your child's profile.</p>
+        {isAiContentGenerationEnabled() && (
+          <p id="generate-messages-description"><strong>AI Generation:</strong> Automatically create personalized messages for all 24 days based on your child's profile and selected template.</p>
+        )}
         <p id="clear-photos-description"><strong>Clear Photos:</strong> Remove all uploaded photos from calendar days.</p>
         <p id="reset-messages-description"><strong>Reset Messages:</strong> Clear all message text from calendar days.</p>
         <p id="save-all-description"><strong>Save All:</strong> Manually save all pending changes to the server.</p>

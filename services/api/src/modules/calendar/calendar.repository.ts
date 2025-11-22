@@ -5,6 +5,7 @@ export interface Calendar {
   calendar_id: string;
   account_id: string;
   child_id: string;
+  template_id: string | null;
   share_uuid: string;
   is_published: boolean;
   year: number;
@@ -24,6 +25,8 @@ export interface CreateCalendarData {
   account_id: string;
   child_id: string;
   year: number;
+  template_id?: string | null; // Optional template selection
+  custom_data?: Record<string, unknown>; // Custom data from template forms
 }
 
 export interface UpdateCalendarData {
@@ -110,7 +113,9 @@ export class CalendarRepository {
         account_id: calendarData.account_id,
         child_id: calendarData.child_id,
         year: calendarData.year,
-      })
+        template_id: calendarData.template_id,
+        custom_data: calendarData.custom_data,
+      } as any)
       .select()
       .single();
 
@@ -121,7 +126,7 @@ export class CalendarRepository {
   async update(calendarId: string, updateData: UpdateCalendarData): Promise<Calendar> {
     const { data, error } = await this.supabase
       .from('advent_calendar_v2')
-      .update(updateData)
+      .update(updateData as any)
       .eq('calendar_id', calendarId)
       .select()
       .single();
@@ -174,7 +179,7 @@ export class CalendarRepository {
         day_number: dayData.day_number,
         photo_url: dayData.photo_url,
         text_content: dayData.text_content,
-      })
+      } as any)
       .select()
       .single();
 
@@ -185,7 +190,7 @@ export class CalendarRepository {
   async updateDay(dayId: string, updateData: UpdateCalendarDayData): Promise<CalendarDay> {
     const { data, error } = await this.supabase
       .from('calendar_day_v2')
-      .update(updateData)
+      .update(updateData as any)
       .eq('day_id', dayId)
       .select()
       .single();
@@ -211,7 +216,7 @@ export class CalendarRepository {
 
     const { error } = await this.supabase
       .from('calendar_day_v2')
-      .insert(days);
+      .insert(days as any);
 
     if (error) throw error;
   }

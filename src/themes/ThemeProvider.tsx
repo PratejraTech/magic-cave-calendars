@@ -3,7 +3,7 @@
  * Provides theme context throughout the application
  */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ThemeTemplate, getThemeById, resolveThemeInheritance, BASE_THEMES } from './definitions';
 
 interface ThemeContextType {
@@ -35,7 +35,7 @@ export function ThemeProvider({ children, defaultThemeId = 'snow' }: ThemeProvid
         const theme = resolveThemeInheritance(defaultThemeId);
         setCurrentTheme(theme);
       } catch (error) {
-        console.error('Failed to load theme:', error);
+        // Error handled silently - could fallback to default theme
         // Fallback to snow theme
         const fallbackTheme = getThemeById('snow');
         if (fallbackTheme) {
@@ -57,7 +57,7 @@ export function ThemeProvider({ children, defaultThemeId = 'snow' }: ThemeProvid
       // Store theme preference (could be localStorage or user preferences)
       localStorage.setItem('advent-calendar-theme', themeId);
     } catch (error) {
-      console.error('Failed to set theme:', error);
+        // Error handled silently - theme change failed
     }
   };
 

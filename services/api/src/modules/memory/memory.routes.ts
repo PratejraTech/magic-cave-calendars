@@ -16,8 +16,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       const limit = parseInt(req.query.limit as string) || 50;
       const fragments = await memoryService.getMemoryFragmentsBySession(sessionId, limit);
       res.json(fragments);
-    } catch (error) {
-      console.error('Error fetching memory fragments:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -34,8 +34,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       const limit = parseInt(req.query.limit as string) || 100;
       const fragments = await memoryService.getMemoryFragmentsByChild(childId, limit);
       res.json(fragments);
-    } catch (error) {
-      console.error('Error fetching memory fragments:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -62,8 +62,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       );
 
       res.status(201).json(fragment);
-    } catch (error) {
-      console.error('Error creating memory fragment:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -80,8 +80,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       const limit = parseInt(req.query.limit as string) || 100;
       const embeddings = await memoryService.getMemoryEmbeddingsByChild(childId, limit);
       res.json(embeddings);
-    } catch (error) {
-      console.error('Error fetching memory embeddings:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -108,8 +108,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       );
 
       res.json(similarMemories);
-    } catch (error) {
-      console.error('Error searching memory embeddings:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -153,8 +153,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       );
 
       res.status(201).json(embedding);
-    } catch (error) {
-      console.error('Error creating memory embedding:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -184,8 +184,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
       }
 
       res.json(updatedEmbedding);
-    } catch (error) {
-      console.error('Error updating memory embedding relevance:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -201,8 +201,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
 
       await memoryService.recordMemoryAccess(embeddingId);
       res.status(200).json({ success: true });
-    } catch (error) {
-      console.error('Error recording memory access:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -218,8 +218,8 @@ export function createMemoryRoutes(memoryService: MemoryService) {
 
       const existingEmbedding = await memoryService.getMemoryByContentHash(childId, contentHash);
       res.json({ exists: !!existingEmbedding, embedding: existingEmbedding });
-    } catch (error) {
-      console.error('Error checking memory embedding:', error);
+    } catch {
+      console.error('Memory error:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

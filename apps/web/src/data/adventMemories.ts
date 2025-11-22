@@ -14,15 +14,15 @@ const titleSeeds = [
 const messageSeeds: Array<(day: number) => string> = [
   (day) =>
     `Day ${day} begins with twinkling heart-lanterns and a swirl of pastel wings who whisper, "You make the sky brighter!"`,
-  (_day) =>
+  () =>
     `Take a deep breath and blow gentle kisses into the air—friendly butterflies will carry them to someone who needs a hug today.`,
-  (_day) =>
+  () =>
     `Build a tiny trail of love-heart pebbles and follow it to a giggling butterfly who shares a secret dance just for you.`,
-  (_day) =>
+  () =>
     `Scoop up handfuls of shimmer snow, toss them high, and watch butterflies draw glowing rainbows while you twirl.`,
-  (_day) =>
+  () =>
     `Snuggle up with your favorite plush friend and listen closely; the butterfly choir is softly singing your name.`,
-  (_day) =>
+  () =>
     `Hop between floating heart-shaped clouds to find a jar of sparkles that transforms into wings whenever you laugh.`,
 ];
 

@@ -2,6 +2,7 @@ export type PhotoPair = {
   image: string;
   title: string;
   message: string;
+  markdown?: string;
 };
 
 export const photoPairs: PhotoPair[] = [

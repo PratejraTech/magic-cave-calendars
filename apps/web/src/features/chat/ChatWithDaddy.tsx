@@ -4,7 +4,7 @@ import {
   fetchDaddyQuotes,
   loadStoredMessages,
   persistMessages,
-  requestDaddyResponse,
+  streamDaddyResponse,
   logChatInput,
   resetSessionId,
 } from './chatService';
@@ -99,31 +99,73 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
     try {
       const payloadHistory = [...storedHistoryRef.current, ...newMessages];
       const payload = [{ role: 'system' as const, content: CHAT_SYSTEM_PROMPT }, ...payloadHistory];
-      const reply = await requestDaddyResponse(payload, quotes);
+
+      let streamingContent = '';
+      await streamDaddyResponse(
+        payload,
+        (chunk: string) => {
+          streamingContent += chunk;
+          // Update the last message with streaming content
+          setMessages(prev => {
+            const updated = [...prev];
+            if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
+              updated[updated.length - 1] = {
+                ...updated[updated.length - 1],
+                content: streamingContent,
+              };
+            } else {
+              // Add new assistant message if it doesn't exist
+              updated.push({
+                role: 'assistant',
+                content: streamingContent,
+                imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+              });
+            }
+            return updated;
+          });
+        },
+        (fullResponse: string) => {
+          const assistantMessage: ChatMessage = {
+            role: 'assistant',
+            content: fullResponse,
+            imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+          };
+          const updatedMessages = [...newMessages, assistantMessage];
+          setMessages(updatedMessages);
+          const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
+          storedHistoryRef.current = persisted;
+          persistMessages(persisted);
+        },
+        (errorMsg: string) => {
+          setError(`Streaming failed: ${errorMsg}`);
+          // Fallback to quotes
+          const fallbackQuote =
+            quotes[Math.floor(Math.random() * quotes.length)]?.text ??
+            "Daddy's thinking about you right now, sweetheart.";
+          const assistantMessage: ChatMessage = {
+            role: 'assistant',
+            content: fallbackQuote,
+            imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+          };
+          const updatedMessages = [...newMessages, assistantMessage];
+          setMessages(updatedMessages);
+          const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
+          storedHistoryRef.current = persisted;
+          persistMessages(persisted);
+        }
+      );
+    } catch (_err) {
+      const fallbackQuote =
+        quotes[Math.floor(Math.random() * quotes.length)]?.text ??
+        "Daddy's thinking about you right now, sweetheart.";
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: reply,
+        content: fallbackQuote,
         imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
       };
       const updatedMessages = [...newMessages, assistantMessage];
       setMessages(updatedMessages);
       const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
-      storedHistoryRef.current = persisted;
-      persistMessages(persisted);
-    } catch (err) {
-      const fallbackQuote =
-        quotes[Math.floor(Math.random() * quotes.length)]?.text ??
-        "Daddy's thinking about you right now, sweetheart.";
-      const updatedMessages = [
-        ...newMessages,
-        {
-          role: 'assistant',
-          content: fallbackQuote,
-          imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
-        },
-      ];
-      setMessages(updatedMessages);
-      const persisted = [...storedHistoryRef.current, userMessage, updatedMessages[updatedMessages.length - 1]].slice(-5);
       storedHistoryRef.current = persisted;
       persistMessages(persisted);
       setError('Chat service is taking a nap. Using a favorite quote instead.');

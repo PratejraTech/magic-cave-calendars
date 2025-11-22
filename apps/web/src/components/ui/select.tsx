@@ -1,9 +1,7 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {}
-
-export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(
   ({ className, children, ...props }, ref) => {
     return (
       <select
@@ -21,9 +19,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 );
 Select.displayName = 'Select';
 
-interface SelectTriggerProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export const SelectTrigger = React.forwardRef<HTMLDivElement, SelectTriggerProps>(
+export const SelectTrigger = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
@@ -39,9 +35,7 @@ export const SelectTrigger = React.forwardRef<HTMLDivElement, SelectTriggerProps
 );
 SelectTrigger.displayName = 'SelectTrigger';
 
-interface SelectValueProps extends React.HTMLAttributes<HTMLSpanElement> {}
-
-export const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
+export const SelectValue = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
   ({ className, ...props }, ref) => (
     <span
       ref={ref}
@@ -52,9 +46,7 @@ export const SelectValue = React.forwardRef<HTMLSpanElement, SelectValueProps>(
 );
 SelectValue.displayName = 'SelectValue';
 
-interface SelectContentProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
+export const SelectContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}

@@ -3,18 +3,88 @@ import { Eye, RefreshCw, AlertCircle } from 'lucide-react';
 import { ProductType, Template } from '../../../lib/api';
 import { isProductPreviewEnabled } from '../../../lib/featureFlags';
 
+// Preview content item types
+interface CalendarGridItem {
+  type: 'calendar_grid';
+  title: string;
+  description: string;
+  items: Array<{
+    day: number;
+    hasContent: boolean;
+    hasPhoto: boolean;
+  }>;
+}
+
+interface SampleDayItem {
+  type: 'sample_day';
+  title: string;
+  content: string;
+  hasPhoto: boolean;
+}
+
+interface StorybookCoverItem {
+  type: 'storybook_cover';
+  title: string;
+  author: string;
+  illustration: string;
+}
+
+interface ChapterListItem {
+  type: 'chapter_list';
+  title: string;
+  chapters: Array<{
+    number: number;
+    title: string;
+    preview: string;
+  }>;
+}
+
+interface GameLevelsItem {
+  type: 'game_levels';
+  title: string;
+  description: string;
+  levels: Array<{
+    number: number;
+    name: string;
+    difficulty: string;
+    completed: boolean;
+  }>;
+}
+
+interface GameFeaturesItem {
+  type: 'game_features';
+  title: string;
+  features: string[];
+}
+
+interface DefaultPreviewItem {
+  type: string;
+  title?: string;
+  content?: string;
+  [key: string]: unknown;
+}
+
+type PreviewContentItem =
+  | CalendarGridItem
+  | SampleDayItem
+  | StorybookCoverItem
+  | ChapterListItem
+  | GameLevelsItem
+  | GameFeaturesItem
+  | DefaultPreviewItem;
+
 interface ProductPreviewProps {
   selectedProductType: ProductType | null;
   selectedTemplate: Template | null;
-  customData: Record<string, any>;
-  onPreviewUpdate?: (previewData: any) => void;
+  customData: Record<string, unknown>;
+  onPreviewUpdate?: (previewData: PreviewData) => void;
 }
 
 interface PreviewData {
   title: string;
   description: string;
   thumbnail: string;
-  content: any[];
+  content: PreviewContentItem[];
   theme: string;
   estimatedCompletion: string;
 }
@@ -56,7 +126,7 @@ export function ProductPreview({
         onPreviewUpdate(mockPreview);
       }
     } catch (err) {
-      console.error('Failed to generate preview:', err);
+      // TODO: Implement proper logging service
       setError('Failed to generate preview. Please try again.');
     } finally {
       setLoading(false);
@@ -65,11 +135,11 @@ export function ProductPreview({
 
   const generateMockPreview = (): PreviewData => {
     const basePreview: PreviewData = {
-      title: customData.title || `${selectedProductType!.name} Preview`,
+      title: (customData.title as string) || `${selectedProductType!.name} Preview`,
       description: `A preview of your ${selectedProductType!.name.toLowerCase()}`,
       thumbnail: getProductTypeThumbnail(selectedProductType!.id),
       content: [],
-      theme: customData.theme || 'snow',
+      theme: (customData.theme as string) || 'snow',
       estimatedCompletion: '2-3 minutes',
     };
 
@@ -91,14 +161,14 @@ export function ProductPreview({
     return basePreview;
   };
 
-  const generateCalendarPreview = (): any[] => {
-    const days = customData.days || 24;
+  const generateCalendarPreview = (): PreviewContentItem[] => {
+    const days = (customData.days as number) || 24;
     return [
       {
         type: 'calendar_grid',
         title: 'Advent Calendar Layout',
         description: `${days} magical days arranged in a beautiful grid`,
-        items: Array.from({ length: Math.min(days, 6) }, (_, i) => ({
+        items: Array.from({ length: Math.min(days as number, 6) }, (_, i) => ({
           day: i + 1,
           hasContent: Math.random() > 0.3,
           hasPhoto: Math.random() > 0.5,
@@ -107,19 +177,19 @@ export function ProductPreview({
       {
         type: 'sample_day',
         title: 'Sample Day Content',
-        content: customData.sampleMessage || 'A magical message for this special day! 🎄',
+        content: (customData.sampleMessage as string) || 'A magical message for this special day! 🎄',
         hasPhoto: true
       }
     ];
   };
 
-  const generateStorybookPreview = (): any[] => {
-    const chapters = customData.chapters || 5;
+  const generateStorybookPreview = (): PreviewContentItem[] => {
+    const chapters = (customData.chapters as number) || 5;
     return [
       {
         type: 'storybook_cover',
-        title: customData.title || 'My Storybook',
-        author: customData.author || 'A Magical Tale',
+        title: (customData.title as string) || 'My Storybook',
+        author: (customData.author as string) || 'A Magical Tale',
         illustration: 'storybook-cover.jpg'
       },
       {
@@ -134,8 +204,8 @@ export function ProductPreview({
     ];
   };
 
-  const generateGamePreview = (): any[] => {
-    const levels = customData.levels || 10;
+  const generateGamePreview = (): PreviewContentItem[] => {
+    const levels = (customData.levels as number) || 10;
     return [
       {
         type: 'game_levels',
@@ -275,15 +345,16 @@ export function ProductPreview({
   );
 }
 
-function renderPreviewItem(item: any) {
+function renderPreviewItem(item: PreviewContentItem) {
   switch (item.type) {
-    case 'calendar_grid':
+    case 'calendar_grid': {
+      const calendarItem = item as CalendarGridItem;
       return (
         <div>
-          <h5 className="font-medium text-gray-900 mb-2">{item.title}</h5>
-          <p className="text-sm text-gray-600 mb-3">{item.description}</p>
+          <h5 className="font-medium text-gray-900 mb-2">{calendarItem.title}</h5>
+          <p className="text-sm text-gray-600 mb-3">{calendarItem.description}</p>
           <div className="grid grid-cols-3 gap-2">
-            {item.items.map((dayItem: any, idx: number) => (
+            {calendarItem.items.map((dayItem, idx) => (
               <div
                 key={idx}
                 className={`aspect-square rounded border-2 flex items-center justify-center text-xs font-medium ${
@@ -299,14 +370,16 @@ function renderPreviewItem(item: any) {
           </div>
         </div>
       );
+    }
 
-    case 'sample_day':
+    case 'sample_day': {
+      const sampleItem = item as SampleDayItem;
       return (
         <div>
-          <h5 className="font-medium text-gray-900 mb-2">{item.title}</h5>
+          <h5 className="font-medium text-gray-900 mb-2">{sampleItem.title}</h5>
           <div className="bg-gray-50 rounded p-3">
-            <p className="text-sm text-gray-700 mb-2">{item.content}</p>
-            {item.hasPhoto && (
+            <p className="text-sm text-gray-700 mb-2">{sampleItem.content}</p>
+            {sampleItem.hasPhoto && (
               <div className="w-full h-16 bg-gray-200 rounded flex items-center justify-center">
                 <span className="text-xs text-gray-500">📷 Photo</span>
               </div>
@@ -314,24 +387,28 @@ function renderPreviewItem(item: any) {
           </div>
         </div>
       );
+    }
 
-    case 'storybook_cover':
+    case 'storybook_cover': {
+      const coverItem = item as StorybookCoverItem;
       return (
         <div className="text-center">
           <div className="w-24 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
             <span className="text-2xl">📖</span>
           </div>
-          <h5 className="font-medium text-gray-900">{item.title}</h5>
-          <p className="text-sm text-gray-600">by {item.author}</p>
+          <h5 className="font-medium text-gray-900">{coverItem.title}</h5>
+          <p className="text-sm text-gray-600">by {coverItem.author}</p>
         </div>
       );
+    }
 
-    case 'chapter_list':
+    case 'chapter_list': {
+      const chapterItem = item as ChapterListItem;
       return (
         <div>
-          <h5 className="font-medium text-gray-900 mb-3">{item.title}</h5>
+          <h5 className="font-medium text-gray-900 mb-3">{chapterItem.title}</h5>
           <div className="space-y-2">
-            {item.chapters.map((chapter: any) => (
+            {chapterItem.chapters.map((chapter) => (
               <div key={chapter.number} className="flex items-center space-x-3">
                 <div className="w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-medium">
                   {chapter.number}
@@ -345,14 +422,16 @@ function renderPreviewItem(item: any) {
           </div>
         </div>
       );
+    }
 
-    case 'game_levels':
+    case 'game_levels': {
+      const levelsItem = item as GameLevelsItem;
       return (
         <div>
-          <h5 className="font-medium text-gray-900 mb-2">{item.title}</h5>
-          <p className="text-sm text-gray-600 mb-3">{item.description}</p>
+          <h5 className="font-medium text-gray-900 mb-2">{levelsItem.title}</h5>
+          <p className="text-sm text-gray-600 mb-3">{levelsItem.description}</p>
           <div className="space-y-2">
-            {item.levels.map((level: any) => (
+            {levelsItem.levels.map((level) => (
               <div key={level.number} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
@@ -370,13 +449,15 @@ function renderPreviewItem(item: any) {
           </div>
         </div>
       );
+    }
 
-    case 'game_features':
+    case 'game_features': {
+      const featuresItem = item as GameFeaturesItem;
       return (
         <div>
-          <h5 className="font-medium text-gray-900 mb-3">{item.title}</h5>
+          <h5 className="font-medium text-gray-900 mb-3">{featuresItem.title}</h5>
           <div className="grid grid-cols-2 gap-2">
-            {item.features.map((feature: string, idx: number) => (
+            {featuresItem.features.map((feature, idx) => (
               <div key={idx} className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <span className="text-sm text-gray-700">{feature}</span>
@@ -385,13 +466,16 @@ function renderPreviewItem(item: any) {
           </div>
         </div>
       );
+    }
 
-    default:
+    default: {
+      const defaultItem = item as DefaultPreviewItem;
       return (
         <div>
-          <h5 className="font-medium text-gray-900 mb-2">{item.title || 'Preview Item'}</h5>
-          <p className="text-sm text-gray-600">{item.content || 'Content preview not available'}</p>
+          <h5 className="font-medium text-gray-900 mb-2">{defaultItem.title || 'Preview Item'}</h5>
+          <p className="text-sm text-gray-600">{defaultItem.content || 'Content preview not available'}</p>
         </div>
       );
+    }
   }
 }

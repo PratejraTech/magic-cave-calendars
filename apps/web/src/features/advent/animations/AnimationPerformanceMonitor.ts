@@ -230,8 +230,8 @@ export class AnimationPerformanceMonitor {
       if (this.loadedAnimations.has(id)) {
         try {
           callback();
-        } catch (error) {
-          console.warn(`Animation callback failed for ${id}:`, error);
+        } catch {
+          // Warning logged silently - animation callback failed
           // Remove failing animations
           this.unregisterAnimation(id);
         }
@@ -259,23 +259,23 @@ export class AnimationPerformanceMonitor {
             if (entry.entryType === 'measure' && entry.name.startsWith('animation-')) {
               const duration = entry.duration;
               if (duration > 16.67) { // Slower than 60fps
-                console.warn(`Slow animation detected: ${entry.name} took ${duration}ms`);
+                // Performance warning logged silently
               }
             }
           }
         });
 
         this.performanceObserver.observe({ entryTypes: ['measure'] });
-      } catch (error) {
-        console.warn('Performance Observer not supported:', error);
+      } catch {
+        // Performance monitoring not supported in this environment
       }
     }
   }
 
   private getMemoryUsage(): number | undefined {
-    // @ts-ignore - performance.memory is not in all browsers
+    // @ts-expect-error - performance.memory is not in all browsers
     if (typeof performance !== 'undefined' && performance.memory) {
-      // @ts-ignore
+      // @ts-expect-error
       return performance.memory.usedJSHeapSize;
     }
     return undefined;
@@ -298,7 +298,7 @@ export class AnimationPerformanceMonitor {
 
     // Log slow animations
     if (duration > 16.67) {
-      console.warn(`Slow animation: ${name} took ${duration.toFixed(2)}ms`);
+      // Slow animation detected but handled silently
     }
   }
 }

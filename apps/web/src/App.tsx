@@ -47,6 +47,8 @@ function App() {
                 <Route path="/product/:shareUuid" element={<ProductViewRoute />} />
                 {/* Backward compatibility: redirect calendar URLs to product URLs */}
                 <Route path="/calendar/:shareUuid" element={<CalendarRedirect />} />
+                {/* Health check endpoint */}
+                <Route path="/health" element={<pre>{JSON.stringify({ status: "healthy", service: "advent-frontend" }, null, 2)}</pre>} />
                 <Route path="*" element={<Navigate to="/auth" replace />} />
               </Routes>
             </RootLayout>

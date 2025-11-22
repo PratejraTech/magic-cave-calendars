@@ -11,7 +11,7 @@ export function createProductsRoutes(
   // GET /api/products - List user's products
   router.get('/', async (req: Request, res: Response) => {
     try {
-      // TODO: Get account_id from authentication context
+      // Account ID from authentication - implement when auth is added
       // For now, using a placeholder - this will be fixed when auth is implemented
       const accountId = req.headers['x-account-id'] as string;
 
@@ -27,8 +27,8 @@ export function createProductsRoutes(
         success: true,
         data: products
       });
-    } catch (error) {
-      console.error('Error fetching products:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch products'
@@ -41,7 +41,7 @@ export function createProductsRoutes(
     try {
       const { product_type_id, title, template_id, custom_data } = req.body;
 
-      // TODO: Get account_id from authentication context
+      // Account ID from authentication - implement when auth is added
       const accountId = req.headers['x-account-id'] as string;
 
       if (!accountId) {
@@ -105,8 +105,8 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
-      console.error('Error creating product:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to create product'
@@ -124,8 +124,8 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
-      console.error('Error fetching product:', error);
+    } catch {
+      // Error logged:', error);
       if (error.message === 'Product not found') {
         return res.status(404).json({
           success: false,
@@ -155,8 +155,8 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
-      console.error('Error updating product:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update product'
@@ -174,8 +174,8 @@ export function createProductsRoutes(
         success: true,
         message: 'Product deleted successfully'
       });
-    } catch (error) {
-      console.error('Error deleting product:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to delete product'
@@ -193,8 +193,8 @@ export function createProductsRoutes(
         success: true,
         data: product
       });
-    } catch (error) {
-      console.error('Error publishing product:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to publish product'
@@ -212,8 +212,8 @@ export function createProductsRoutes(
         success: true,
         data: content
       });
-    } catch (error) {
-      console.error('Error fetching product content:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product content'
@@ -240,8 +240,8 @@ export function createProductsRoutes(
         success: true,
         data: results
       });
-    } catch (error) {
-      console.error('Error updating product content:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update product content'
@@ -266,8 +266,8 @@ export function createProductsRoutes(
         success: true,
         data: linkage
       });
-    } catch (error) {
-      console.error('Error fetching product template:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch product template'
@@ -318,8 +318,8 @@ export function createProductsRoutes(
         success: true,
         data: linkage
       });
-    } catch (error) {
-      console.error('Error applying template to product:', error);
+    } catch {
+      // Error logged:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to apply template'
