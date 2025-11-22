@@ -105,16 +105,16 @@ Follow this file and record state in **bridge.md**
 
 ---
 
-* [ ] 2.0 Extend Data Model for Product Types & Generalized Templates
+* [x] 2.0 Extend Data Model for Product Types & Generalized Templates
 
-  * [ ] 2.1 Design product_type table: id, name, description, default_content_schema (JSON), supported_features (array), created_at, updated_at.
-  * [ ] 2.2 Create product table: id, account_id, product_type_id, title, status, created_at, updated_at (generalizing calendar table).
-  * [ ] 2.3 Create product_content table: id, product_id, day_number, content_type, content_data (JSON), generated_at (generalizing calendar_day).
-  * [ ] 2.4 Update template_catalog: add product_type_id column, make compatible_themes optional, add product_specific_config (JSON).
-  * [ ] 2.5 Create product_template_linkage table: product_id, template_id, custom_data (JSON), applied_at.
-  * [ ] 2.6 Write Supabase migrations for new tables and relationships.
-  * [ ] 2.7 Update TypeScript ORM models to reflect generalized schema.
-  * [ ] 2.8 Implement database constraints and indexes for performance.
+  * [x] 2.1 Design product_type table: id, name, description, default_content_schema (JSON), supported_features (array), created_at, updated_at.
+  * [x] 2.2 Create product table: id, account_id, product_type_id, title, status, created_at, updated_at (generalizing calendar table).
+  * [x] 2.3 Create product_content table: id, product_id, day_number, content_type, content_data (JSON), generated_at (generalizing calendar_day).
+  * [x] 2.4 Update template_catalog: add product_type_id column, make compatible_themes optional, add product_specific_config (JSON).
+  * [x] 2.5 Create product_template_linkage table: product_id, template_id, custom_data (JSON), applied_at.
+  * [x] 2.6 Write Supabase migrations for new tables and relationships.
+  * [x] 2.7 Update TypeScript ORM models to reflect generalized schema.
+  * [x] 2.8 Implement database constraints and indexes for performance.
 
 ---
 
