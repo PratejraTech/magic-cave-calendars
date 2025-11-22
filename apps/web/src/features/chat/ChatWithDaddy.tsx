@@ -4,7 +4,8 @@ import {
   fetchDaddyQuotes,
   loadStoredMessages,
   persistMessages,
-  streamDaddyResponse,
+  requestDaddyResponse,
+  requestDaddyResponseStreaming,
   logChatInput,
   resetSessionId,
 } from './chatService';
@@ -24,6 +25,8 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
   const [quotes, setQuotes] = useState<DaddyQuote[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
+  const [currentStreamingMessage, setCurrentStreamingMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const soundManager = SoundManager.getInstance();
@@ -93,6 +96,8 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
     setMessages(newMessages);
     setInput('');
     setLoading(true);
+    setStreaming(true);
+    setCurrentStreamingMessage('');
     setError(null);
     logChatInput(userMessage);
 
@@ -100,31 +105,14 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
       const payloadHistory = [...storedHistoryRef.current, ...newMessages];
       const payload = [{ role: 'system' as const, content: CHAT_SYSTEM_PROMPT }, ...payloadHistory];
 
-      let streamingContent = '';
-      await streamDaddyResponse(
+      const cleanup = requestDaddyResponseStreaming(
         payload,
-        (chunk: string) => {
-          streamingContent += chunk;
-          // Update the last message with streaming content
-          setMessages(prev => {
-            const updated = [...prev];
-            if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
-              updated[updated.length - 1] = {
-                ...updated[updated.length - 1],
-                content: streamingContent,
-              };
-            } else {
-              // Add new assistant message if it doesn't exist
-              updated.push({
-                role: 'assistant',
-                content: streamingContent,
-                imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
-              });
-            }
-            return updated;
-          });
+        quotes,
+        (chunk) => {
+          setCurrentStreamingMessage(prev => prev + chunk);
         },
-        (fullResponse: string) => {
+        (fullResponse) => {
+          setStreaming(false);
           const assistantMessage: ChatMessage = {
             role: 'assistant',
             content: fullResponse,
@@ -135,42 +123,51 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
           const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
           storedHistoryRef.current = persisted;
           persistMessages(persisted);
+          setLoading(false);
         },
-        (errorMsg: string) => {
-          setError(`Streaming failed: ${errorMsg}`);
-          // Fallback to quotes
+        (error) => {
+          setStreaming(false);
+          setLoading(false);
           const fallbackQuote =
             quotes[Math.floor(Math.random() * quotes.length)]?.text ??
             "Daddy's thinking about you right now, sweetheart.";
-          const assistantMessage: ChatMessage = {
-            role: 'assistant',
-            content: fallbackQuote,
-            imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
-          };
-          const updatedMessages = [...newMessages, assistantMessage];
+          const updatedMessages = [
+            ...newMessages,
+            {
+              role: 'assistant' as const,
+              content: fallbackQuote,
+              imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+            },
+          ];
           setMessages(updatedMessages);
-          const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
+          const persisted = [...storedHistoryRef.current, userMessage, updatedMessages[updatedMessages.length - 1]].slice(-5);
           storedHistoryRef.current = persisted;
           persistMessages(persisted);
+          setError('Chat service is taking a nap. Using a favorite quote instead.');
         }
       );
-    } catch (_err) {
+
+      // Store cleanup function for potential cancellation
+      // Note: In a real implementation, you might want to store this for cleanup
+    } catch (err) {
+      setStreaming(false);
+      setLoading(false);
       const fallbackQuote =
         quotes[Math.floor(Math.random() * quotes.length)]?.text ??
         "Daddy's thinking about you right now, sweetheart.";
-      const assistantMessage: ChatMessage = {
-        role: 'assistant',
-        content: fallbackQuote,
-        imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
-      };
-      const updatedMessages = [...newMessages, assistantMessage];
+      const updatedMessages = [
+        ...newMessages,
+        {
+          role: 'assistant' as const,
+          content: fallbackQuote,
+          imageUrl: Math.random() < 0.4 ? getRandomPhoto() : undefined,
+        },
+      ];
       setMessages(updatedMessages);
-      const persisted = [...storedHistoryRef.current, userMessage, assistantMessage].slice(-5);
+      const persisted = [...storedHistoryRef.current, userMessage, updatedMessages[updatedMessages.length - 1]].slice(-5);
       storedHistoryRef.current = persisted;
       persistMessages(persisted);
       setError('Chat service is taking a nap. Using a favorite quote instead.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -220,7 +217,12 @@ export function ChatWithDaddy({ isOpen, onClose }: ChatWithDaddyProps) {
             )}
           </div>
         ))}
-        {loading && (
+        {streaming && (
+          <div className="mr-auto max-w-xl rounded-2xl px-4 py-3 shadow-lg bg-white/90 text-slate-900">
+            <div>{currentStreamingMessage}<span className="animate-pulse">|</span></div>
+          </div>
+        )}
+        {loading && !streaming && (
           <div className="mr-auto flex items-center gap-2 text-sm text-cyan-200">
             <span>Daddy is typing</span>
             <span className="flex items-center gap-1">
